@@ -170,12 +170,19 @@
 
 (defn tutorials-comp []
   [:div
-   (if (zero? (:tutorial-no @state))
+   (cond
+     (zero? (:tutorial-no @state))
      [:span
       [:button {:on-click (tutorial-fu inc)} "Go to next example"]
       [:button
          {:on-click (tutorial-fu (fn [_] (dec (count tutorials))))}
          "Go to rocket launch"]]
+     (= (:tutorial-no @state) (dec (count tutorials)))
+     [:span
+      [:button
+       {:on-click (tutorial-fu (fn [_] (dec (dec (count tutorials)))))}
+       "Go to previous example"]]
+     :else
      [:span
       [:button {:on-click (tutorial-fu #(- % 5))} "<<"]
       [:button {:on-click (tutorial-fu #(+ % 5))} ">>"]
@@ -249,19 +256,21 @@
           [tutorials-comp]
           [reagent-comp]
           (when (:result @state)
-            [:table {:style {:width "100%"}}
-             [:thead
-              [:tr {:align :left}
-               [:th {:style {:width "50%"}} "Output"]
-               (when (< 1 (:tutorial-no @state)) [:th "Code"])]]
-             [:tbody
-              [:tr
-               [:td {:align :top}
-                (when-let [so (:stdout @state)]
-                  [:pre so])
-                [:pre (:result @state)]]
-               (when (< 1 (:tutorial-no @state))
-                 [:td {:align :top} [:pre (:code @state)]])]]])])}
+            (let [showcode? (< 1 (:tutorial-no @state) (dec (count tutorials)))]
+              (when (< (:tutorial-no @state) (dec (count tutorials)))
+                [:table {:style {:width "100%"}}
+                 [:thead
+                  [:tr {:align :left}
+                   [:th {:style {:width "50%"}} "Output"]
+                   (when showcode? [:th "Code"])]]
+                 [:tbody
+                  [:tr
+                   [:td {:align :top}
+                    (when-let [so (:stdout @state)]
+                      [:pre so])
+                    [:pre (:result @state)]]
+                   (when showcode?
+                     [:td {:align :top} [:pre (:code @state)]])]]])))])}
       (when menu
         {:component-did-update (fn []
                                  (.select (gdom/getElement "xmltext"))
