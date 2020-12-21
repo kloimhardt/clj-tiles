@@ -6,6 +6,7 @@
    [sci.core :as sci]
    ["blockly" :as blockly]
    [cljtiles.xmlparse :as edn->code]
+   [cljtiles.tutorials-0 :as t-0]
    [cljtiles.tutorials-a :as t-a]
    [cljtiles.tutorials-b :as t-b]
    [cljtiles.tutorials-c :as t-c]
@@ -21,9 +22,12 @@
 
 (def menu false)
 
-(def tutorials (vec (concat t-a/vect t-b/vect t-c/vect t-d/vect t-e/vect
-                            t-f/vect)))
+(def tutorials (vec (concat t-0/vect
+                            t-a/vect t-b/vect
+                            t-c/vect t-d/vect
+                            t-e/vect t-f/vect)))
 (def chapters (vec (concat
+                     (repeat (count t-0/vect) "0")
                      (repeat (count t-a/vect) "I")
                      (repeat (count t-b/vect) "II")
                      (repeat (count t-c/vect) "III")
@@ -115,7 +119,6 @@
   (reset! counter 0)
   msg)
 
-
 (defn start-timer [fu ms max msg]
   (when-not @timer
     (reset! timer
@@ -171,8 +174,8 @@
 (defn tutorials-comp []
   [:div
    (cond
-     (zero? (:tutorial-no @state))
-     [:span
+     #_(zero? (:tutorial-no @state))
+     #_[:span
       [:button {:on-click (tutorial-fu inc)} "Go to next example"]
       [:button
          {:on-click (tutorial-fu (fn [_] (dec (count tutorials))))}
