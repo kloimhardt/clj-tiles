@@ -12,6 +12,7 @@
 ;; npm init -y
 ;; npm install shadow-cljs
 ;; npm install blockly
+;; npm install sax
 
 ;; shadow-cljs watch cljtiles
 

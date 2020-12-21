@@ -47,6 +47,8 @@
           idx-new (inc-or-dec idx-old)
           idx (cond
                 (< -1 idx-new (count tutorials)) idx-new
+                (> 0 idx-new) 0
+                (< (dec (count tutorials)) idx-new) (dec (count tutorials))
                 (< -1 idx-old (count tutorials)) idx-old
                 :else 0)
           tut (get tutorials idx)]
@@ -61,8 +63,9 @@
     (js/initblocks blockly)
     (.inject blockly
              "blocklyDiv"
-             (when menu (clj->js {:toolbox (gdom/getElement "toolbox")
-                                  :media "/blockly/media/"})))))
+             (clj->js (merge {:scrollbars true
+                              :media "/blockly/media/"}
+                        (when menu {:toolbox (gdom/getElement "toolbox")}))))))
 
 ((tutorial-fu identity))
 
@@ -148,7 +151,7 @@
       (println erg))
     (swap! state assoc
            :stdout @theout
-           :result (my-str erg str-width)
+           :result (if (some? erg) (my-str erg str-width) "")
            :code (if (:error aug-edn-code)
                    "Cannot even parse the blocks"
                    (code->break-str str-width (:code aug-edn-code)))
@@ -166,20 +169,23 @@
   (run-code edn-code)))
 
 (defn tutorials-comp []
-  (if (zero? (:tutorial-no @state))
-    [:div
-     [:button {:on-click (tutorial-fu inc)} "Go to next example"]
-     #_[:button
-        {:on-click (tutorial-fu (fn [_] (dec (count tutorials))))}
-        "Go to rocket launch"]]
-    [:div
-     [:button {:on-click (tutorial-fu #(- % 5))} "<<"]
-     [:button {:on-click (tutorial-fu #(+ % 5))} ">>"]
-     " " (inc (:tutorial-no @state)) "/" (count tutorials) " "
-     "(" (get chapters (:tutorial-no @state)) ")" " "
-     [:button {:on-click (tutorial-fu dec)} "<"]
-     [:button {:on-click (tutorial-fu inc)} ">"]
-     ]))
+  [:div
+   (if (zero? (:tutorial-no @state))
+     [:span
+      [:button {:on-click (tutorial-fu inc)} "Go to next example"]
+      [:button
+         {:on-click (tutorial-fu (fn [_] (dec (count tutorials))))}
+         "Go to rocket launch"]]
+     [:span
+      [:button {:on-click (tutorial-fu #(- % 5))} "<<"]
+      [:button {:on-click (tutorial-fu #(+ % 5))} ">>"]
+      " " (inc (:tutorial-no @state)) "/" (count tutorials) " "
+      "(" (get chapters (:tutorial-no @state)) ")" " "
+      [:button {:on-click (tutorial-fu dec)} "<"]
+      [:button {:on-click (tutorial-fu inc)} ">"]
+      ])
+   [:span " "]
+   [:button {:on-click startsci} "Run"]])
 
 
 (defn filter-defns [edn-code fu]
@@ -259,9 +265,7 @@
       (when menu
         {:component-did-update (fn []
                                  (.select (gdom/getElement "xmltext"))
-                                 (.execCommand js/document "copy"))})
-
-      )))
+                                 (.execCommand js/document "copy"))}))))
 
 (defn theview []
   [:div
