@@ -1,0 +1,18 @@
+{:dependencies [[reagent "1.0.0-rc1"]
+                [borkdude/sci "0.1.0"]
+                [zprint "1.0.2"]]
+ :source-paths ["src"]
+ :dev-http {8080 ["public" "node_modules"]}
+ :builds
+ {:cljtiles {:target :browser
+             :output-dir "public/target"
+             :asset-path "/target"
+             :modules {:main {:entries [cljtiles.view]}}}}}
+
+;; npm init -y
+;; npm install shadow-cljs
+;; npm install blockly
+
+;; shadow-cljs watch cljtiles
+
+;; shadow-cljs release cljtiles
