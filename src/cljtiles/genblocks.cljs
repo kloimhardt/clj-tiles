@@ -13,8 +13,8 @@
   [:block (blockmap type givenid)
    [:field {:name "nummer"} nummer]])
 
-(defmethod gen :funs-h-inp [{:keys [kopf arity argsvec]} givenid]
-  (let [type (keyword (str "funs-h-" arity "-inp"))
+(defmethod gen :h-inp [{:keys [kopf arity argsvec subtype]} givenid]
+  (let [type (keyword (str subtype "-h-" arity "-inp"))
         {:keys [id] :as bm} (blockmap type givenid)]
     (into [:block bm
            [:field {:name "kopf"} kopf]]
@@ -41,7 +41,10 @@
   {:type :num :nummer nummer})
 
 (defn fun [name & argsvec]
-  {:type :funs-h-inp :arity (inc (count argsvec)) :kopf name :argsvec argsvec})
+  {:type :h-inp :subtype "funs" :arity (inc (count argsvec)) :kopf name :argsvec argsvec})
+
+(defn fun-inli [name & argsvec]
+  (assoc (apply fun name argsvec) :subtype "inli"))
 
 (def slot {:type :slot})
 

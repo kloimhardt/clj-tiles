@@ -38,8 +38,7 @@
             (gb/text " ")
             (gb/text "Hello World!")
             (gb/fun "count" gb/slot)
-            (gb/fun "count" gb/slot)
-            )
+            (gb/fun "count" gb/slot))
    (gb/page (gb/coords [0 0] [0 50] [0 100])
             (gb/num "false")
             (gb/fun "println" (gb/num "true"))
@@ -54,6 +53,10 @@
                     gb/slot gb/slot gb/slot)
             (gb/num "true")
             (gb/num "false"))
+   (gb/page (gb/coords [0 0] [0 50] [150 50])
+            (gb/fun-inli "/" gb/slot (gb/num 2))
+            (gb/fun-inli "+" gb/slot (gb/num "40.0"))
+            (gb/num 20))
 
 
    ))
