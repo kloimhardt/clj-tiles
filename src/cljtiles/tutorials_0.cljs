@@ -57,6 +57,17 @@
             (gb/fun-inli "/" gb/slot (gb/num 2))
             (gb/fun-inli "+" gb/slot (gb/num "40.0"))
             (gb/num 20))
-
+   (gb/page (gb/coords [0 0] [0 50] [0 150] [0 200])
+            (gb/num "the-average")
+            (gb/fun-vert "def"
+                         gb/slot
+                         (gb/fun-inli "/"
+                                      (gb/fun-inli "+"
+                                                   (gb/num 20)
+                                                   (gb/num "40.0"))
+                                      (gb/num 2)))
+            (gb/num "the-average")
+            (gb/fun "println" gb/slot)
+            )
 
    ))

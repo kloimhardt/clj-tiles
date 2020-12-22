@@ -13,8 +13,8 @@
   [:block (blockmap type givenid)
    [:field {:name "nummer"} nummer]])
 
-(defmethod gen :h-inp [{:keys [kopf arity argsvec subtype]} givenid]
-  (let [type (keyword (str subtype "-h-" arity "-inp"))
+(defmethod gen :fun [{:keys [kopf arity argsvec subtype]} givenid]
+  (let [type (keyword (str subtype "-" arity "-inp"))
         {:keys [id] :as bm} (blockmap type givenid)]
     (into [:block bm
            [:field {:name "kopf"} kopf]]
@@ -41,10 +41,13 @@
   {:type :num :nummer nummer})
 
 (defn fun [name & argsvec]
-  {:type :h-inp :subtype "funs" :arity (inc (count argsvec)) :kopf name :argsvec argsvec})
+  {:type :fun :subtype "funs-h" :arity (inc (count argsvec)) :kopf name :argsvec argsvec})
 
 (defn fun-inli [name & argsvec]
-  (assoc (apply fun name argsvec) :subtype "inli"))
+  (assoc (apply fun name argsvec) :subtype "inli-h"))
+
+(defn fun-vert [name & argsvec]
+  (assoc (apply fun name argsvec) :subtype "funs-v"))
 
 (def slot {:type :slot})
 
@@ -52,3 +55,39 @@
   (mapv (fn [[x y]] [(+ x 10) (+ y 10)]) thecoords))
 
 (defn chapter [& pages] (into [] pages))
+
+(defn exp [v]
+  (if (coll? v)
+    (apply fun (first v) (map exp (rest v)))
+    (cond
+      (string? v) (text v)
+      :else (num v))))
+(comment
+
+  (exp ["println" "hello"])
+  (def a 3)
+  (defn expa [v] (num v))
+  (expa a)
+;; => {:type :num, :nummer 3}  (def u ["println" 3 4])
+(def b ["println" 3])
+(defn expb [v] (fun (first v) (num (last v))))
+(expb b)
+
+(def c ["println" 3 4])
+(defn expc [v]
+  (if (coll? v)
+    (apply fun (first v) (map expc v))
+    (num v)))
+(expc c)
+(expc 3)
+
+(defn exp [v]
+
+  (let [a (first v)
+        b (rest v)])
+  (cond
+    (seq? b) (fun a (exp (first b) (rest b)))
+    :else (num a)
+    ))
+(exp u)
+  )

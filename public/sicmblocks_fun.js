@@ -570,6 +570,34 @@ Blockly.Blocks["funs-h-3-cus"]= {
             }
         )}};
 
+    Blockly.Blocks["funs-v-3-inp"]= {
+        init: function() {this.jsonInit(
+            {
+                "type": "funs-v-3-inp",
+                "message0": "%1 %2 %3",
+                "args0": [
+                    {
+                        "type": "field_input",
+                        "name": "kopf",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-2"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-3"
+                    }
+                ],
+                "inputsInline": false,
+                "output": null,
+                "colour": 140,
+                "tooltip": "",
+                "helpUrl": ""
+            }
+        )}};
+
 Blockly.Blocks["funs-h-4-cus"]= {
     init: function() {this.jsonInit(
         {
@@ -627,6 +655,38 @@ Blockly.Blocks["funs-h-4-cus"]= {
                     }
                 ],
                 "inputsInline": true,
+                "output": null,
+                "colour": 230,
+                "tooltip": "",
+                "helpUrl": ""
+            }
+        )}};
+
+    Blockly.Blocks["funs-v-4-inp"]= {
+        init: function() {this.jsonInit(
+            {
+                "type": "funs-v-4-inp",
+                "message0": "%1 %2 %3 %4",
+                "args0": [
+                    {
+                        "type": "field_input",
+                        "name": "kopf",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-2"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-3"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-4"
+                    }
+                ],
+                "inputsInline": false,
                 "output": null,
                 "colour": 230,
                 "tooltip": "",
