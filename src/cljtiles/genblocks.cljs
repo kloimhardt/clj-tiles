@@ -58,10 +58,14 @@
 
 (defn exp [v]
   (if (vector? v)
-    (apply fun (first v) (map exp (into [] (rest v))))
+    (let [erst (first v)
+          appl (fn [fuct] (apply fuct erst (map exp (into [] (rest v)))))]
+      (cond
+        (and (= (count v) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-inli)
+        (#{"def" "defn"} erst) (appl fun-vert)
+        :else (appl fun)))
     (cond
       (map? v) v
-      (= :slot v) slot
       (nil? v) (num "nil")
       (string? v) (text v)
       :else (num v))))
@@ -72,35 +76,3 @@
          (map-indexed (fn [idx blk] (addcoords (gen (exp blk)) (shifted idx))))
          (into [:xml])
          html)))
-
-(comment
-  [
-   (fun "println"
-        (text "Hello, World!"))
-   (exp ["str" 3 :slot :slot])]
-  (def a 3)
-  (defn expa [v] (num v))
-  (expa a)
-;; => {:type :num, :nummer 3}  (def u ["println" 3 4])
-(def b ["println" 3])
-(defn expb [v] (fun (first v) (num (last v))))
-(expb b)
-
-(def c ["println" 3 4])
-(defn expc [v]
-  (if (coll? v)
-    (apply fun (first v) (map expc v))
-    (num v)))
-(expc c)
-(expc 3)
-
-(defn exp [v]
-
-  (let [a (first v)
-        b (rest v)])
-  (cond
-    (seq? b) (fun a (exp (first b) (rest b)))
-    :else (num a)
-    ))
-(exp u)
-  )
