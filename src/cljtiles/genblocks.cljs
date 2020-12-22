@@ -57,14 +57,27 @@
 (defn chapter [& pages] (into [] pages))
 
 (defn exp [v]
-  (if (coll? v)
-    (apply fun (first v) (map exp (rest v)))
+  (if (vector? v)
+    (apply fun (first v) (map exp (into [] (rest v))))
     (cond
+      (map? v) v
+      (= :slot v) slot
+      (nil? v) (num "nil")
       (string? v) (text v)
       :else (num v))))
-(comment
 
-  (exp ["println" "hello"])
+(defn pg [coords & blocks]
+  (let [shifted (mapv (fn [[x y]] [(+ x 10) (+ y 10)]) coords)]
+    (->> blocks
+         (map-indexed (fn [idx blk] (addcoords (gen (exp blk)) (shifted idx))))
+         (into [:xml])
+         html)))
+
+(comment
+  [
+   (fun "println"
+        (text "Hello, World!"))
+   (exp ["str" 3 :slot :slot])]
   (def a 3)
   (defn expa [v] (num v))
   (expa a)

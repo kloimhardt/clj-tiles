@@ -3,56 +3,44 @@
 
 (def vect
   (gb/chapter
-   (gb/page (gb/coords [0 0])
-            (gb/text "Hello, World!"))
-   (gb/page (gb/coords [0 0]  [0 50])
-            (gb/text "Hello, World!")
-            (gb/text "I feel great."))
-   (gb/page (gb/coords [0 0] [0 50])
-            (gb/fun "println"
-                    (gb/text "Hello, World!"))
-            (gb/text "I feel great."))
-   (gb/page (gb/coords [0 0] [0 50])
-            (gb/text "Hello World!")
-            (gb/fun "println" gb/slot))
-   (gb/page (gb/coords [0 0] [0 50] [0 100])
-            (gb/fun "str" gb/slot gb/slot)
-            (gb/text "Clo")
-            (gb/text "jure"))
-   (gb/page (gb/coords [0 0] [100 0] [0 50] [0 100] [100 100])
-            (gb/text "World")
-            (gb/text " ")
-            (gb/fun "str" gb/slot gb/slot gb/slot gb/slot)
-            (gb/text "!")
-            (gb/text "Hello,"))
-   (gb/page (gb/coords [0 0] [50 0] [100 0] [150 0] [0 50])
-            (gb/num 1)
-            (gb/num 2)
-            (gb/text " ")
-            (gb/text " ")
-            (gb/fun "str" (gb/num 3) gb/slot gb/slot (gb/text " ")
-                    (gb/fun "str" gb/slot gb/slot (gb/text "Blast off!"))))
-   (gb/page (gb/coords [0 0] [0 50] [150 50] [0 100] [0 150] [100 150])
-            (gb/text "Hello")
-            (gb/fun "count" gb/slot)
-            (gb/text " ")
-            (gb/text "Hello World!")
-            (gb/fun "count" gb/slot)
-            (gb/fun "count" gb/slot))
-   (gb/page (gb/coords [0 0] [0 50] [0 100])
-            (gb/num "false")
-            (gb/fun "println" (gb/num "true"))
-            (gb/fun "println" gb/slot))
-   (gb/page (gb/coords [0 0] [0 50])
-            (gb/fun "println" (gb/text "Nobody's home") gb/slot)
-            (gb/num "nil"))
-   (gb/page (gb/coords [0 0] [0 50] [0 100] [100 100])
-            (gb/num "nil")
-            (gb/fun "println"
-                    (gb/text "We can print many things:")
-                    gb/slot gb/slot gb/slot)
-            (gb/num "true")
-            (gb/num "false"))
+   (gb/pg [[0 0]]
+          "Hello, World!")
+   (gb/pg [[0 0] [0 50]]
+          "Hello, World!"
+          "I feel great.")
+   (gb/pg [[0 0] [0 50]]
+          ["println" "Hello, World!"]
+          "I feel great.")
+   (gb/pg [[0 0] [0 50]]
+          "Hello World!"
+          ["println" :slot])
+   (gb/pg [[0 0] [0 50] [0 100]]
+          ["str" :slot :slot]
+          "Clo"
+          "jure")
+   (gb/pg [[0 0] [100 0] [0 50] [0 100] [100 100]]
+          "World" " "
+          ["str" :slot :slot :slot :slot]
+          "!" "Hello,")
+   (gb/pg  [[0 0] [50 0] [100 0] [150 0] [0 50]]
+           1 2 " " " "
+           ["str" 3 :slot :slot " " ["str" :slot :slot "Blast off!"]])
+   (gb/pg [[0 0] [0 50] [150 50] [0 100] [0 150] [100 150]]
+          "Hello"
+          ["count" :slot] " "
+          "Hello World!"
+          ["count" :slot] ["count" :slot])
+   (gb/pg  [[0 0] [0 50] [0 100]]
+           false
+           ["println" true]
+           ["println" :slot])
+   (gb/pg [[0 0] [0 50]]
+          ["println" "Nobody's home" :slot]
+          nil)
+   (gb/pg [[0 0] [0 50] [0 100] [100 100]]
+            nil
+            ["println" "We can print many things:" :slot :slot :slot]
+            true false)
    (gb/page (gb/coords [0 0] [0 50] [150 50])
             (gb/fun-inli "/" gb/slot (gb/num 2))
             (gb/fun-inli "+" gb/slot (gb/num "40.0"))
@@ -67,7 +55,4 @@
                                                    (gb/num "40.0"))
                                       (gb/num 2)))
             (gb/num "the-average")
-            (gb/fun "println" gb/slot)
-            )
-
-   ))
+            (gb/fun "println" gb/slot))))
