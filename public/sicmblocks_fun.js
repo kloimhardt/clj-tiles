@@ -363,6 +363,27 @@ Blockly.Blocks["inli-h-3"]= {
          "helpUrl": ""}
     )}};
 
+    Blockly.Blocks["inli-h-3-inp"]= {
+        init: function() {this.jsonInit(
+            {"type": "inli-h-3-inp",
+             "message0": "%1 %2 %3",
+             "args0": [
+                 {"type": "input_value",
+                  "name": "args-2"},
+                 {"type": "field_input",
+                  "name": "kopf",
+                  "text": ""
+                  },
+                 {"type": "input_value",
+                  "name": "args-3"}],
+             "inputsInline": true,
+             "output": null,
+             "colour": 140,
+             "tooltip": "",
+             "helpUrl": ""}
+        )}};
+
+
 Blockly.Blocks["funs-h-4"]= {
     init: function() {this.jsonInit(
         {"type": "funs-h-4",

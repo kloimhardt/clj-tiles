@@ -154,7 +154,10 @@
       (println erg))
     (swap! state assoc
            :stdout @theout
-           :result (if (some? erg) (my-str erg str-width) "")
+           :result
+           (cond (some? erg) (my-str erg str-width)
+                 (= "nil" (str (last (get-in edn-code [:code :dat])))) "nil"
+                 :else "")
            :code (if (:error aug-edn-code)
                    "Cannot even parse the blocks"
                    (code->break-str str-width (:code aug-edn-code)))
