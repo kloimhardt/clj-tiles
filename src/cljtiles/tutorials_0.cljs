@@ -2,25 +2,33 @@
   (:require [cljtiles.genblocks :as gb]))
 
 (def vect
-  [(gb/xml [(gb/text "Hello, World!") 10 10])
-   (comment
-     (gb/xml [(gb/text "Hello, World!") 10 10]
-             [(gb/text "I feel great.") 10 50])
-     (gb/xml [(gb/fun "println" 2 (gb/text "Hello, World!")) 10 10]
-             [(gb/text "I feel great.") 10 60])
-     (gb/xml [(gb/text "Hello World!") 10 10]
-             [(gb/fun "println" 2) 10 60])
-     (gb/xml [(gb/fun "str" 3) 10 10]
-             [(gb/text "Clo") 10 50]
-             [(gb/text "jure") 10 90])
-     (gb/xml [(gb/text "World") 10 10]
-             [(gb/text " ") 150 10]
-             [(gb/fun "str" 5) 10 70]
-             [(gb/text "!") 10 130]
-             [(gb/text "Hello,") 90 130])
-     (gb/xml [(gb/num 1) 10 10]
-             [(gb/num 2) 50 10]
-             [(gb/text " ") 100 10]
-             [(gb/text " ") 150 10]
-             [(gb/fun "str" 6 (gb/num 3) gb/null gb/null (gb/text " ")
-                      ) 10 50]))])
+  (gb/chapter
+   (gb/page (gb/coords [0 0])
+            (gb/text "Hello, World!"))
+   (gb/page (gb/coords [0 0]  [0 50])
+            (gb/text "Hello, World!")
+            (gb/text "I feel great."))
+   (gb/page (gb/coords [0 0] [0 50])
+            (gb/fun "println"
+                    (gb/text "Hello, World!"))
+            (gb/text "I feel great."))
+   (gb/page (gb/coords [0 0] [0 50])
+            (gb/text "Hello World!")
+            (gb/fun "println" gb/slot))
+   (gb/page (gb/coords [0 0] [0 50] [0 100])
+            (gb/fun "str" gb/slot gb/slot)
+            (gb/text "Clo")
+            (gb/text "jure"))
+   (gb/page (gb/coords [0 0] [100 0] [0 50] [0 100] [100 100])
+            (gb/text "World")
+            (gb/text " ")
+            (gb/fun "str" gb/slot gb/slot gb/slot gb/slot)
+            (gb/text "!")
+            (gb/text "Hello,"))
+   (gb/page (gb/coords [0 0] [50 0] [100 0] [150 0] [0 50])
+            (gb/num 1)
+            (gb/num 2)
+            (gb/text " ")
+            (gb/text " ")
+            (gb/fun "str" (gb/num 3) gb/slot gb/slot (gb/text " ")
+                    (gb/fun "str" gb/slot gb/slot (gb/text "Blast off!"))))))
