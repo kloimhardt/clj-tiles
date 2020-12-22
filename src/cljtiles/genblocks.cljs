@@ -4,12 +4,14 @@
 
 (defmulti gen (fn [m _] (:type m)))
 
+(defmethod gen :null [] nil)
+
 (defn blockmap [type givenid]
    {:type type :id (str type givenid)})
 
-(defmethod gen :text [{:keys [type dertext]} givenid]
+(defmethod gen :num [{:keys [type nummer]} givenid]
   [:block (blockmap type givenid)
-   [:field {:name "dertext"} dertext]])
+   [:field {:name "nummer"} nummer]])
 
 (defmethod gen :funs-h-inp [{:keys [kopf arity argsvec]} givenid]
   (let [type (keyword (str "funs-h-" arity "-inp"))
@@ -33,16 +35,12 @@
        html))
 
 (defn text [txt]
-  {:type :text :dertext txt})
+  {:type :num :nummer (str "\"" txt "\"")})
 
-(defn fun-inp [name arity & argsvec]
+(defn num [nummer]
+  {:type :num :nummer nummer})
+
+(defn fun [name arity & argsvec]
   {:type :funs-h-inp :arity arity :kopf name :argsvec argsvec})
 
-(comment
-  (gen (fun-inp "str" 3 (text "Clo")))
-
-  (def stri {:type :funs-h-3-inp :kopf "str"})
-  (def stri2 {:type :funs-h-inp :arity 3 :kopf "str"})
-
-  [(gen stri) (gen stri2)]
-  )
+(def null {:type :null})
