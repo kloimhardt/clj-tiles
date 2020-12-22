@@ -50,9 +50,9 @@
       (cond
         (and (:pair x) (:pair (last a)))
         (assoc x :dat (vec (concat (butlast a) (:dat (last a)))))
-        (and (= (:fun x) "defn") (:var (a 1)))
+        (and (= (:fun x) "defn") (or (:var (a 1)) (:num (a 1))))
         (assoc x :dat [(a 0) {:args "args-1" :dat [(a 1)]} (a 2)])
-        (and (= (:fun x) "fn") (:var (a 0)))
+        (and (= (:fun x) "fn") (or (:var (a 0)) (:num (a 0))))
         (assoc x :dat [{:args "args-1" :dat [(a 0)]} (a 1)])
         :else (assoc x :dat a)))))
 
