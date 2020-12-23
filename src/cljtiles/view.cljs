@@ -20,7 +20,7 @@
    [zprint.core :as zp]))
 
 
-(def menu true)
+(def menu false)
 
 (def tutorials (vec (concat t-0/vect
                             t-a/vect t-b/vect

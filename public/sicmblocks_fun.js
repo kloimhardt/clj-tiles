@@ -766,6 +766,43 @@ Blockly.Blocks["funs-h-5-cus"]= {
             }
         )}};
 
+    Blockly.Blocks["funs-v-5-inp"]= {
+        init: function() {this.jsonInit(
+            {
+                "type": "funs-v-5-inp",
+                "message0": "%1 %2 %3 %4 %5",
+                "args0": [
+                    {
+                        "type": "field_input",
+                        "name": "kopf",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-2"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-3"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-4"
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "args-5"
+                    }
+                ],
+                "inputsInline": false,
+                "output": null,
+                "colour": 360,
+                "tooltip": "",
+                "helpUrl": ""
+            }
+        )}};
+
+
 Blockly.Blocks["funs-h-6-cus"]= {
     init: function() {this.jsonInit(
         {

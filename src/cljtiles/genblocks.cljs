@@ -44,13 +44,13 @@
        html))
 
 (defn text [txt]
-  {:type :num :nummer (str "\"" txt "\"")})
+  {::intern true :type :num :nummer (str "\"" txt "\"")})
 
 (defn num [nummer]
-  {:type :num :nummer nummer})
+  {::intern true :type :num :nummer nummer})
 
 (defn fun [name & argsvec]
-  {:type :fun :subtype "funs-h" :kopf name :argsvec argsvec})
+  {::intern true :type :fun :subtype "funs-h" :kopf name :argsvec argsvec})
 
 (defn fun-inli [name & argsvec]
   (assoc (apply fun name argsvec) :subtype "inli-h"))
@@ -58,10 +58,10 @@
 (defn fun-vert [name & argsvec]
   (assoc (apply fun name argsvec) :subtype "funs-v"))
 
-(def slot {:type :slot})
+(def slot {::intern true :type :slot})
 
 (defn args [& argsvec]
-  {:type :args :argsvec argsvec})
+  {::intern true :type :args :argsvec argsvec})
 
 (defn chapter [& pages] (into [] pages))
 
@@ -71,7 +71,7 @@
           appl (fn [fuct] (apply fuct erst (map exp (into [] (rest v)))))]
       (cond
         (and (= (count v) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-inli)
-        (#{"def" "defn"} erst) (appl fun-vert)
+        (#{"def" "defn" "do"} erst) (appl fun-vert)
         :else (appl fun)))
     (cond
       (map? v) v
@@ -79,22 +79,46 @@
       (string? v) (text v)
       :else (num v))))
 
+(defn parse [l]
+  (if (list? l)
+    (let [erst (str (first l))
+          appl (fn [fuct] (apply fuct erst (map exp (rest l))))]
+      (cond
+        (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-inli)
+        (#{"def" "defn" "do"} erst) (appl fun-vert)
+        :else (appl fun)))
+    (cond
+      (and (map? l) (::intern l)) l
+      (nil? l) (num "nil")
+      (string? l) (text l)
+      :else (num l))))
+
+(comment
+
+(parse '(hi 3))
+
+  )
+
+(defn shift-coords [nofblocks & coords]
+  (->> (range 0 nofblocks)
+       (mapv (fn [x] [0 (* 50 x)]))
+       (concat coords)
+       (mapv (fn [[x y]] [(+ x 10) (+ y 10)]))))
+
 (defn pg [coords & blocks]
-  (let [shifted (mapv (fn [[x y]] [(+ x 10) (+ y 10)]) coords)]
+  (let [shifted (apply shift-coords (count blocks) coords)]
     (->> blocks
-         (map-indexed (fn [idx blk] (addcoords (gen (exp blk)) (shifted idx))))
+         (map-indexed (fn [idx blk]
+                        (addcoords (gen (exp blk)) (shifted idx))))
          (into [:xml])
          html)))
 
 (comment
 
-  (defn coords [& thecoords]
-     (mapv (fn [[x y]] [(+ x 10) (+ y 10)]) thecoords))
-
   (gen (num 2))
   (= (num 2)
      (exp 2))
-  (= (page (coords [0 0]) (num 2))
+  (= (page (shift-coords [0 0]) (num 2))
      (pg [[0 0]] (num 2))
      (pg [[0 0]] 2))
 

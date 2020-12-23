@@ -71,11 +71,52 @@
           (gb/args gb/slot gb/slot)
           (gb/num "a")
           (gb/num "b")
-          (gb/num "average")
-
+          (gb/num "average"))
+   (gb/pg [[0 0] [170 0] [300 50] [350 100] [0 140] [0 200] [0 250] [0 300]]
+          ["defn" gb/slot gb/slot gb/slot]
+          ["do" ["println" "chatty-average function called"]
+           gb/slot gb/slot gb/slot]
+          (gb/args (gb/num "a") (gb/num "b"))
+          (gb/num "chatty-average")
+          ["/" ["+" (gb/num "a") (gb/num "b")] 2]
+          ["println" "** first argumnet " (gb/num "a")]
+          ["println" "** second argumnet " (gb/num "b")]
+          ["chatty-average" (gb/num "5.0") (gb/num "10.0")])
+   (gb/pg []
+          4
+          (gb/args (gb/num 1) gb/slot (gb/num 3) gb/slot)
+          2)
+   (gb/pg []
+          "four"
+          (gb/args (gb/num 1) gb/slot (gb/num 3) gb/slot)
+          "two")
+   (gb/pg []
+          5
+          (gb/args gb/slot (gb/num 3)  (gb/text "four") gb/slot)
+          true)
+   (gb/pg []
+          (gb/args (gb/num 1) gb/slot gb/slot)
+          6
+          (gb/args (gb/num true) (gb/num 3)  (gb/text "four") (gb/num 5)))
+   (gb/pg []
+          (gb/args gb/slot gb/slot gb/slot)
+          0
+          (gb/args (gb/num 1)
+                   (gb/args (gb/num true) (gb/num 3)  (gb/text "four") (gb/num 5))
+                   (gb/num 6))
+          7)
+   (gb/pg []
+          3
+          "four"
+          ["vector" gb/slot gb/slot gb/slot gb/slot]
+          true
+          5)
+   (gb/pg []
+          (gb/num "books")
+          "Getting Clojure"
+          (gb/num "books")
+          ["def" gb/slot (gb/args (gb/text "Emma") gb/slot (gb/text "War and Peace"))]
+          ["count" gb/slot]
 
           )
-
-
-
    ))
