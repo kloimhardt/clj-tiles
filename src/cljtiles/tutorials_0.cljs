@@ -12,7 +12,7 @@
             (gb/fun "println" (gb/text "Hello, World!"))
             (gb/text "I feel great."))
    (gb/pg [[0 0] [0 50]]
-          "Hello World!"
+          "Hello, World!"
           ["println" gb/slot])
    (gb/pg [[0 0] [0 50] [0 100]]
           ["str" gb/slot gb/slot]
@@ -21,21 +21,19 @@
    (gb/pg [[0 0] [100 0] [0 50] [0 100] [100 100]]
           "World" " "
           ["str" gb/slot gb/slot gb/slot gb/slot]
-          "!" "Hello,")
+          "Hello," "!" )
    (gb/pg [[0 0] [50 0] [100 0] [150 0] [0 50]]
           1 2 " " " "
           ["str" 3 gb/slot gb/slot " " ["str" gb/slot gb/slot "Blast off!"]])
    (gb/pg [[0 0] [0 50] [150 50] [0 100] [0 150] [100 150]]
           "Hello"
           ["count" gb/slot] " "
-          "Hello World!"
-          ["count" gb/slot] ["count" gb/slot])
+          "Hello, World!")
    (gb/pg [[0 0] [0 50] [0 100]]
           false
-          ["println" true]
-          ["println" gb/slot])
+          ["println" true])
    (gb/pg [[0 0] [0 50]]
-          ["println" "Nobody's home" gb/slot]
+          ["println" "Nobody's home:" gb/slot]
           nil)
    (gb/pg [[0 0] [0 50] [0 100] [100 100]]
           nil
@@ -65,12 +63,12 @@
           "Welcome to"
           "Clojure")
    (gb/pg [[0 0] [0 50] [0 120] [150 120] [0 220] [50 220] [0 260]]
-          ["average" 5 10]
+          ["average" (gb/num "5.0") (gb/num "10.0")]
           ["/" ["+" (gb/num "a") (gb/num "b")] 2]
           ["defn" gb/slot gb/slot gb/slot]
           (gb/args gb/slot gb/slot)
-          (gb/num "a")
           (gb/num "b")
+          (gb/num "a")
           (gb/num "average"))
    (gb/rpg [[0 0] [170 0] [300 50] [350 100] [0 140] [0 200] [0 250] [0 300]]
            '(defn :tiles/slot :tiles/slot :tiles/slot)
@@ -79,9 +77,9 @@
            '[a b]
            'chatty-average
            '(/ (+ a b) 2)
-           '(println "** first argumnet " a)
-           '(println "** second argumnet " b)
-           '(chatty-average 5.0 10.0))
+           '(println "** first argument:" a)
+           '(println "** second argument:" b)
+           '(chatty-average (:tiles/num "5.0") (:tiles/num "10.0")))
    (gb/rpg []
            4
            [1 :tiles/slot 3 :tiles/slot]

@@ -87,25 +87,15 @@
       (cond
         (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-inli)
         (#{"def" "defn" "do"} erst) (appl fun-vert)
+        (= ":tiles/num" erst) (num (last l))
         :else (appl fun)))
-    (vector? l)
-    (apply args (map parse l))
+    (vector? l) (apply args (map parse l))
     :else
     (cond
       (nil? l) (num "nil")
       (string? l) (text l)
       (= :tiles/slot l) slot
       :else (num l))))
-
-(comment
-
-(parse '(hi 3))
-
-(type (nth (nth blocks 3) 1))
-(= :tiles/slot (nth (nth blocks 3) 1))
-(def expr (nth blocks 3))
-(parse expr)
-  )
 
 (defn shift-coords [nofblocks & coords]
   (->> (range 0 nofblocks)
