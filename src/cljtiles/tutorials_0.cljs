@@ -107,9 +107,19 @@
            '(vector :tiles/slot :tiles/slot :tiles/slot :tiles/slot)
            true
            5)
-   (gb/rpg []
+   (gb/rpg [[0 0] [0 50] [0 100] [0 150] [0 250]]
            'books
            "Getting Clojure"
            'books
            '(def :tiles/slot ["Emma" :tiles/slot "War and Peace"])
-           '(count :tiles/slot))))
+           '(count :tiles/slot))
+   (gb/rpg [[0 0] [0 100] [0 150] [0 200]]
+           '(def books ["Emma" "Getting Clojure" "War and Peace"])
+           '(first :tiles/slot)
+           'books
+           '(nth books 1))
+   (gb/rpg []
+           '(def books
+              (println "a" "b" "c")))
+
+   ))

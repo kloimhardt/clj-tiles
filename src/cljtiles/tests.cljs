@@ -37,4 +37,6 @@
   (dotests)
   (map #(= %1 %2) t0 t1)
   [(nth t0 16) (nth t1 16)]
-  (= (nth t0 16) (nth t1 16)))
+  (= (nth t0 16) (nth t1 16))
+
+  )
