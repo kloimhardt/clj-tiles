@@ -9,13 +9,22 @@
 (defn blockmap [type givenid]
    {:type type :id (str type givenid)})
 
-(defmethod gen :num [{:keys [type nummer]} givenid]
-  [:block (blockmap type givenid)
+(defmethod gen :num [{:keys [nummer]} givenid]
+  [:block (blockmap "num" givenid)
    [:field {:name "nummer"} nummer]])
 
-(defmethod gen :fun [{:keys [kopf arity argsvec subtype]} givenid]
-  (let [type (keyword (str subtype "-" arity "-inp"))
-        {:keys [id] :as bm} (blockmap type givenid)]
+;; is really a vector
+(defmethod gen :args [{:keys [argsvec]} givenid]
+  (let [xml-block-type (str "args-" (count argsvec))
+        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
+    (into [:block bm]
+          (map-indexed (fn [idx v]
+                         [:value {:name (str "arg_" (+ idx 1))}
+                          (gen v (str (+ idx 1) "-" id))]) argsvec))))
+
+(defmethod gen :fun [{:keys [kopf argsvec subtype]} givenid]
+  (let [xml-block-type (str subtype "-" (inc (count argsvec)) "-inp")
+        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
     (into [:block bm
            [:field {:name "kopf"} kopf]]
           (map-indexed (fn [idx v]
@@ -41,7 +50,7 @@
   {:type :num :nummer nummer})
 
 (defn fun [name & argsvec]
-  {:type :fun :subtype "funs-h" :arity (inc (count argsvec)) :kopf name :argsvec argsvec})
+  {:type :fun :subtype "funs-h" :kopf name :argsvec argsvec})
 
 (defn fun-inli [name & argsvec]
   (assoc (apply fun name argsvec) :subtype "inli-h"))
@@ -51,8 +60,8 @@
 
 (def slot {:type :slot})
 
-(defn coords [& thecoords]
-  (mapv (fn [[x y]] [(+ x 10) (+ y 10)]) thecoords))
+(defn args [& argsvec]
+  {:type :args :argsvec argsvec})
 
 (defn chapter [& pages] (into [] pages))
 
@@ -76,3 +85,26 @@
          (map-indexed (fn [idx blk] (addcoords (gen (exp blk)) (shifted idx))))
          (into [:xml])
          html)))
+
+(comment
+
+  (defn coords [& thecoords]
+     (mapv (fn [[x y]] [(+ x 10) (+ y 10)]) thecoords))
+
+  (gen (num 2))
+  (= (num 2)
+     (exp 2))
+  (= (page (coords [0 0]) (num 2))
+     (pg [[0 0]] (num 2))
+     (pg [[0 0]] 2))
+
+  (gen (fun "hu" (num 2)))
+  (= (fun "hu" (num 2))
+     (exp ["hu" 2]))
+  (not= (exp ["hu" 2]) (exp (fun "hu" 2)))
+  (= (page (coords [0 0]) (fun "hu" (num 2)))
+     (pg [[0 0]] ["hu" 2]))
+
+  (gen (args (num 2)))
+
+  )

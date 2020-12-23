@@ -55,7 +55,17 @@
            gb/slot
            ["println" "Welcome to" gb/slot]]
           (gb/num "what")
-          ["say-welcome" "Clojure"]
+          ["say-welcome" "Clojure"])
+   (gb/pg [[0 0] [0 50] [0 150] [150 150] [0 200] [0 250] [150 250]]
+          (gb/num "what")
+          ["defn" (gb/num "say-welcome") gb/slot gb/slot]
+          ["println" gb/slot gb/slot]
+          (gb/num "what")
+          ["say-welcome" gb/slot]
+          "Welcome to"
+          "Clojure")
+   (gb/pg [[0 0]]
+          (gb/args (gb/num 2) (gb/num 3)))
 
 
-          )))
+   ))
