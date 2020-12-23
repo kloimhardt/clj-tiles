@@ -64,8 +64,18 @@
           ["say-welcome" gb/slot]
           "Welcome to"
           "Clojure")
-   (gb/pg [[0 0]]
-          (gb/args (gb/num 2) (gb/num 3)))
+   (gb/pg [[0 0] [0 50] [0 120] [150 120] [0 220] [50 220] [0 260]]
+          ["average" 5 10]
+          ["/" ["+" (gb/num "a") (gb/num "b")] 2]
+          ["defn" gb/slot gb/slot gb/slot]
+          (gb/args gb/slot gb/slot)
+          (gb/num "a")
+          (gb/num "b")
+          (gb/num "average")
+
+
+          )
+
 
 
    ))
