@@ -190,5 +190,33 @@
            '(def book :tiles/slot)
            '(:please-select-keyword book)
            "copy+paste the Hash-Map from previous workspace")
-
+   (gb/rpg [[0 0] [0 150]]
+           '(def book
+              (:tiles/vert {:title "Getting Clojure"
+                            :author "Russ Olson"
+                            please-rename-me 2018}))
+           '(please-rename-me book))
+   (gb/rpg [[0 0] [0 150] [0 200] [200 200] [0 250]]
+           '(def great-book
+              (:tiles/vert {:title "Getting Clojure"
+                            :author "Russ Olson"
+                            :year 2018}))
+           :page-count
+           '(assoc :tiles/slot :tiles/slot :tiles/slot)
+           270
+           'great-book)
+   (gb/rpg [[0 0] [0 150] [220 150] [120 170] [0 200]
+            [0 250] [220 250]]
+           '(def great-book
+              (:tiles/vert {:title "Getting Clojure"
+                            :author "Russ Olson"
+                            :year 2018}))
+           :title
+           270
+           '(:tiles/vert
+             (assoc :tiles/slot :tiles/slot :tiles/slot
+                               :tiles/slot :tiles/slot))
+           'great-book
+           :page-count
+           "Clojure for the brave and true")
    ))

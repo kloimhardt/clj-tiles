@@ -70,6 +70,9 @@
 (defn text [txt]
   {:type :num :nummer (str "\"" txt "\"")})
 
+(defn kw [k]
+  {:type :num :nummer (str k)})
+
 (defn num [nummer]
   {:type :num :nummer nummer})
 
@@ -120,9 +123,10 @@
     (map? l) (apply t-map (map (fn [[k v]] [k (parse v)]) l))
     :else
     (cond
+      (= :tiles/slot l) slot
       (nil? l) (num "nil")
       (string? l) (text l)
-      (= :tiles/slot l) slot
+      (keyword? l) (kw l)
       :else (num l))))
 
 (defn shift-coords [nofblocks & coords]
@@ -144,14 +148,15 @@
 (def rpg (p-gen parse))
 
 (comment
-  (map (fn [[k v]] [k (inc v)]) {:a 1 :b 2})
-
-
 
   (= (num 2)
      (exp 2)
      (parse 2))
+
   (gen (num 2))
+  (gen (kw :a))
+  (gen (text "hi"))
+
   (= (page (shift-coords 1 [0 0]) (num 2))
      (pg [[0 0]] (num 2))
      (pg [[0 0]] 2)
