@@ -7,26 +7,26 @@
 
 (defmethod gen :slot [] nil)
 
-(defn blockmap [type givenid inline?]
-  {:type type :id (str type givenid) :inline (str inline?)})
+(defn blockmap [type givenid]
+  {:type type :id (str type givenid)})
 
-(defmethod gen :num [{:keys [nummer inline?]} givenid]
-  [:block (blockmap "num" givenid inline?)
+(defmethod gen :num [{:keys [nummer]} givenid]
+  [:block (blockmap "num" givenid)
    [:field {:name "nummer"} nummer]])
 
 ;; is really a vector
 (defmethod gen :args [{:keys [argsvec inline?]} givenid]
   (let [xml-block-type (str "args-" (count argsvec))
-        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
-    (into [:block bm]
+        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
+    (into [:block (assoc bm :inline (str inline?))]
           (map-indexed (fn [idx v]
                          [:value {:name (str "arg_" (+ idx 1))}
                           (gen v (str (+ idx 1) "-" id))]) argsvec))))
 
 (defmethod gen :fun [{:keys [kopf argsvec subtype inline?]} givenid]
   (let [xml-block-type (str subtype "-" (inc (count argsvec)) "-inp")
-        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
-    (into [:block bm
+        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
+    (into [:block (assoc bm :inline (str inline?))
            [:field {:name "kopf"} kopf]]
           (map-indexed (fn [idx v]
                          [:value {:name (str "args-" (+ idx 2))}
@@ -34,8 +34,8 @@
 
 (defmethod gen :map [{:keys [argsvec subtype inline?]} givenid]
   (let [xml-block-type (str subtype "-" (* (count argsvec) 2) "-inp")
-        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
-    (into [:block bm]
+        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
+    (into [:block (assoc bm :inline (str inline?))]
           (apply concat
                  (map-indexed (fn [idx v]
                                 (let [i (inc (* idx 2))]
@@ -93,21 +93,21 @@
       (string? v) (text v)
       :else (num v))))
 
-(defn parse [l & [opt]]
+(defn parse [l]
   (cond
     (list? l)
     (let [erst (str (first l))
           appl (fn [fuct] (apply fuct erst (map parse (rest l))))]
       (cond
-        (str/starts-with? erst ":tiles") (parse (second l) erst)
+        (= ":tiles/vert" erst) (assoc (parse (second l)) :inline? false)
+        (= ":tiles/num" erst) (num (second l))
         (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-infi)
-        (or (#{"def" "defn" "do"} erst)
-            (= ":tiles/vert" opt)) (assoc (appl fun) :inline? false)
+        (#{"def" "defn" "do"} erst) (assoc (appl fun) :inline? false)
         :else (appl fun)))
     (vector? l) (apply args (map parse l))
+    (map? l) (apply t-map (map (fn [[k v]] [k (parse v)]) l))
     :else
     (cond
-      (= ":tiles/num" opt) (num l)
       (nil? l) (num "nil")
       (string? l) (text l)
       (= :tiles/slot l) slot
@@ -132,6 +132,9 @@
 (def rpg (p-gen parse))
 
 (comment
+  (map (fn [[k v]] [k (inc v)]) {:a 1 :b 2})
+
+
 
   (= (num 2)
      (exp 2)

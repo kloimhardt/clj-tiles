@@ -178,5 +178,20 @@
                 (assoc :inline? false))
             (gb/num 2018)
             (gb/text "Getting Clojure"))
+   (gb/rpg [[0 0] [0 100] [0 170] [100 170] [0 220]]
+           '(:tiles/vert {:title "Getting Clojure"
+                          :author "Russ Olson"
+                          :published 2018})
+           '(def :tiles/slot :tiles/slot)
+           'book
+           'book
+           '(:published :tiles/slot)
+
+           )
+   (gb/rpg [[0 0] [0 100] [0 170] [100 170] [0 220]]
+           {:title "Getting Clojure"
+            :author "Russ Olson"
+            :published 2018}
+           )
 
    ))
