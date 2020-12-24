@@ -32,18 +32,28 @@
                          [:value {:name (str "args-" (+ idx 2))}
                           (gen v (str (+ idx 2) "-" id))]) argsvec))))
 
+(defn rearrange [m]
+  (let [a (partition 2 m)]
+    (concat (map first a) (map second a))))
+
 (defmethod gen :map [{:keys [argsvec subtype inline?]} givenid]
   (let [xml-block-type (str subtype "-" (* (count argsvec) 2) "-inp")
         {:keys [id] :as bm} (blockmap xml-block-type givenid)]
     (into [:block (assoc bm :inline (str inline?))]
-          (apply concat
-                 (map-indexed (fn [idx v]
-                                (let [i (inc (* idx 2))]
-                                  [[:field {:name (str "key-" i)}
-                                    (str (first v))]
-                                   [:value {:name (str "val-" (inc i))}
-                                    (gen (second v) (str (inc i) "-" id))]]))
-                              argsvec)))))
+          (rearrange ;;(rearrange [1 2 3 4]) => (1 3 2 4)
+            ;;the Blockly ui does this rearrangemnt to the XML and
+            ;;the end->code/parse depends on it
+            ;;namely that in the XML all the :field are given first and
+            ;;then the :value
+            (apply concat
+                   (map-indexed (fn [idx v]
+                                  (let [i (inc (* idx 2))]
+                                    [[:field {:name (str "key-" i)}
+                                      (str (first v))]
+                                     [:value {:name (str "val-" (inc i))}
+                                      (gen (second v) (str (inc i) "-" id))]]))
+                                argsvec))))))
+
 
 (defn addcoords [block [x y]]
   (update block 1 #(-> %
@@ -75,7 +85,9 @@
   {:type :args :argsvec argsvec})
 
 (defn t-map [& argsvec]
-  {:type :map :subtype "map-h" :argsvec argsvec :inline? true})
+  (if (> (count argsvec) 1)
+    {:type :map :subtype "map-h" :argsvec argsvec :inline? true}
+    (text "clj-tiles error: one-entry map not allowed")))
 
 (defn chapter [& pages] (into [] pages))
 
@@ -162,8 +174,6 @@
 
   (gen (t-map ["a" (text "v1")] ["b" (text "v2")] ["c" (text "v3")]) "id1")
   (gen (t-map [:a (text "v1")] [:b (text "v2")] [:c (text "v3")]) "id1")
-
-  (html (into [:xml (gen (t-map-vert [:a (text "v1")] [:b (text "v2")] [:c (text "v3")]) "id1")]))
 
   )
 

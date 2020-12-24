@@ -1292,6 +1292,40 @@ Blockly.Blocks['text']= {
             }
         );}};
 
+    Blockly.Blocks["map-h-4-inp"]= {
+        init: function() {this.jsonInit(
+            {
+                "type": "map-h-4-inp",
+                "message0": "%1 %2 %3 %4",
+                "args0": [
+                    {
+                        "type": "field_input",
+                        "name": "key-1",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "val-2"
+                    },
+                    {
+                        "type": "field_input",
+                        "name": "key-3",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "val-4"
+                    }
+                ],
+                "inputsInline": true,
+                "output": null,
+                "colour": 140,
+                "tooltip": "",
+                "helpUrl": ""
+            }
+        );}};
+
+
     Blockly.Blocks["map-h-6"]= {
         init: function() {this.jsonInit(
             {
@@ -1423,6 +1457,55 @@ Blockly.Blocks['text']= {
                 "helpUrl": ""
             }
         );}};
+
+ Blockly.Blocks["map-h-8-inp"]= {
+        init: function() {this.jsonInit(
+            {
+                "type": "map-h-8-inp",
+                "message0": "%1 %2 %3 %4 %5 %6 %7 %8",
+                "args0": [
+                    {
+                        "type": "field_input",
+                        "name": "key-1",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "val-2"
+                    },
+                    {
+                        "type": "field_input",
+                        "name": "key-3",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "val-4"
+                    },{
+                        "type": "field_input",
+                        "name": "key-5",
+                        "text": ""
+                    },{
+                        "type": "input_value",
+                        "name": "val-6"
+                    },{
+                       "type": "field_input",
+                       "name": "key-7",
+                       "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "val-8"
+                    }
+                ],
+                "inputsInline": true,
+                "output": null,
+                "colour": 360,
+                "tooltip": "",
+                "helpUrl": ""
+            }
+        );}};
+
 
 
 

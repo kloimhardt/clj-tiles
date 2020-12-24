@@ -185,13 +185,10 @@
            '(def :tiles/slot :tiles/slot)
            'book
            'book
-           '(:published :tiles/slot)
-
-           )
+           '(:published :tiles/slot))
    (gb/rpg [[0 0] [0 100] [0 170] [100 170] [0 220]]
-           {:title "Getting Clojure"
-            :author "Russ Olson"
-            :published 2018}
-           )
+           '(def book :tiles/slot)
+           '(:please-select-keyword book)
+           "copy+paste the Hash-Map from previous workspace")
 
    ))
