@@ -7,8 +7,9 @@
 
 (defmethod gen :slot [] nil)
 
-(defn blockmap [type givenid]
-  {:type type :id (str type givenid)})
+(defn blockmap [type givenid & [inline?]]
+  (conj {:type type :id (str type givenid)}
+        (when (some? inline?) {:inline (str inline?)})))
 
 (defmethod gen :num [{:keys [nummer]} givenid]
   [:block (blockmap "num" givenid)
@@ -32,9 +33,9 @@
                          [:value {:name (str "args-" (+ idx 2))}
                           (gen v (str (+ idx 2) "-" id))]) argsvec))))
 
-(defmethod gen :map [{:keys [argsvec subtype]} givenid]
+(defmethod gen :map [{:keys [argsvec subtype inline?]} givenid]
   (let [xml-block-type (str subtype "-" (* (count argsvec) 2) "-inp")
-        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
+        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
     (into [:block bm]
           (apply concat
                  (map-indexed (fn [idx v]
@@ -78,7 +79,10 @@
   {:type :args :argsvec argsvec})
 
 (defn t-map [& argsvec]
-  {:type :map :subtype "map-h" :argsvec argsvec})
+  {:type :map :subtype "map-h" :argsvec argsvec :inline? true})
+
+(defn t-map-vert [& argsvec]
+  {:type :map :subtype "map-h" :argsvec argsvec :inline? false})
 
 (defn chapter [& pages] (into [] pages))
 
@@ -158,8 +162,12 @@
 
   (= (args (num 2) slot)
      (exp (args (num 2) slot))
-     (parse [2 :tiles/slot])))
+     (parse [2 :tiles/slot]))
 
-(gen (t-map ["a" (text "v1")] ["b" (text "v2")] ["c" (text "v3")]) "id1")
-(gen (t-map [:a (text "v1")] [:b (text "v2")] [:c (text "v3")]) "id1")
+  (gen (t-map ["a" (text "v1")] ["b" (text "v2")] ["c" (text "v3")]) "id1")
+  (gen (t-map [:a (text "v1")] [:b (text "v2")] [:c (text "v3")]) "id1")
+
+  (html (into [:xml (gen (t-map-vert [:a (text "v1")] [:b (text "v2")] [:c (text "v3")]) "id1")]))
+
+  )
 

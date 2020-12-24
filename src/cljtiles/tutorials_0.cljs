@@ -163,8 +163,7 @@
                                     :tiles/slot :tiles/slot :tiles/slot))
            "Russ Olson"
            "published"
-           "author"
-           )
+           "author")
    (gb/rpg [[0 0] [0 200] [100 200] [200 200] [0 250] [0 350]]
            '(:tiles/fvert (hash-map "title" "Getting Clojure" "author"
                                     "Russ Olson" "published" 2018))
@@ -172,11 +171,12 @@
            'book
            "published"
            '(def :tiles/slot :tiles/slot)
-           '(get :tiles/slot :tiles/slot)
-           )
-   (gb/page (gb/shift-coords 2)
+           '(get :tiles/slot :tiles/slot))
+   (gb/page (gb/shift-coords 4 [0 0] [0 50] [150 50] [0 150])
             (gb/text "Russ Olson")
-            (gb/t-map [:title (gb/text "v1")] [:author (gb/text "v2")] [:published (gb/text "v3")])
+            (gb/t-map-vert [:title gb/slot] [:author gb/slot] [:published gb/slot])
+            (gb/num 2018)
+            (gb/text "Getting Clojure")
             )
 
    ))
