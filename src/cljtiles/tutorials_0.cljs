@@ -120,7 +120,7 @@
            '(nth books 1))
    (gb/rpg [[0 0] [0 150] [0 200]]
            '(def books
-              (:tiles/fvert
+              (:tiles/vert
                (println
                  "Hi! Please copy+paste the Vector block from the previous workspace."
                  "Go to the previous workspace, left-click on the blue area, so that it has a yellow border. Then press Ctrl+C (maybe cmd+c works on your keyboard)."
@@ -159,13 +159,13 @@
            "Getting Clojure"
            "title"
            2018
-           '(:tiles/fvert (hash-map :tiles/slot :tiles/slot :tiles/slot
+           '(:tiles/vert (hash-map :tiles/slot :tiles/slot :tiles/slot
                                     :tiles/slot :tiles/slot :tiles/slot))
            "Russ Olson"
            "published"
            "author")
    (gb/rpg [[0 0] [0 200] [100 200] [200 200] [0 250] [0 350]]
-           '(:tiles/fvert (hash-map "title" "Getting Clojure" "author"
+           '(:tiles/vert (hash-map "title" "Getting Clojure" "author"
                                     "Russ Olson" "published" 2018))
            'book
            'book
@@ -174,8 +174,9 @@
            '(get :tiles/slot :tiles/slot))
    (gb/page (gb/shift-coords 4 [0 0] [0 50] [150 50] [0 150])
             (gb/text "Russ Olson")
-            (gb/t-map-vert [:title gb/slot] [:author gb/slot] [:published gb/slot])
+            (-> (gb/t-map [:title gb/slot] [:author gb/slot] [:published gb/slot])
+                (assoc :inline? false))
             (gb/num 2018)
-            (gb/text "Getting Clojure")
-            )
+            (gb/text "Getting Clojure"))
+
    ))

@@ -66,11 +66,8 @@
 (defn fun [name & argsvec]
   {:type :fun :subtype "funs-h" :kopf name :argsvec argsvec})
 
-(defn fun-inli [name & argsvec]
+(defn fun-infi [name & argsvec]
   (assoc (apply fun name argsvec) :subtype "infi-h"))
-
-(defn fun-vert [name & argsvec]
-  (assoc (apply fun name argsvec) :inline? false))
 
 (def slot {:type :slot})
 
@@ -80,9 +77,6 @@
 (defn t-map [& argsvec]
   {:type :map :subtype "map-h" :argsvec argsvec :inline? true})
 
-(defn t-map-vert [& argsvec]
-  (assoc (apply t-map argsvec) :inline? false))
-
 (defn chapter [& pages] (into [] pages))
 
 (defn exp [v]
@@ -90,8 +84,8 @@
     (let [erst (first v)
           appl (fn [fuct] (apply fuct erst (map exp (into [] (rest v)))))]
       (cond
-        (and (= (count v) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-inli)
-        (#{"def" "defn" "do"} erst) (appl fun-vert)
+        (and (= (count v) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-infi)
+        (#{"def" "defn" "do"} erst) (assoc (appl fun) :inline? false)
         :else (appl fun)))
     (cond
       (map? v) v
@@ -106,9 +100,9 @@
           appl (fn [fuct] (apply fuct erst (map parse (rest l))))]
       (cond
         (str/starts-with? erst ":tiles") (parse (second l) erst)
-        (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-inli)
+        (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-infi)
         (or (#{"def" "defn" "do"} erst)
-            (= ":tiles/fvert" opt)) (appl fun-vert)
+            (= ":tiles/vert" opt)) (assoc (appl fun) :inline? false)
         :else (appl fun)))
     (vector? l) (apply args (map parse l))
     :else
