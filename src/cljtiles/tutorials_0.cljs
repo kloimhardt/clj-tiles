@@ -21,7 +21,7 @@
    (gb/pg [[0 0] [100 0] [0 50] [0 100] [100 100]]
           "World" " "
           ["str" gb/slot gb/slot gb/slot gb/slot]
-          "Hello," "!" )
+          "Hello," "!")
    (gb/pg [[0 0] [50 0] [100 0] [150 0] [0 50]]
           1 2 " " " "
           ["str" 3 gb/slot gb/slot " " ["str" gb/slot gb/slot "Blast off!"]])
@@ -122,9 +122,9 @@
            '(def books
               (:tiles/vert
                (println
-                 "Hi! Please copy+paste the Vector block from the previous workspace."
-                 "Go to the previous workspace, left-click on the blue area, so that it has a yellow border. Then press Ctrl+C (maybe cmd+c works on your keyboard)."
-                 "Return to this workspace here, press Ctrl+V (or cmd+v). Make sure to remove the println block before pasting (remove it by right clicking in the blue area)")))
+                "Hi! Please copy+paste the Vector block from the previous workspace."
+                "Go to the previous workspace, left-click on the blue area, so that it has a yellow border. Then press Ctrl+C (maybe cmd+c works on your keyboard)."
+                "Return to this workspace here, press Ctrl+V (or cmd+v). Make sure to remove the println block before pasting (remove it by right clicking in the blue area)")))
            'books
            '(vec-rest :tiles/slot))
    (gb/rpg [[0 0] [0 100] [0 150] [0 200]]
@@ -160,13 +160,13 @@
            "title"
            2018
            '(:tiles/vert (hash-map :tiles/slot :tiles/slot :tiles/slot
-                                    :tiles/slot :tiles/slot :tiles/slot))
+                                   :tiles/slot :tiles/slot :tiles/slot))
            "Russ Olson"
            "published"
            "author")
    (gb/rpg [[0 0] [0 200] [100 200] [200 200] [0 250] [0 350]]
            '(:tiles/vert (hash-map "title" "Getting Clojure" "author"
-                                    "Russ Olson" "published" 2018))
+                                   "Russ Olson" "published" 2018))
            'book
            'book
            "published"
@@ -215,8 +215,20 @@
            270
            '(:tiles/vert
              (assoc :tiles/slot :tiles/slot :tiles/slot
-                               :tiles/slot :tiles/slot))
+                    :tiles/slot :tiles/slot))
            'great-book
            :page-count
            "Clojure for the brave and true")
+   (gb/rpg [[0 0] [0 150] [0 200] [250 200] [0 250] [0 300]]
+           '(def great-book
+              (:tiles/vert {:title "Getting Clojure"
+                            :author "Russ Olson"
+                            :year 2018}))
+           :title
+           '(dissoc great-book :tiles/slot :tiles/slot)
+           :favourite-zoo-animal
+           :author
+           '(println great-book))
+
+
    ))
