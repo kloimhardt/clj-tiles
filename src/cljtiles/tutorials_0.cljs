@@ -118,8 +118,65 @@
            '(first :tiles/slot)
            'books
            '(nth books 1))
-   (gb/rpg []
+   (gb/rpg [[0 0] [0 150] [0 200]]
            '(def books
-              (:tiles/fvert (println "a" "b" "c"))))
+              (:tiles/fvert
+               (println
+                 "Hi! Please copy+paste the Vector block from the previous workspace."
+                 "Go to the previous workspace, left-click on the blue area, so that it has a yellow border. Then press Ctrl+C (maybe cmd+c works on your keyboard)."
+                 "Return to this workspace here, press Ctrl+V (or cmd+v). Make sure to remove the println block before pasting (remove it by right clicking in the blue area)")))
+           'books
+           '(vec-rest :tiles/slot))
+   (gb/rpg [[0 0] [0 100] [0 150] [0 200]]
+           '(def books ["Emma" "Getting Clojure" "War and Peace"])
+           'books
+           '(vec-rest :tiles/slot)
+           '(vec-rest :tiles/slot))
+   (gb/rpg []
+           [:tiles/slot]
+           "Getting Clojure"
+           '(vec-rest :tiles/slot))
+   (gb/rpg [[0 0] [0 100] [0 150] [0 200]]
+           '(def books ["Emma" "Getting Clojure" "War and Peace"])
+           "Carrie"
+           '(conj :tiles/slot :tiles/slot)
+           'books)
+   (gb/rpg [[0 0] [100 50] [0 100] [0 150] [0 200]]
+           '(def books :tiles/slot)
+           "copy+paste the Vector from previous workspace"
+           "Carrie"
+           '(vec-cons :tiles/slot :tiles/slot)
+           'books)
+   (gb/rpg [[0 0] [0 100] [0 150] [0 250] [0 300] [100 300] [200 300]]
+           '(def books ["Emma" "Getting Clojure" "War and Peace"])
+           '(conj books "Carrie")
+           '(def :tiles/slot :tiles/slot)
+           '(println :tiles/slot)
+           'books
+           'more-books
+           'more-books)
+   (gb/rpg [[100 0] [0 20] [300 20] [150 50] [0 100] [300 100] [100 250]]
+           "Getting Clojure"
+           "title"
+           2018
+           '(:tiles/fvert (hash-map :tiles/slot :tiles/slot :tiles/slot
+                                    :tiles/slot :tiles/slot :tiles/slot))
+           "Russ Olson"
+           "published"
+           "author"
+           )
+   (gb/rpg [[0 0] [0 200] [100 200] [200 200] [0 250] [0 350]]
+           '(:tiles/fvert (hash-map "title" "Getting Clojure" "author"
+                                    "Russ Olson" "published" 2018))
+           'book
+           'book
+           "published"
+           '(def :tiles/slot :tiles/slot)
+           '(get :tiles/slot :tiles/slot)
+           )
+   (gb/page (gb/shift-coords 2)
+            (gb/text "Russ Olson")
+            (gb/t-map [:title (gb/text "v1")] [:author (gb/text "v2")] [:published (gb/text "v3")])
+            )
 
    ))

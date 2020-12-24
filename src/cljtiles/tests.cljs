@@ -30,13 +30,13 @@
         tests (map #(= %1 %2) t0 t1)]
     (def t0 t0)
     (def t1 t1)
-    [(if (seq (filter not tests)) "tests failed" "all ok!") tests]))
+    [(count tests)(if (seq (filter not tests)) "tests failed" "all ok!") tests]))
 
 (comment
 
   (dotests)
   (map #(= %1 %2) t0 t1)
-  [(nth t0 16) (nth t1 16)]
+  [(nth t0 31) (nth t1 31)]
   (= (nth t0 16) (nth t1 16))
 
   )

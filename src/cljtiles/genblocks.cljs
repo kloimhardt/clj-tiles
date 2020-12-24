@@ -8,7 +8,7 @@
 (defmethod gen :slot [] nil)
 
 (defn blockmap [type givenid]
-   {:type type :id (str type givenid)})
+  {:type type :id (str type givenid)})
 
 (defmethod gen :num [{:keys [nummer]} givenid]
   [:block (blockmap "num" givenid)
@@ -31,6 +31,19 @@
           (map-indexed (fn [idx v]
                          [:value {:name (str "args-" (+ idx 2))}
                           (gen v (str (+ idx 2) "-" id))]) argsvec))))
+
+(defmethod gen :map [{:keys [argsvec subtype]} givenid]
+  (let [xml-block-type (str subtype "-" (* (count argsvec) 2) "-inp")
+        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
+    (into [:block bm]
+          (apply concat
+                 (map-indexed (fn [idx v]
+                                (let [i (inc (* idx 2))]
+                                  [[:field {:name (str "key-" i)}
+                                    (str (first v))]
+                                   [:value {:name (str "val-" (inc i))}
+                                    (gen (second v) (str (inc i) "-" id))]]))
+                              argsvec)))))
 
 (defn addcoords [block [x y]]
   (update block 1 #(-> %
@@ -64,6 +77,9 @@
 (defn args [& argsvec]
   {:type :args :argsvec argsvec})
 
+(defn t-map [& argsvec]
+  {:type :map :subtype "map-h" :argsvec argsvec})
+
 (defn chapter [& pages] (into [] pages))
 
 (defn exp [v]
@@ -94,9 +110,9 @@
     (vector? l) (apply args (map parse l))
     :else
     (cond
+      (= ":tiles/num" opt) (num l)
       (nil? l) (num "nil")
       (string? l) (text l)
-      (= ":tiles/num" opt) (num l)
       (= :tiles/slot l) slot
       :else (num l))))
 
@@ -142,6 +158,8 @@
 
   (= (args (num 2) slot)
      (exp (args (num 2) slot))
-     (parse [2 :tiles/slot]))
+     (parse [2 :tiles/slot])))
 
-  )
+(gen (t-map ["a" (text "v1")] ["b" (text "v2")] ["c" (text "v3")]) "id1")
+(gen (t-map [:a (text "v1")] [:b (text "v2")] [:c (text "v3")]) "id1")
+

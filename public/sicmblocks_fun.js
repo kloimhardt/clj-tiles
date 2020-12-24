@@ -883,6 +883,46 @@ Blockly.Blocks["funs-h-6-inp"]= {
         }
     )}};
 
+Blockly.Blocks["funs-v-6-inp"]= {
+    init: function() {this.jsonInit(
+        {
+            "type": "funs-v-6-inp",
+            "message0": "%1 %2 %3 %4 %5 %6",
+            "args0": [
+                {
+                    "type": "field_input",
+                    "name": "kopf",
+                    "text": ""
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-2"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-3"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-4"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-5"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-6"
+                }
+            ],
+            "inputsInline": false,
+            "output": null,
+            "colour": "#A65C81",
+            "tooltip": "",
+            "helpUrl": ""
+        }
+    )}};
+
 
 Blockly.Blocks["funs-h-7-cus"]= {
     init: function() {this.jsonInit(
@@ -972,6 +1012,49 @@ Blockly.Blocks["funs-h-7-inp"]= {
         }
     )}};
 
+Blockly.Blocks["funs-v-7-inp"]= {
+    init: function() {this.jsonInit(
+        {
+            "type": "funs-v-7-inp",
+            "message0": "%1 %2 %3 %4 %5 %6 %7",
+            "args0": [
+                {
+                    "type": "field_input",
+                    "name": "kopf",
+                    "text": ""
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-2"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-3"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-4"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-5"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-6"
+                },
+                {
+                    "type": "input_value",
+                    "name": "args-7"
+                }
+            ],
+            "inputsInline": false,
+            "output": null,
+            "colour": 140,
+            "tooltip": "",
+            "helpUrl": ""
+        }
+    )}};
 
 Blockly.Blocks["list-h-2"]= {
     init: function() {this.jsonInit(
@@ -1432,6 +1515,49 @@ Blockly.Blocks['text']= {
                 "helpUrl": ""
             }
         );}};
+
+    Blockly.Blocks["map-h-6-inp"]= {
+        init: function() {this.jsonInit(
+            {
+                "type": "map-h-6-inp",
+                "message0": "%1 %2 %3 %4 %5 %6",
+                "args0": [
+                    {
+                        "type": "field_input",
+                        "name": "key-1",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "val-2"
+                    },
+                    {
+                        "type": "field_input",
+                        "name": "key-3",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "val-4"
+                    },
+                    {
+                        "type": "field_input",
+                        "name": "key-5",
+                        "text": ""
+                    },
+                    {
+                        "type": "input_value",
+                        "name": "val-6"
+                    }
+                ],
+                "inputsInline": true,
+                "output": null,
+                "colour": 230,
+                "tooltip": "",
+                "helpUrl": ""
+            }
+        );}};
+
  Blockly.Blocks["map-h-8"]= {
         init: function() {this.jsonInit(
             {
