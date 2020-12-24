@@ -8,8 +8,7 @@
 (defmethod gen :slot [] nil)
 
 (defn blockmap [type givenid inline?]
-  (conj {:type type :id (str type givenid)}
-        (when (some? inline?) {:inline (str inline?)})))
+  {:type type :id (str type givenid) :inline (str inline?)})
 
 (defmethod gen :num [{:keys [nummer inline?]} givenid]
   [:block (blockmap "num" givenid inline?)
@@ -68,10 +67,10 @@
   {:type :fun :subtype "funs-h" :kopf name :argsvec argsvec})
 
 (defn fun-inli [name & argsvec]
-  (assoc (apply fun name argsvec) :subtype "inli-h"))
+  (assoc (apply fun name argsvec) :subtype "infi-h"))
 
 (defn fun-vert [name & argsvec]
-  (assoc (apply fun name argsvec) :subtype "funs-h" :inline? false))
+  (assoc (apply fun name argsvec) :inline? false))
 
 (def slot {:type :slot})
 
@@ -82,7 +81,7 @@
   {:type :map :subtype "map-h" :argsvec argsvec :inline? true})
 
 (defn t-map-vert [& argsvec]
-  {:type :map :subtype "map-h" :argsvec argsvec :inline? false})
+  (assoc (apply t-map argsvec) :inline? false))
 
 (defn chapter [& pages] (into [] pages))
 

@@ -363,9 +363,9 @@ Blockly.Blocks["inli-h-3"]= {
          "helpUrl": ""}
     )}};
 
-    Blockly.Blocks["inli-h-3-inp"]= {
+    Blockly.Blocks["infi-h-3-inp"]= {
         init: function() {this.jsonInit(
-            {"type": "inli-h-3-inp",
+            {"type": "infi-h-3-inp",
              "message0": "%1 %2 %3",
              "args0": [
                  {"type": "input_value",
@@ -570,34 +570,6 @@ Blockly.Blocks["funs-h-3-cus"]= {
             }
         )}};
 
-    Blockly.Blocks["funs-v-3-inp"]= {
-        init: function() {this.jsonInit(
-            {
-                "type": "funs-v-3-inp",
-                "message0": "%1 %2 %3",
-                "args0": [
-                    {
-                        "type": "field_input",
-                        "name": "kopf",
-                        "text": ""
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-2"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-3"
-                    }
-                ],
-                "inputsInline": false,
-                "output": null,
-                "colour": 140,
-                "tooltip": "",
-                "helpUrl": ""
-            }
-        )}};
-
 Blockly.Blocks["funs-h-4-cus"]= {
     init: function() {this.jsonInit(
         {
@@ -655,38 +627,6 @@ Blockly.Blocks["funs-h-4-cus"]= {
                     }
                 ],
                 "inputsInline": true,
-                "output": null,
-                "colour": 230,
-                "tooltip": "",
-                "helpUrl": ""
-            }
-        )}};
-
-    Blockly.Blocks["funs-v-4-inp"]= {
-        init: function() {this.jsonInit(
-            {
-                "type": "funs-v-4-inp",
-                "message0": "%1 %2 %3 %4",
-                "args0": [
-                    {
-                        "type": "field_input",
-                        "name": "kopf",
-                        "text": ""
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-2"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-3"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-4"
-                    }
-                ],
-                "inputsInline": false,
                 "output": null,
                 "colour": 230,
                 "tooltip": "",
@@ -765,43 +705,6 @@ Blockly.Blocks["funs-h-5-cus"]= {
                 "helpUrl": ""
             }
         )}};
-
-    Blockly.Blocks["funs-v-5-inp"]= {
-        init: function() {this.jsonInit(
-            {
-                "type": "funs-v-5-inp",
-                "message0": "%1 %2 %3 %4 %5",
-                "args0": [
-                    {
-                        "type": "field_input",
-                        "name": "kopf",
-                        "text": ""
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-2"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-3"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-4"
-                    },
-                    {
-                        "type": "input_value",
-                        "name": "args-5"
-                    }
-                ],
-                "inputsInline": false,
-                "output": null,
-                "colour": 360,
-                "tooltip": "",
-                "helpUrl": ""
-            }
-        )}};
-
 
 Blockly.Blocks["funs-h-6-cus"]= {
     init: function() {this.jsonInit(
@@ -882,47 +785,6 @@ Blockly.Blocks["funs-h-6-inp"]= {
             "helpUrl": ""
         }
     )}};
-
-Blockly.Blocks["funs-v-6-inp"]= {
-    init: function() {this.jsonInit(
-        {
-            "type": "funs-v-6-inp",
-            "message0": "%1 %2 %3 %4 %5 %6",
-            "args0": [
-                {
-                    "type": "field_input",
-                    "name": "kopf",
-                    "text": ""
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-2"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-3"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-4"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-5"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-6"
-                }
-            ],
-            "inputsInline": false,
-            "output": null,
-            "colour": "#A65C81",
-            "tooltip": "",
-            "helpUrl": ""
-        }
-    )}};
-
 
 Blockly.Blocks["funs-h-7-cus"]= {
     init: function() {this.jsonInit(
@@ -1005,50 +867,6 @@ Blockly.Blocks["funs-h-7-inp"]= {
                 }
             ],
             "inputsInline": true,
-            "output": null,
-            "colour": 140,
-            "tooltip": "",
-            "helpUrl": ""
-        }
-    )}};
-
-Blockly.Blocks["funs-v-7-inp"]= {
-    init: function() {this.jsonInit(
-        {
-            "type": "funs-v-7-inp",
-            "message0": "%1 %2 %3 %4 %5 %6 %7",
-            "args0": [
-                {
-                    "type": "field_input",
-                    "name": "kopf",
-                    "text": ""
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-2"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-3"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-4"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-5"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-6"
-                },
-                {
-                    "type": "input_value",
-                    "name": "args-7"
-                }
-            ],
-            "inputsInline": false,
             "output": null,
             "colour": 140,
             "tooltip": "",
