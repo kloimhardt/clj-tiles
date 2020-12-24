@@ -7,26 +7,26 @@
 
 (defmethod gen :slot [] nil)
 
-(defn blockmap [type givenid & [inline?]]
+(defn blockmap [type givenid inline?]
   (conj {:type type :id (str type givenid)}
         (when (some? inline?) {:inline (str inline?)})))
 
-(defmethod gen :num [{:keys [nummer]} givenid]
-  [:block (blockmap "num" givenid)
+(defmethod gen :num [{:keys [nummer inline?]} givenid]
+  [:block (blockmap "num" givenid inline?)
    [:field {:name "nummer"} nummer]])
 
 ;; is really a vector
-(defmethod gen :args [{:keys [argsvec]} givenid]
+(defmethod gen :args [{:keys [argsvec inline?]} givenid]
   (let [xml-block-type (str "args-" (count argsvec))
-        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
+        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
     (into [:block bm]
           (map-indexed (fn [idx v]
                          [:value {:name (str "arg_" (+ idx 1))}
                           (gen v (str (+ idx 1) "-" id))]) argsvec))))
 
-(defmethod gen :fun [{:keys [kopf argsvec subtype]} givenid]
+(defmethod gen :fun [{:keys [kopf argsvec subtype inline?]} givenid]
   (let [xml-block-type (str subtype "-" (inc (count argsvec)) "-inp")
-        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
+        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
     (into [:block bm
            [:field {:name "kopf"} kopf]]
           (map-indexed (fn [idx v]
@@ -71,7 +71,7 @@
   (assoc (apply fun name argsvec) :subtype "inli-h"))
 
 (defn fun-vert [name & argsvec]
-  (assoc (apply fun name argsvec) :subtype "funs-v"))
+  (assoc (apply fun name argsvec) :subtype "funs-h" :inline? false))
 
 (def slot {:type :slot})
 

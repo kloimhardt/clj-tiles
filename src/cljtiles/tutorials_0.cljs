@@ -178,5 +178,4 @@
             (gb/num 2018)
             (gb/text "Getting Clojure")
             )
-
    ))
