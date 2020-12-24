@@ -120,6 +120,6 @@
            '(nth books 1))
    (gb/rpg []
            '(def books
-              (println "a" "b" "c")))
+              (:tiles/fvert (println "a" "b" "c"))))
 
    ))

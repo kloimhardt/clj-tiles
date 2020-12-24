@@ -1,6 +1,7 @@
 (ns cljtiles.genblocks
   (:require-macros [hiccups.core :as hiccups :refer [html]])
-  (:require [hiccups.runtime :as hiccupsrt]))
+  (:require [hiccups.runtime :as hiccupsrt]
+            [clojure.string :as str]))
 
 (defmulti gen (fn [m _] (:type m)))
 
@@ -79,21 +80,23 @@
       (string? v) (text v)
       :else (num v))))
 
-(defn parse [l]
+(defn parse [l & [opt]]
   (cond
     (list? l)
     (let [erst (str (first l))
           appl (fn [fuct] (apply fuct erst (map parse (rest l))))]
       (cond
+        (str/starts-with? erst ":tiles") (parse (second l) erst)
         (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-inli)
-        (#{"def" "defn" "do"} erst) (appl fun-vert)
-        (= ":tiles/num" erst) (num (last l))
+        (or (#{"def" "defn" "do"} erst)
+            (= ":tiles/fvert" opt)) (appl fun-vert)
         :else (appl fun)))
     (vector? l) (apply args (map parse l))
     :else
     (cond
       (nil? l) (num "nil")
       (string? l) (text l)
+      (= ":tiles/num" opt) (num l)
       (= :tiles/slot l) slot
       :else (num l))))
 
