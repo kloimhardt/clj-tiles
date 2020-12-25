@@ -11,7 +11,8 @@
    [tubax.core :as sax]
    [cljtiles.xmlparse :as edn->code]
    [cljtiles.xmlparse-orig :as edn->code-orig]
-   [clojure.string :as cs]))
+   [clojure.string :as cs]
+   ["blockly" :as blockly]))
 
 (def tutorials (concat t-a/vect
                        t-b/vect
@@ -51,6 +52,15 @@
   (-> (str s)
       (cs/replace #"\(clojure.core/deref app-state\)" "@app-state")
       (cs/replace #"\[\]" "[ ]")))
+
+(defn pipethrough [xml-text]
+  (.. blockly/Xml
+      (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-text))
+                                    (.getMainWorkspace blockly)))
+  (->> (.-mainWorkspace blockly)
+       (.workspaceToDom blockly/Xml)
+       (.domToPrettyText blockly/Xml))
+  )
 
 (defn test-consistency []
   (let [orig t-0s/vect-code
