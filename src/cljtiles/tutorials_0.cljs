@@ -236,5 +236,11 @@
            '(:tiles/deref app-state)
            '(println :tiles/slot)
            '(:tiles/deref app-state))
-
+   (gb/rpg [[0 0] [150 0] [0 50] [150 50] [250 50] [0 100] [0 100]]
+           '(println :tiles/slot)
+           'app-state
+           '(swap! :tiles/slot :tiles/slot)
+           'inc
+           '(:tiles/deref app-state)
+           '(println (:tiles/deref app-state)))
    ))
