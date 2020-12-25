@@ -67,14 +67,17 @@
        (into [:xml])
        html))
 
-(defn text [txt]
-  {:type :num :nummer (str "\"" txt "\"")})
+(defn num [nummer]
+  {:type :num :nummer nummer})
 
 (defn kw [k]
   {:type :num :nummer (str k)})
 
-(defn num [nummer]
-  {:type :num :nummer nummer})
+(defn text [txt]
+  {:type :num :nummer (str "\"" txt "\"")})
+
+(defn tiles-deref [e]
+  {:type :num :nummer (str "@" e)})
 
 (defn fun [name & argsvec]
   {:type :fun :subtype "funs-h" :kopf name :argsvec argsvec})
@@ -116,6 +119,7 @@
       (cond
         (= ":tiles/vert" erst) (assoc (parse (second l)) :inline? false)
         (= ":tiles/num" erst) (num (second l))
+        (= ":tiles/deref" erst) (tiles-deref (second l))
         (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-infi)
         (#{"def" "defn" "do"} erst) (assoc (appl fun) :inline? false)
         :else (appl fun)))

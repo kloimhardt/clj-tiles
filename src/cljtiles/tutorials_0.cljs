@@ -226,9 +226,15 @@
                             :year 2018}))
            :title
            '(dissoc great-book :tiles/slot :tiles/slot)
-           :favourite-zoo-animal
+           :favorite-zoo-animal
            :author
            '(println great-book))
-
+   (gb/rpg [[0 0] [150 0] [0 50] [150 50] [0 100] [150 100]]
+           '(println :tiles/slot)
+           '(:tiles/deref app-state)
+           '(inc :tiles/slot)
+           '(:tiles/deref app-state)
+           '(println :tiles/slot)
+           '(:tiles/deref app-state))
 
    ))

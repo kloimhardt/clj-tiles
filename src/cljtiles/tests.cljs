@@ -38,8 +38,8 @@
 
   (dotests)
   (map #(= %1 %2) t0 t1)
-  [(nth t0 35) (nth t1 35)]
-  (= (nth t0 16) (nth t1 16))
+  [(nth t0 39) (nth t1 39)]
+  (= (nth t0 40) (nth t1 40))
 
   (edn->code/parse
     (sax/xml->clj (gb/rpg [[0 0] [0 100] [0 170] [100 170] [0 220]]
