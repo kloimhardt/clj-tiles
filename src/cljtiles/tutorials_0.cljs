@@ -147,7 +147,7 @@
            "Carrie"
            '(vec-cons :tiles/slot :tiles/slot)
            'books)
-   (gb/rpg [[0 0] [0 100] [0 150] [0 250] [0 300] [100 300] [200 300]]
+   (gb/rpg [[0 0] [0 100] [0 150] [0 250] [0 300] [100 300] [250 300]]
            '(def books ["Emma" "Getting Clojure" "War and Peace"])
            '(conj books "Carrie")
            '(def :tiles/slot :tiles/slot)
@@ -231,18 +231,18 @@
            '(println great-book))
    (gb/rpg [[0 0] [150 0] [0 50] [150 50] [0 100] [150 100]]
            '(println :tiles/slot)
-           '(:tiles/deref app-state)
+           '@app-state
            '(inc :tiles/slot)
-           '(:tiles/deref app-state)
+           '@app-state
            '(println :tiles/slot)
-           '(:tiles/deref app-state))
+           '@app-state)
    (gb/rpg [[0 0] [150 0] [0 50] [150 50] [250 50] [0 100] [0 100]]
            '(println :tiles/slot)
            'app-state
            '(swap! :tiles/slot :tiles/slot)
            'inc
-           '(:tiles/deref app-state)
-           '(println (:tiles/deref app-state)))
+           '@app-state
+           '(println @app-state))
    (gb/rpg []
            [:div :tiles/slot]
            [:p "Hello, World!"])
@@ -267,29 +267,28 @@
            'click-function
            'click-function
            '(defn :tiles/slot [] :tiles/slot)
-           '(println (:tiles/deref app-state))
+           '(println @app-state)
            '(:tiles/vert [:div
                           [:hr]
                           [:h1 "Being in the World"]
                           (:tiles/vert [:button {:id "first-button" :on-click :tiles/slot} "Hello, World. I print zero in the Output area"])
                           [:hr]]))
    (gb/rpg [[0 0] [150 0] [300 0] [0 50] [0 200] [200 400]]
-           '(:tiles/deref app-state)
+           '@app-state
            'app-state
            'inc
-           '(defn click-function []
+           '(defn click-function [ ]
               (do (swap! :tiles/slot :tiles/slot)
                   (println :tiles/slot)))
            '(:tiles/vert [:div
                           [:hr]
                           [:h1 "Being in the World"]
                           (:tiles/vert [:button {:id "first-button" :on-click click-function} "Hello, World. I count!"])
-                          :tiles/slot
                           [:hr]]))
    (gb/rpg [[0 0] [0 150] [0 200] [200 400]]
            '(defn click-function []
               (do (swap! app-state inc)
-                  (println (:tiles/deref app-state))))
+                  (println @app-state)))
            '(str " " :tiles/slot)
            '(:tiles/vert [:div
                           [:hr]
@@ -297,7 +296,7 @@
                           (:tiles/vert [:button {:id "first-button" :on-click click-function} "Hello, World. I obviously count."])
                           :tiles/slot
                           [:hr]])
-           '(:tiles/deref app-state))
+           '@app-state)
    (gb/rpg [[0 0] [0 100] [0 200] [0 250]]
            '(defn click-function
               []
@@ -319,4 +318,4 @@
                 [:image
                  {:href "rocket.png",
                   :x 50,
-                  :y (- 160 (:tiles/deref app-state))}]])]))))
+                  :y (- 160 @app-state)}]])]))))
