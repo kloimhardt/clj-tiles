@@ -297,4 +297,26 @@
                           (:tiles/vert [:button {:id "first-button" :on-click click-function} "Hello, World. I obviously count."])
                           :tiles/slot
                           [:hr]])
-           '(:tiles/deref app-state))))
+           '(:tiles/deref app-state))
+   (gb/rpg [[0 0] [0 100] [0 200] [0 250]]
+           '(defn click-function
+              []
+              (swap! app-state inc))
+           '(defn start-rocket
+              []
+              (start-timer click-function
+                           30
+                           200
+                           "Timer started"))
+           '(reset! app-state 0)
+           '(:tiles/vert
+             [:div
+              [:button
+               {:id "launch", :on-click start-rocket}
+               "Launch rocket"]
+              (:tiles/vert
+               [:svg {:height 200 :id "rocket"}
+                [:image
+                 {:href "rocket.png",
+                  :x 50,
+                  :y (- 160 (:tiles/deref app-state))}]])]))))

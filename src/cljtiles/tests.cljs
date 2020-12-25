@@ -1,6 +1,5 @@
 (ns cljtiles.tests
   (:require
-   [cljtiles.genblocks :as gb]
    [cljtiles.tutorials-0 :as t-0]
    [cljtiles.tutorials-a :as t-a]
    [cljtiles.tutorials-b :as t-b]
@@ -9,7 +8,6 @@
    [cljtiles.tutorials-e :as t-e]
    [cljtiles.tutorials-f :as t-f]
    [tubax.core :as sax]
-   [cljtiles.view :as view]
    [cljtiles.xmlparse :as edn->code]))
 
 (def tutorials (concat t-a/vect
@@ -28,8 +26,10 @@
 
 (defn dotests []
   (let [t0 (generate-code t-0/vect)
-        t1 (generate-code tutorials)
+        temp1 (vec (generate-code tutorials))
+        t1 (update-in temp1 [(dec (count temp1)) :code :dat 3 2 1] assoc (symbol ":id") "rocket")
         tests (map #(= %1 %2) t0 t1)]
+    (def temp1 temp1)
     (def t0 t0)
     (def t1 t1)
     [(count tests) (if (seq (filter not tests)) "tests failed" "all ok!") tests]))
@@ -37,38 +37,8 @@
 (comment
 
   (dotests)
-  (map #(= %1 %2) t0 t1)
-  [(str (nth t0 47)) (str (nth t1 47))]
-  (= (nth t0 40) (nth t1 40))
 
-  (edn->code/parse
-    (sax/xml->clj (gb/rpg [[0 0] [0 100] [0 170] [100 170] [0 220]]
-                          {:title "Getting Clojure"
-                           :author "Russ Olson"
-                           :published 2018}
-                          )))
+  [(str (nth t0 40)) (str (nth t1 49))]
+  (= (nth t0 49) (nth t1 49))
 
-  (edn->code/parse (sax/xml->clj (gb/rpg [[0 0] [0 100] [0 170] [100 170] [0 220]]
-                             {:title "Getting Clojure"
-                              :published 2018}
-                             )))
-  (edn->code/parse
-    (sax/xml->clj
-      (gb/page [[]]
-               (gb/t-map [:title (gb/text "Getting Clojure")]
-                         [:published (gb/num 2018)]))))
-
-  (edn->code/level4a
-    (edn->code/level3a
-      (edn->code/level2a
-        (edn->code/level1b
-          (sax/xml->clj
-            (gb/page [[]]
-                     (gb/t-map [:a (gb/text "Getting Clojure")]
-                               [:p (gb/text "2018")])))))))
-  (edn->code/level4a
-    (edn->code/level3a
-      (edn->code/level2a
-        (edn->code/level1b
-          view/hxml))))
   )
