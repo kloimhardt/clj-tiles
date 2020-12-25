@@ -51,7 +51,12 @@
       (cond
         (and (:pair x) (:pair (last a)))
         (assoc x :dat (vec (concat (butlast a) (:dat (last a)))))
-        (and (= (:fun x) "defn") (or (:var (a 1)) (:num (a 1))))
+        ;; this is to wrap a var or number/symbol in [brackets] if
+        ;; it appears as second argument (= parameter) of a function
+        ;; except the symbol is already an empty vector
+        (and (= (:fun x) "defn") (or (:var (a 1))
+                                     (let [symb (:num (a 1))]
+                                       (when-not (#{"[]" "[ ]"} symb) symb))))
         (assoc x :dat [(a 0) {:args "args-1" :dat [(a 1)]} (a 2)])
         (and (= (:fun x) "fn") (or (:var (a 0)) (:num (a 0))))
         (assoc x :dat [{:args "args-1" :dat [(a 0)]} (a 1)])

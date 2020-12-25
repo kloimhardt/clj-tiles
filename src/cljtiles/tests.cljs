@@ -38,7 +38,7 @@
 
   (dotests)
   (map #(= %1 %2) t0 t1)
-  [(nth t0 39) (nth t1 39)]
+  [(str (nth t0 47)) (str (nth t1 47))]
   (= (nth t0 40) (nth t1 40))
 
   (edn->code/parse

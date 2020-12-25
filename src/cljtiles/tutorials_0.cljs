@@ -250,19 +250,51 @@
            [:hr]
            [:hr]
            :div
-           '(:tiles/vert [:tiles/slot :tiles/slot [:h1 "Being in the World"] :tiles/slot])
-           )
+           '(:tiles/vert [:tiles/slot :tiles/slot [:h1 "Being in the World"] :tiles/slot]))
    (gb/rpg [[0 0] [0 50] [130 170]]
            [:button :tiles/slot]
            '(:tiles/vert [:div [:hr] [:h1 "Being in the World"] :tiles/slot [:hr]])
-           "Hello, World. I don't do much."
-           )
+           "Hello, World. I don't do much.")
    (gb/rpg [[0 0] [0 200] [0 250]]
-           '(:tiles/vert [:div [:hr] [:h1 "Being in the World"] [:button :tiles/slot "Hello, World. I still don't do much."] [:hr]])
+           '(:tiles/vert [:div
+                          [:hr]
+                          [:h1 "Being in the World"]
+                          [:button :tiles/slot "Hello, World. I still don't do much."]
+                          [:hr]])
            nil
            {:id "first-button" :on-click :tiles/slot})
-   #_(gb/rpg []
+   (gb/rpg [[0 0] [150 0] [0 50] [150 50] [0 150]]
            'click-function
            'click-function
-           '(defn :tiles/slot :tiles/emptyvec  :tiles/slot))
-   ))
+           '(defn :tiles/slot [] :tiles/slot)
+           '(println (:tiles/deref app-state))
+           '(:tiles/vert [:div
+                          [:hr]
+                          [:h1 "Being in the World"]
+                          (:tiles/vert [:button {:id "first-button" :on-click :tiles/slot} "Hello, World. I print zero in the Output area"])
+                          [:hr]]))
+   (gb/rpg [[0 0] [150 0] [300 0] [0 50] [0 200] [200 400]]
+           '(:tiles/deref app-state)
+           'app-state
+           'inc
+           '(defn click-function []
+              (do (swap! :tiles/slot :tiles/slot)
+                  (println :tiles/slot)))
+           '(:tiles/vert [:div
+                          [:hr]
+                          [:h1 "Being in the World"]
+                          (:tiles/vert [:button {:id "first-button" :on-click click-function} "Hello, World. I count!"])
+                          :tiles/slot
+                          [:hr]]))
+   (gb/rpg [[0 0] [0 150] [0 200] [200 400]]
+           '(defn click-function []
+              (do (swap! app-state inc)
+                  (println (:tiles/deref app-state))))
+           '(str " " :tiles/slot)
+           '(:tiles/vert [:div
+                          [:hr]
+                          [:h1 "Being in the World"]
+                          (:tiles/vert [:button {:id "first-button" :on-click click-function} "Hello, World. I obviously count."])
+                          :tiles/slot
+                          [:hr]])
+           '(:tiles/deref app-state))))

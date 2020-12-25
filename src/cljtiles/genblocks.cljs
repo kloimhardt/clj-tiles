@@ -129,7 +129,10 @@
         (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-infi)
         (#{"def" "defn" "do"} erst) (assoc (appl fun) :inline? false)
         :else (appl fun)))
-    (vector? l) (apply args (map parse l))
+    (vector? l)
+    (if (empty? l)
+      (num "[ ]")
+      (apply args (map parse l)))
     (map? l) (apply t-map (map (fn [[k v]] [k (parse v)]) l))
     :else
     (cond
