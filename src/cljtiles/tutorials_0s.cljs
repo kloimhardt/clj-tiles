@@ -168,7 +168,6 @@
    ['(defn click-function
       [ ]
       (println @app-state))
-    '(click-function)
     [:div [:hr] [:h1 "Being in the World"]
      [:button
       {:id "first-button",
@@ -179,7 +178,6 @@
       [ ]
       (do (swap! app-state inc)
           (println @app-state)))
-    '(click-function)
     [:div [:hr] [:h1 "Being in the World"]
      [:button
       {:id "first-button",

@@ -12,6 +12,7 @@
    [cljtiles.xmlparse :as edn->code]
    [cljtiles.xmlparse-orig :as edn->code-orig]
    [clojure.string :as cs]
+   [clojure.data :as cd]
    ["blockly" :as blockly]))
 
 (def tutorials (concat t-a/vect
@@ -64,7 +65,7 @@
 
 (defn test-consistency []
   (let [orig t-0s/vect-code
-        proc (mapv #(get-code (prs (sax/xml->clj %)))  t-0s/vect)
+        proc (mapv #(get-code (prs (sax/xml->clj %))) t-0s/vect)
         tests (map #(= (repls %1) (str %2)) orig proc)]
     (def orig orig)
     (def proc proc)
@@ -76,8 +77,17 @@
   (test-consistency)
 
   [(repls (last orig))
-   (str (last proc))
-   ]
+   (str (last proc))]
+
+  (doall (map-indexed (fn[idx val] (print idx) (pipethrough val)) (take 55 t-0s/vect)))
+
+  [(assoc (sax/xml->clj (pipethrough (t-0s/vect 24))) :attributes {})
+   (sax/xml->clj (t-0s/vect 24))]
+  (cd/diff (assoc (sax/xml->clj (pipethrough (t-0s/vect 24))) :attributes {})
+       (sax/xml->clj (t-0s/vect 24)))
+
+  (map #(= (assoc (sax/xml->clj (pipethrough %)) :attributes {})
+          (sax/xml->clj %)) t-0s/vect)
 
   (dotests)
 
