@@ -7,26 +7,31 @@
 
 (defmethod gen :slot [] nil)
 
-(defn blockmap [type givenid]
-  {:type type :id (str type givenid)})
+(defn blockmap [type givenid & [inline?]]
+  (cond-> {:type type :id (str type givenid)}
+    (some? inline?) (assoc :inline (str inline?))))
 
 (defmethod gen :num [{:keys [nummer]} givenid]
   [:block (blockmap "num" givenid)
    [:field {:name "nummer"} nummer]])
 
+(defmethod gen :text [{:keys [dertext]} givenid]
+  [:block (blockmap "text" givenid)
+   [:field {:name "dertext"} dertext]])
+
 ;; is really a vector
 (defmethod gen :args [{:keys [argsvec inline?]} givenid]
   (let [xml-block-type (str "args-" (count argsvec))
-        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
-    (into [:block (assoc bm :inline (str inline?))]
+        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
+    (into [:block bm]
           (map-indexed (fn [idx v]
                          [:value {:name (str "arg_" (+ idx 1))}
                           (gen v (str (+ idx 1) "-" id))]) argsvec))))
 
 (defmethod gen :fun [{:keys [kopf argsvec subtype inline?]} givenid]
   (let [xml-block-type (str subtype "-" (inc (count argsvec)) "-inp")
-        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
-    (into [:block (assoc bm :inline (str inline?))
+        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
+    (into [:block bm
            [:field {:name "kopf"} kopf]]
           (map-indexed (fn [idx v]
                          [:value {:name (str "args-" (+ idx 2))}
@@ -38,8 +43,8 @@
 
 (defmethod gen :map [{:keys [argsvec subtype inline?]} givenid]
   (let [xml-block-type (str subtype "-" (* (count argsvec) 2) "-inp")
-        {:keys [id] :as bm} (blockmap xml-block-type givenid)]
-    (into [:block (assoc bm :inline (str inline?))]
+        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
+    (into [:block bm]
           (rearrange ;;(rearrange [1 2 3 4]) => (1 3 2 4)
             ;;the Blockly ui does this rearrangemnt to the XML and
             ;;the end->code/parse depends on it
@@ -67,6 +72,8 @@
        (into [:xml])
        html))
 
+(def slot {:type :slot})
+
 (defn num [nummer]
   {:type :num :nummer nummer})
 
@@ -74,7 +81,7 @@
   {:type :num :nummer (str k)})
 
 (defn text [txt]
-  {:type :num :nummer (str "\"" txt "\"")})
+  {:type :text :dertext txt})
 
 (defn tiles-deref [e]
   {:type :num :nummer (str "@" e)})
@@ -85,14 +92,13 @@
 (defn fun-infi [name & argsvec]
   (assoc (apply fun name argsvec) :subtype "infi-h"))
 
-(def slot {:type :slot})
 
 (defn args [& argsvec]
   {:type :args :argsvec argsvec})
 
 (defn t-map [& argsvec]
   (if (> (count argsvec) 1)
-    {:type :map :subtype "map-h" :argsvec argsvec :inline? true}
+    {:type :map :subtype "map-h" :argsvec argsvec}
     (text "clj-tiles error: one-entry map not allowed")))
 
 (defn chapter [& pages] (into [] pages))
@@ -184,5 +190,6 @@
   (gen (t-map ["a" (text "v1")] ["b" (text "v2")] ["c" (text "v3")]) "id1")
   (gen (t-map [:a (text "v1")] [:b (text "v2")] [:c (text "v3")]) "id1")
 
+  (html (gen (parse '(def x 3))))
   )
 

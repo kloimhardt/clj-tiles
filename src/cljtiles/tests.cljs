@@ -24,7 +24,7 @@
        (catch js/Error e {:error (.-message e)})))
 
 (defn generate-code [t]
-  (map #(pr-str (prs (sax/xml->clj %))) t))
+  (map #(prs (sax/xml->clj %)) t))
 
 (defn dotests []
   (let [t0 (generate-code t-0/vect)

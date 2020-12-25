@@ -243,4 +243,26 @@
            'inc
            '(:tiles/deref app-state)
            '(println (:tiles/deref app-state)))
+   (gb/rpg []
+           [:div :tiles/slot]
+           [:p "Hello, World!"])
+   (gb/rpg [[0 0] [100 0] [0 50] [0 100]]
+           [:hr]
+           [:hr]
+           :div
+           '(:tiles/vert [:tiles/slot :tiles/slot [:h1 "Being in the World"] :tiles/slot])
+           )
+   (gb/rpg [[0 0] [0 50] [130 170]]
+           [:button :tiles/slot]
+           '(:tiles/vert [:div [:hr] [:h1 "Being in the World"] :tiles/slot [:hr]])
+           "Hello, World. I don't do much."
+           )
+   (gb/rpg [[0 0] [0 200] [0 250]]
+           '(:tiles/vert [:div [:hr] [:h1 "Being in the World"] [:button :tiles/slot "Hello, World. I still don't do much."] [:hr]])
+           nil
+           {:id "first-button" :on-click :tiles/slot})
+   #_(gb/rpg []
+           'click-function
+           'click-function
+           '(defn :tiles/slot :tiles/emptyvec  :tiles/slot))
    ))
