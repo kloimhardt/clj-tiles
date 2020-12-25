@@ -54,24 +54,27 @@
       (cs/replace #"\(clojure.core/deref app-state\)" "@app-state")
       (cs/replace #"\[\]" "[ ]")))
 
-(defn pipethrough [xml-text]
-  (.. blockly/Xml
-      (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-text))
-                                    (.getMainWorkspace blockly)))
-  (->> (.-mainWorkspace blockly)
-       (.workspaceToDom blockly/Xml)
-       (.domToPrettyText blockly/Xml))
-  )
-
 (defn test-consistency []
   (let [orig t-0s/vect-code
         proc (mapv #(get-code (prs (sax/xml->clj %))) t-0s/vect)
         tests (map #(= (repls %1) (str %2)) orig proc)]
     (def orig orig)
     (def proc proc)
-    [(count tests) (if (seq (filter not tests)) "con tests failed" "con all ok!") tests]
-    )
-  )
+    [(count tests) (if (seq (filter not tests)) "con tests failed" "con all ok!") tests]))
+
+(defn pipethrough [xml-text]
+  (.. blockly/Xml
+      (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-text))
+                                    (.getMainWorkspace blockly)))
+  (->> (.-mainWorkspace blockly)
+       (.workspaceToDom blockly/Xml)
+       (.domToPrettyText blockly/Xml)))
+
+(defn pipetest! []
+  (let [tests
+        (map #(= (assoc (sax/xml->clj (pipethrough %)) :attributes {})
+                 (sax/xml->clj %)) t-0s/vect)]
+    [(count tests) (if (seq (filter not tests)) "pipe tests failed" "pipe all ok!") tests]))
 
 (comment
   (test-consistency)
@@ -79,15 +82,10 @@
   [(repls (last orig))
    (str (last proc))]
 
-  (doall (map-indexed (fn[idx val] (print idx) (pipethrough val)) (take 55 t-0s/vect)))
+  (pipetest!)
 
-  [(assoc (sax/xml->clj (pipethrough (t-0s/vect 24))) :attributes {})
-   (sax/xml->clj (t-0s/vect 24))]
   (cd/diff (assoc (sax/xml->clj (pipethrough (t-0s/vect 24))) :attributes {})
        (sax/xml->clj (t-0s/vect 24)))
-
-  (map #(= (assoc (sax/xml->clj (pipethrough %)) :attributes {})
-          (sax/xml->clj %)) t-0s/vect)
 
   (dotests)
 

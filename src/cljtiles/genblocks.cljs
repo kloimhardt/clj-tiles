@@ -63,12 +63,15 @@
 (defn addcoords [block [x y]]
   (update block 1 #(-> %
                        (assoc :x x)
-                       (assoc :y y)
-                       (assoc :id (str (:id %) "-" x "-" y)))))
+                       (assoc :y y))))
+
+(defn gen-str [[x y]]
+  (str "-" x "-" y))
 
 (defn page [coords & blocks]
   (->> blocks
-       (map-indexed (fn [idx blk] (addcoords (gen blk) (coords idx))))
+       (map-indexed (fn [idx blk] (addcoords (gen blk (gen-str (coords idx)))
+                                             (coords idx))))
        (into [:xml])
        html))
 
@@ -153,7 +156,8 @@
     (let [shifted (apply shift-coords (count blocks) coords)]
       (->> blocks
            (map-indexed (fn [idx blk]
-                          (addcoords (gen (parser-fn blk)) (shifted idx))))
+                          (addcoords (gen (parser-fn blk) (gen-str (shifted idx)))
+                                     (shifted idx))))
            (into [:xml])
            html))))
 
