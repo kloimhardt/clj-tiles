@@ -23,7 +23,7 @@
 (def menu false)
 
 (print (tst/dotests))
-(print (tst/test-consistency))
+(print (tst/test-consistency false))
 
 (def tutorials (vec (concat t-0/vect
                             t-a/vect t-b/vect
