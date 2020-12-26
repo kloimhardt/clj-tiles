@@ -37,6 +37,15 @@
                     (repeat (count t-e/vect) "V")
                     (repeat (count t-f/vect) "VI"))))
 
+(def chapnames ["Null" " I" "II" "III" "IV" " V" "VI"])
+(def chaps [50 11 6 14 9 9 1])
+
+(defn page->chapter [page-no]
+   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
+
+(defn chapter->page [chap-no]
+  (if (pos? chap-no) (nth (reductions + chaps) (dec chap-no)) 0))
+
 (defn load-workspace [xml-text]
   (.. blockly/Xml
       (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-text))
@@ -45,6 +54,13 @@
 (defonce state (rc/atom nil))
 
 (defonce app-state (rc/atom nil))
+
+(defn goto-page! [page-no]
+  (load-workspace (get tutorials page-no))
+  (gforms/setValue (gdom/getElement "tutorial_no") page-no)
+  (reset! state
+          {:stdout nil :result nil :code nil :tutorial-no page-no})
+  (reset! app-state 0))
 
 (defn tutorial-fu [inc-or-dec]
   (fn []
@@ -56,13 +72,8 @@
                 (> 0 idx-new) 0
                 (< (dec (count tutorials)) idx-new) (dec (count tutorials))
                 (< -1 idx-old (count tutorials)) idx-old
-                :else 0)
-          tut (get tutorials idx)]
-      (load-workspace tut)
-      (gforms/setValue el idx)
-      (reset! state
-              {:stdout nil :result nil :code nil :tutorial-no idx})
-      (reset! app-state 0))))
+                :else 0)]
+      (goto-page! idx))))
 
 (defonce workspace
   (do
@@ -185,17 +196,27 @@
         [:button
          {:on-click (tutorial-fu (fn [_] (dec (count tutorials))))}
          "Go to rocket launch"]]
-     (= (:tutorial-no @state) (dec (count tutorials)))
-     [:span
+     #_(= (:tutorial-no @state) (dec (count tutorials)))
+     #_[:span
       [:button
        {:on-click (tutorial-fu (fn [_] (dec (dec (count tutorials)))))}
        "Go to previous example"]]
      :else
      [:span
-      [:button {:on-click (tutorial-fu #(- % 5))} "<<"]
-      [:button {:on-click (tutorial-fu #(+ % 5))} ">>"]
-      " " (inc (:tutorial-no @state)) "/" (count tutorials) " "
-      "(" (get chapters (:tutorial-no @state)) ")" " "
+      [:select {:value (page->chapter (:tutorial-no @state))
+                :on-change (fn [el]
+                             (let [chap (gstring/toNumber
+                                          (.. el -target -value))
+                                   no (chapter->page chap)]
+                               (goto-page! no)))}
+       (map-indexed (fn [idx val] [:option {:key idx :value idx} val]) chapnames)]
+     ;; [:button {:on-click (tutorial-fu #(- % 5))} "<<"]
+      ;; [:button {:on-click (tutorial-fu #(+ % 5))} ">>"]
+      (let [txt (str (inc (:tutorial-no @state)) "/" (count tutorials))]
+        [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
+                 :value txt}])
+      ;;"(" (get chapters (:tutorial-no @state)) ")"
+      " "
       [:button {:on-click (tutorial-fu dec)} "<"]
       [:button {:on-click (tutorial-fu inc)} ">"]])
    [:span " "]

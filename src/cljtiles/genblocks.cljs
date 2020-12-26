@@ -1,7 +1,6 @@
 (ns cljtiles.genblocks
   (:require-macros [hiccups.core :as hiccups :refer [html]])
-  (:require [hiccups.runtime :as hiccupsrt]
-            [clojure.string :as str]))
+  (:require [hiccups.runtime :as hiccupsrt]))
 
 (defmulti gen (fn [m _] (:type m)))
 
@@ -94,7 +93,6 @@
 
 (defn fun-infi [name & argsvec]
   (assoc (apply fun name argsvec) :subtype "infi-h"))
-
 
 (defn args [& argsvec]
   {:type :args :argsvec argsvec})

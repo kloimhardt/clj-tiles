@@ -80,7 +80,6 @@
   (map second [(test-consistency false)
                (test-original false)]))
 
-
 (defn test-all-pipe! []
   (map second [(test-pipe!)
               (test-consistency true)
