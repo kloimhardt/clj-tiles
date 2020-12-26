@@ -7,17 +7,23 @@
    ["blockly" :as blockly]
    [cljtiles.xmlparse :as edn->code]
    [cljtiles.tutorials-0 :as t-0]
+   [cljtiles.tutorials-sicm :as t-s]
    [clojure.walk :as w]
    [tubax.core :as sax]
    [reagent.core :as rc]
    [reagent.dom :as rd]
    [zprint.core :as zp]
-   #_[cljtiles.tests :as tst]))
+   [cljtiles.tests :as tst]
+   [cljtiles.sicm :as sicm]))
 
-(def menu false)
-#_(print (tst/test-pure))
+(def dev true)
+(if dev
+  (do
+    (def menu false)
+    (print (tst/test-pure)))
+  (def menu false))
 
-(def tutorials t-0/vect)
+(def tutorials (vec (concat t-s/vect t-0/vect)))
 
 (def chapnames [" I" "II" "III" "IV" " V" "VI"])
 (def chaps [11 6 14 9 9 1])
@@ -129,13 +135,16 @@
   (let [aug-edn-code (augment-code edn-code)
         theout (atom "")
         str-width 41
-        bindings {'println (fn [& x]
-                             (swap! theout str (my-str x str-width) "\n") nil)
-                  'print (fn [& x]
-                           (swap! theout str (my-str x str-width)) nil)
-                  'app-state app-state
-                  'start-timer start-timer
-                  'stop-timer stop-timer}
+        bindings (merge
+                   sicm/bindings
+                   {'println (fn [& x]
+                                    (swap! theout str (my-str x str-width) "\n") nil)
+                         'print (fn [& x]
+                                  (swap! theout str (my-str x str-width)) nil)
+                         'app-state app-state
+                         'start-timer start-timer
+                         'stop-timer stop-timer
+                         })
         erg (try (sci/eval-string (code->break-str str-width
                                                    (:code aug-edn-code))
                                   {:bindings bindings})
@@ -188,13 +197,13 @@
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
-    (if (> (:tutorial-no @state) 0)
-      [:button {:on-click startsci} "Run"]
+    (if (and (not dev) (= (:tutorial-no @state) 0))
       [:span
        [:button {:on-click startsci} "Run this Hello World example"]
        " "
        [:button {:on-click #(goto-page! rocket-no)}
-        "Go to Rocket Launch example"]])]])
+        "Go to Rocket Launch example"]]
+      [:button {:on-click startsci} "Run"])]])
 
 (defn filter-defns [edn-code fu]
   (let [ec (if (:dat edn-code) edn-code {:dat [edn-code]})]
@@ -254,7 +263,7 @@
         [tutorials-comp]
         [reagent-comp]
         (when (:result @state)
-          (let [showcode? (not (#{0 1 rocket-no} (:tutorial-no @state)))]
+          (let [showcode? (or dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
             (when (< (:tutorial-no @state) (dec (count tutorials)))
               [:table {:style {:width "100%"}}
                [:thead
