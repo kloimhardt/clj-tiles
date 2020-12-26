@@ -22,62 +22,76 @@
                        t-e/vect
                        t-f/vect))
 
-(defn prs [edn-xml]
-  (try {:code (edn->code/parse edn-xml)}
-       (catch js/Error e {:error (.-message e)})))
+(defn pipethrough [xml-str]
+  (.. blockly/Xml
+      (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-str))
+                                    (.getMainWorkspace blockly)))
+  (->> (.-mainWorkspace blockly)
+       (.workspaceToDom blockly/Xml)
+       (.domToPrettyText blockly/Xml)))
 
-(defn prs-orig [edn-xml]
-  (try {:code (edn->code-orig/parse edn-xml)}
-       (catch js/Error e {:error (.-message e)})))
+(defn gen-hiccup [xml-str pipeit!?]
+  (sax/xml->clj (if pipeit!? (pipethrough xml-str) xml-str)))
 
-(defn generate-code [t]
-  (map #(prs (sax/xml->clj %)) t))
+(defn edn->code-parse [hccp strict? orig?]
+  (let [parse-function (if orig? edn->code-orig/parse edn->code/parse)
+        clj-code (if strict?
+                  (parse-function hccp)
+                  (try (parse-function hccp)
+                       (catch js/Error e {:error (.-message e)})))]
+    (or (:dat clj-code) [clj-code])))
 
-(defn generate-code-orig [t]
-  (map #(prs-orig (sax/xml->clj %)) t))
+(defn analyze [tests failed ok]
+  [(count tests) (if (seq (filter not tests)) failed ok) tests])
 
-(defn dotests []
-  (let [t0 (generate-code t-0/vect)
-        temp1 (vec (generate-code-orig tutorials))
-        t1 (update-in temp1 [(dec (count temp1)) :code :dat 3 2 1] assoc (symbol ":id") "rocket")
+(defn test-original [pipeit!?]
+  (let [t0 (mapv #(edn->code-parse (gen-hiccup % pipeit!?) false false)
+                 t-0/vect)
+        temp1 (mapv #(edn->code-parse (gen-hiccup % false) false true)
+                    tutorials)
+        t1 (update-in temp1 [(dec (count temp1)) 3 2 1] assoc (symbol ":id")
+                      "rocket")
         tests (map #(= %1 %2) t0 t1)]
-    (def temp1 temp1)
-    (def t0 t0)
     (def t1 t1)
-    [(count tests) (if (seq (filter not tests)) "tests failed" "all ok!") tests]))
-
-(defn get-code [v]
-  (or (-> v :code :dat) [(-> v :code)]))
+    (def t0 t0)
+    (analyze tests "orig tests failed" "test orig all ok!")))
 
 (defn repls [s]
   (-> (str s)
       (cs/replace #"\(clojure.core/deref app-state\)" "@app-state")
       (cs/replace #"\[\]" "[ ]")))
 
-(defn pipethrough [xml-text]
-  (.. blockly/Xml
-      (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-text))
-                                    (.getMainWorkspace blockly)))
-  (->> (.-mainWorkspace blockly)
-       (.workspaceToDom blockly/Xml)
-       (.domToPrettyText blockly/Xml)))
-
 (defn test-consistency [pipeit!?]
   (let [orig t-0s/vect-code
-        proc (mapv #(get-code (prs (sax/xml->clj (if pipeit!? (pipethrough %) %)))) t-0s/vect)
+        proc (mapv #(edn->code-parse (gen-hiccup % pipeit!?) true false)
+                   t-0s/vect)
         tests (map #(= (repls %1) (str %2)) orig proc)]
     (def orig orig)
     (def proc proc)
-    [(count tests) (if (seq (filter not tests)) "con tests failed" "con all ok!") tests]))
+    (analyze tests "con tests failed" "test con all ok!")))
 
-(defn pipetest! []
-  (let [tests
-        (map #(= (assoc (sax/xml->clj (pipethrough %)) :attributes {})
-                 (sax/xml->clj %)) t-0s/vect)]
-    [(count tests) (if (seq (filter not tests)) "pipe tests failed" "pipe all ok!") tests]))
+(defn test-pipe! []
+  (-> (map #(= (assoc (gen-hiccup % true) :attributes {})
+               (gen-hiccup % false)) t-0s/vect)
+      (analyze "pipe tests failed"
+               "pipe all ok!")))
+
+(defn test-pure []
+  (map second [(test-consistency false)
+               (test-original false)]))
+
+
+(defn test-all-pipe! []
+  (map second [(test-pipe!)
+              (test-consistency true)
+              (test-original true)]))
 
 (comment
-  (dotests)
+
+  (test-all-pipe!)
+  (test-pure)
+
+  (test-original false)
 
   [(str (nth t0 40)) (str (nth t1 40))]
   (= (nth t0 49) (nth t1 49))
@@ -87,10 +101,12 @@
   [(repls (last orig))
    (str (last proc))]
 
-  (pipetest!)
+  (test-pipe!)
 
   (cd/diff (assoc (sax/xml->clj (pipethrough (t-0s/vect 24))) :attributes {})
        (sax/xml->clj (t-0s/vect 24)))
 
   (test-consistency true)
+  (test-original true)
+
   )
