@@ -7,38 +7,21 @@
    ["blockly" :as blockly]
    [cljtiles.xmlparse :as edn->code]
    [cljtiles.tutorials-0 :as t-0]
-   [cljtiles.tutorials-a :as t-a]
-   [cljtiles.tutorials-b :as t-b]
-   [cljtiles.tutorials-c :as t-c]
-   [cljtiles.tutorials-d :as t-d]
-   [cljtiles.tutorials-e :as t-e]
-   [cljtiles.tutorials-f :as t-f]
    [clojure.walk :as w]
    [tubax.core :as sax]
    [reagent.core :as rc]
    [reagent.dom :as rd]
    [zprint.core :as zp]
-   [cljtiles.tests :as tst]))
+   #_[cljtiles.tests :as tst]))
 
 (def menu false)
+#_(print (tst/test-pure))
 
-(print (tst/test-pure))
+(def tutorials t-0/vect)
 
-(def tutorials (vec (concat t-0/vect
-                            t-a/vect t-b/vect
-                            t-c/vect t-d/vect
-                            t-e/vect t-f/vect)))
-(def chapters (vec (concat
-                    (repeat (count t-0/vect) "0")
-                    (repeat (count t-a/vect) "I")
-                    (repeat (count t-b/vect) "II")
-                    (repeat (count t-c/vect) "III")
-                    (repeat (count t-d/vect) "IV")
-                    (repeat (count t-e/vect) "V")
-                    (repeat (count t-f/vect) "VI"))))
-
-(def chapnames ["Null" " I" "II" "III" "IV" " V" "VI"])
-(def chaps [50 11 6 14 9 9 1])
+(def chapnames [" I" "II" "III" "IV" " V" "VI"])
+(def chaps [11 6 14 9 9 1])
+(def rocket-no 49)
 
 (defn page->chapter [page-no]
    (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
@@ -189,38 +172,29 @@
 
 (defn tutorials-comp []
   [:div
-   (cond
-     #_(zero? (:tutorial-no @state))
-     #_[:span
-        [:button {:on-click (tutorial-fu inc)} "Go to next example"]
-        [:button
-         {:on-click (tutorial-fu (fn [_] (dec (count tutorials))))}
-         "Go to rocket launch"]]
-     #_(= (:tutorial-no @state) (dec (count tutorials)))
-     #_[:span
-      [:button
-       {:on-click (tutorial-fu (fn [_] (dec (dec (count tutorials)))))}
-       "Go to previous example"]]
-     :else
-     [:span
-      [:select {:value (page->chapter (:tutorial-no @state))
-                :on-change (fn [el]
-                             (let [chap (gstring/toNumber
-                                          (.. el -target -value))
-                                   no (chapter->page chap)]
-                               (goto-page! no)))}
-       (map-indexed (fn [idx val] [:option {:key idx :value idx} val]) chapnames)]
-     ;; [:button {:on-click (tutorial-fu #(- % 5))} "<<"]
-      ;; [:button {:on-click (tutorial-fu #(+ % 5))} ">>"]
-      (let [txt (str (inc (:tutorial-no @state)) "/" (count tutorials))]
-        [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
-                 :value txt}])
-      ;;"(" (get chapters (:tutorial-no @state)) ")"
-      " "
-      [:button {:on-click (tutorial-fu dec)} "<"]
-      [:button {:on-click (tutorial-fu inc)} ">"]])
-   [:span " "]
-   [:button {:on-click startsci} "Run"]])
+   [:span
+    [:select {:value (page->chapter (:tutorial-no @state))
+              :on-change (fn [el]
+                           (let [chap (gstring/toNumber
+                                        (.. el -target -value))
+                                 no (chapter->page chap)]
+                             (goto-page! no)))}
+     (map-indexed (fn [idx val] [:option {:key idx :value idx} val]) chapnames)]
+    " "
+    [:button {:on-click (tutorial-fu dec)} "<"]
+    " "
+    [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
+             :value (str (inc (:tutorial-no @state)) "/" (count tutorials))}]
+    " "
+    [:button {:on-click (tutorial-fu inc)} ">"]
+    " "
+    (if (> (:tutorial-no @state) 0)
+      [:button {:on-click startsci} "Run"]
+      [:span
+       [:button {:on-click startsci} "Run this Hello World example"]
+       " "
+       [:button {:on-click #(goto-page! rocket-no)}
+        "Go to Rocket Launch example"]])]])
 
 (defn filter-defns [edn-code fu]
   (let [ec (if (:dat edn-code) edn-code {:dat [edn-code]})]
@@ -280,7 +254,7 @@
         [tutorials-comp]
         [reagent-comp]
         (when (:result @state)
-          (let [showcode? (< 1 (:tutorial-no @state) (dec (count tutorials)))]
+          (let [showcode? (not (#{0 1 rocket-no} (:tutorial-no @state)))]
             (when (< (:tutorial-no @state) (dec (count tutorials)))
               [:table {:style {:width "100%"}}
                [:thead
