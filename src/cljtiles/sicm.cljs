@@ -11,6 +11,7 @@
             [sicmutils.expression :as ex]
             [sicmutils.calculus.derivative :as dr]
             [sicmutils.numerical.minimize :as mn]
+            [sicmutils.mechanics.lagrange :as lg]
             [clojure.string :as cs]))
 
 (comment
@@ -19,6 +20,7 @@
   (filter #(s/valid? % (st/up 3 4)) sps)
   (s/valid? ::sfunction (st/up 3 4))
 (kind? kind?)
+
   )
 
 (def sps [::nu "Number" ::fn "Function" ::sy "Symbol" ::up "Column Vector"])
@@ -91,6 +93,7 @@
                    #(< (count %) 4)
                    #(#{:sicmutils.structure/up} (vl/kind %))
                    #(s/valid? ::up-args (seq %))))
+
 (s/def ::nu-sy-eex-dr-fn-up (s/or :nse ::nu-sy-eex :fn fn? :up ::up :dr ::differential))
 (s/def ::dow-args (s/cat :a-dow ::nu-sy-eex-dr-fn-up
                          :b-dow ::nu-sy-eex-dr-fn-up
@@ -104,12 +107,90 @@
 
 (s/def ::nu-sy-eex-dr-fn-up-dow (s/or :nsedfu ::nu-sy-eex-dr-fn-up :dow ::dow))
 
-(defn func? [] false #_(instance? sicmutils.function.Function %)) ;;hack
-
-(s/def ::sfunction func?)
+(s/def ::sfunction #(instance? sicmutils.function.Function %))
 (s/def ::nu-sy-eex-dr-fn-up-sfn (s/or :nsedfu ::nu-sy-eex-dr-fn-up :sf ::sfunction))
 (s/def ::up-fnargs (s/cat :a-uf ::nu-sy-eex-dr-fn-up-sfn
                           :opt (s/? (s/cat
-                                      :b-uf ::nu-sy-eex-dr-fn-up-sfn
-                                      :c-uf (s/? ::nu-sy-eex-dr-fn-up-sfn)))))
-(s/valid? ::up (st/up 4 5))
+                                     :b-uf ::nu-sy-eex-dr-fn-up-sfn
+                                     :c-uf (s/? ::nu-sy-eex-dr-fn-up-sfn)))))
+
+(s/fdef ny/mul :args (s/cat :a-mul ::expression :b-mul ::expression))
+(s/fdef gn/bin* :args (s/cat :a-bmul ::nu-sy-eex-dr-fn-up-dow :b-bmul ::nu-sy-eex-dr-fn-up-dow))
+(s/fdef ny/add :args (s/cat :a-add ::expression :b-add ::expression))
+(s/fdef gn/bin+ :args (s/cat :a-badd ::nu-sy-eex-dr-fn-up :b-badd ::nu-sy-eex-dr-fn-up))
+(s/fdef ny/sub :args (s/cat :a-sub ::expression :b-sub ::expression))
+(s/fdef gn/bin- :args (s/cat :a-sub ::nu-sy-eex-dr-fn-up-dow :b-sub ::nu-sy-eex-dr-fn-up-dow))
+(s/fdef ny/div :args (s/cat :a-div ::expression :b-div ::expression))
+(s/fdef gn/bin-div :args (s/cat :a-bdiv ::nu-sy-eex-dr-fn-up :b-bdiv ::nu-sy-eex-dr-fn-up))
+(s/fdef gn/square :args (s/cat :a-squre (s/or :nse ::nu-sy-eex :up ::up :dr ::differential)))
+(s/fdef ny/expt :args (s/cat :a-expt (s/or :dr ::differential :up ::up :exp ::expression) :expt2 int?))
+(s/fdef ny/sine :args (s/cat :a (s/or :dr ::differential :ex ::expression)))
+(s/fdef gn/sin :args (s/cat :a ::nu-sy-eex-dr))
+(s/fdef ny/cosine :args (s/cat :a (s/or :dr ::differential :ex ::expression)))
+(s/fdef gn/cos :args (s/cat :a ::nu-sy-eex-dr))
+(s/fdef st/up :args ::up-fnargs)
+
+(s/fdef lg/Lagrangian-action
+  :args (s/cat :lagrangian fn? :test-path fn? :start-time number? :end-time number?))
+
+(s/fdef mn/minimize
+  :args (s/alt
+         :three (s/cat :a3-min fn? :b3-min number? :c3-min number?)
+         :four (s/cat :a4-min fn? :b4-min number? :c4-min number? :d4-min any?)))
+
+(s/fdef lg/make-path :args
+        (s/cat :t0 number? :q0 number?
+               :t1 number? :q1 number?
+               :qs (s/spec #(s/valid? (s/+ number?) (into [] %)))))
+
+(s/fdef lg/parametric-path-action :args
+        (s/cat :a1 fn? :a2 number? :a3 number? :a4 number? :a5 number?))
+
+(s/fdef mn/multidimensional-minimize :args
+        (s/alt :two (s/cat :a1 fn? :a2 (s/spec (s/+ number?)))
+               :three (s/cat :a1 fn? :a2 (s/spec (s/+ number?)) :a3 any?)))
+
+(s/fdef lg/find-path :args (s/cat :a1 fn? :a2 number?
+                                  :a3 number? :a4 number? :a5 number? :a6 int?))
+
+(s/fdef lg/linear-interpolants :args (s/cat :a1 number? :a2 number? :a3 int?))
+(s/fdef lg/L-harmonic :args (s/cat :a1 ::nu-sy :a2 ::nu-sy))
+(s/fdef lg/Lagrange-equations :args (s/cat :a1 fn?))
+(s/fdef lg/L-uniform-acceleration :args (s/cat :a1 ::nu-sy :a2 ::nu-sy))
+(s/fdef lg/L-central-rectangular :args
+        (s/cat :a1 ::nu-sy-eex :a2 (s/or :o1 ::sfunction :o2 fn?)))
+
+(s/fdef lg/L-central-polar :args
+        (s/cat :a1 ::nu-sy-eex :a2 (s/or :o1 ::sfunction :o2 fn?)))
+
+(s/fdef lg/F->C :args (s/cat :a fn?))
+(s/fdef lg/L-free-particle :args (s/cat :a ::nu-sy))
+(s/fdef lg/Gamma :args (s/cat :a fn?))
+(s/fdef lg/->local :args (s/cat :a symbol?
+                                :b (s/or :s symbol? :u ::up)
+                                :c (s/or :s symbol? :u ::up)))
+
+(s/def ::up-down-expression
+  (s/and seq?
+         #(> (count %) 2)
+         #(< (count %) 5)
+         (s/cat :a-udex #{'up 'down}
+                :rest (s/+ (s/or :e ::expression :udex ::up-down-expression)))))
+
+;;simplify-spec-full is not used, it checks the result of a simplify call
+;;but this check would not be deactiveted with (ts/unstrument)
+#_(defn simplify-spec-full [x]
+  (let [s (ts/with-instrument-disabled (gn/simplify x))]
+    (do
+      (if-not  (s/valid? (s/or :e ::expression :udex ::up-down-expression) s)
+        (throw (Exception. "simplify result does not conform to spec")))
+      s)))
+
+(defn simplify-spec [x]
+  (ts/with-instrument-disabled (gn/simplify x)))
+
+(s/fdef simplify-spec :args (s/cat :a (s/or :e ::eexpression :u ::up :d ::dow)))
+
+;;If you like to activate spec: (ts/instrument) If you like to deactivate spec: (ts/unstrument)
+
+(ts/instrument)

@@ -82,6 +82,10 @@
     (apply str (interpose "\n" (map #(zp/zprint-str % width) code)))
     (zp/zprint-str edn-code width)))
 
+(defn code->break-str1 [width edn-code]
+  (apply str (interpose "\n" (map #(zp/zprint-str % width) edn-code)))
+  )
+
 (defn part-str [width s]
   (apply str
          (interpose "\n"
@@ -103,6 +107,11 @@
       (update edn-code :code (fn [c] {:dat [fn-code c]})))
     edn-code))
 
+(defn augment-code-fu1 [edn-code flat-code fn-code]
+  (if (seq (filter #{(second fn-code)} flat-code))
+    (into [] (cons fn-code edn-code))
+    edn-code))
+
 (defn augment-code [edn-code]
   (let [flat-code (flatten (w/postwalk #(if (map? %) (vec %) %) edn-code))]
     (-> edn-code
@@ -112,6 +121,17 @@
         (augment-code-fu flat-code
                          '(defn vec-cons "added by Blockly parser" [x coll]
                             (let [c (cons x coll)] (if (seq? c) (vec c) c)))))))
+
+(defn augment-code1 [edn-code]
+  (let [flat-code (flatten (w/postwalk #(if (map? %) (vec %) %) edn-code))]
+    (-> edn-code
+        (augment-code-fu1 flat-code
+                         '(defn vec-rest "added by Blockly parser" [x]
+                            (let [r (rest x)] (if (seq? r) (vec r) r))))
+        (augment-code-fu1 flat-code
+                         '(defn vec-cons "added by Blockly parser" [x coll]
+                            (let [c (cons x coll)] (if (seq? c) (vec c) c)))))))
+
 (def timer (atom nil))
 (def counter (atom 0))
 
@@ -131,8 +151,19 @@
                                 (stop-timer nil))) ms))
     msg))
 
-(defn run-code [edn-code]
+(defn bindings1 [new-println new-print]
+  (merge
+    sicm/bindings
+    {'println new-println
+     'print new-print
+     'app-state app-state
+     'start-timer start-timer
+     'stop-timer stop-timer
+     }))
+
+(defn run-code [edn-code &[edn-code1 error]]
   (let [aug-edn-code (augment-code edn-code)
+        aug-edn-code1 (augment-code1 edn-code1)
         theout (atom "")
         str-width 41
         bindings (merge
@@ -144,28 +175,43 @@
                          'app-state app-state
                          'start-timer start-timer
                          'stop-timer stop-timer
-                         })
-        erg (try (sci/eval-string (code->break-str str-width
-                                                   (:code aug-edn-code))
-                                  {:bindings bindings})
-                 (catch js/Error e (.-message e)))]
+                    })
+        new-println (fn [& x]
+                      (swap! theout str (my-str x str-width) "\n") nil)
+        new-print (fn [& x]
+                    (swap! theout str (my-str x str-width)) nil)
+
+        bindings2 (bindings1 new-println new-print)
+        cbr (code->break-str str-width (:code aug-edn-code))
+        cbr1 (code->break-str1 str-width aug-edn-code1)
+        erg (try (sci/eval-string cbr {:bindings bindings})
+                 (catch js/Error e (.-message e)))
+        _ (def c erg)
+        erg1 (try (sci/eval-string cbr {:bindings bindings})
+                  (catch js/Error e (.-message e)))
+        _ (def d erg1)]
     (when dev
       ;;(println "edn: " edn)
       (println "-------")
       (print (code->break-str str-width (:code aug-edn-code)))
+      (println cbr1)
       (println (:error aug-edn-code))
+      (println error)
       (println "-------")
       (when @theout (println @theout))
-      (println erg))
+      (println erg)
+      (println erg1))
     (swap! state assoc
            :stdout @theout
            :result
            (cond (some? erg) (my-str erg str-width)
+                 (some? erg1) (my-str erg1 str-width)
                  (= "nil" (str (last (get-in edn-code [:code :dat])))) "nil"
+                 (= "nil" (str (last edn-code1))) "nil"
                  :else "")
            :code (if (:error aug-edn-code)
                    "Cannot even parse the blocks"
-                   (code->break-str str-width (:code aug-edn-code)))
+                   cbr)
            :edn-code (:code aug-edn-code))))
 
 (defn ^:export startsci []
@@ -175,9 +221,17 @@
         edn-xml (sax/xml->clj xml-str)
         edn-code (if (seq (:content edn-xml))
                    (try {:code (edn->code/parse edn-xml)}
-                        (catch js/Error e {:error (.-message e)})) "")]
+                        (catch js/Error e {:error (.-message e)})) "")
+        {:keys [code error]}
+        (when (seq (:content edn-xml))
+          (try (edn->code/parse {:code edn-xml})
+               (catch js/Error e {:error (.-message e)})))
+        edn-code1 (when code (or (:dat code) [code]))
+        _ (def a edn-code)
+        _ (def b edn-code1)
+        ]
     (reset! thexml xml-str)
-    (run-code edn-code)))
+    (run-code edn-code edn-code1 error)))
 
 (defn tutorials-comp []
   [:div
