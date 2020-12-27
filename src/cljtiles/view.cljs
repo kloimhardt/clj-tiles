@@ -149,7 +149,7 @@
                                                    (:code aug-edn-code))
                                   {:bindings bindings})
                  (catch js/Error e (.-message e)))]
-    (when menu
+    (when dev
       ;;(println "edn: " edn)
       (println "-------")
       (print (code->break-str str-width (:code aug-edn-code)))

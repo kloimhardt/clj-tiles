@@ -127,7 +127,7 @@
         (= ":tiles/vert" erst) (assoc (parse (second l)) :inline? false)
         (= ":tiles/num" erst) (num (second l))
         (= "clojure.core/deref" erst) (tiles-deref (second l))
-        ;;(= "quote" erst) (num (str "'" (second l)))
+        (= "quote" erst) (num (str "'" (second l)))
         (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-infi)
         (#{"def" "defn" "do"} erst) (assoc (appl fun) :inline? false)
         :else (appl fun)))

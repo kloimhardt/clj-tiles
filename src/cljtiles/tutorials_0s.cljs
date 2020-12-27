@@ -205,7 +205,7 @@
     '(reset! app-state 0)
     '[:div
      [:button
-      {:id "launch", :on-click 'start-rocket}
+      {:id "launch", :on-click start-rocket}
       "Launch rocket"]
      [:svg {:height 200, :id "rocket"}
       [:image
