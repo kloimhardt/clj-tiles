@@ -190,7 +190,8 @@
         _ (def e cbr)
         cbr1 (code->break-str1 str-width aug-edn-code1)
         _ (def f cbr1)
-        erg (try (sci/eval-string cbr {:bindings bindings})
+        _ (= f e) ;should be true
+        erg nil #_(try (sci/eval-string cbr {:bindings bindings})
                  (catch js/Error e (.-message e)))
         _ (def c erg)
         erg1 (try (sci/eval-string cbr1 {:bindings bindings2})
@@ -240,8 +241,7 @@
                      (.workspaceToDom blockly/Xml)
                      (.domToPrettyText blockly/Xml))
         edn-xml (sax/xml->clj xml-str)
-        edn-code nil
-        #_(if (seq (:content edn-xml))
+        edn-code (if (seq (:content edn-xml))
                    (try {:code (edn->code/parse edn-xml)}
                         (catch js/Error e {:error (.-message e)})) "")
         {:keys [code error]}
