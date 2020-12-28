@@ -322,9 +322,9 @@
     (if (:on-click sy)
       (assoc sy
              :on-click
-             #(run-code
-                {:code
-                 (filter-defns1 edn-code (:on-click sy))}))
+             #(run-code nil
+                        (filter-defns1 edn-code (:on-click sy))
+                        nil))
       sy)
     (list? sy)
     (try (sci/eval-string (pr-str sy))
