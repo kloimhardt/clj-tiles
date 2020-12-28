@@ -77,7 +77,7 @@
 
 (def thexml (atom ""))
 
-(defn code->break-str1 [width edn-code]
+(defn code->break-str [width edn-code]
   (apply str (interpose "\n" (map #(zp/zprint-str % width) edn-code))))
 
 (defn part-str [width s]
@@ -93,18 +93,18 @@
       (part-str width (apply str (interpose " " (map f e))))
       (part-str width (f e)))))
 
-(defn augment-code-fu1 [edn-code flat-code fn-code]
+(defn augment-code-fu [edn-code flat-code fn-code]
   (if (seq (filter #{(second fn-code)} flat-code))
     (into [] (cons fn-code edn-code))
     edn-code))
 
-(defn augment-code1 [edn-code]
+(defn augment-code [edn-code]
   (let [flat-code (flatten (w/postwalk #(if (map? %) (vec %) %) edn-code))]
     (-> edn-code
-        (augment-code-fu1 flat-code
+        (augment-code-fu flat-code
                          '(defn vec-rest "added by Blockly parser" [x]
                             (let [r (rest x)] (if (seq? r) (vec r) r))))
-        (augment-code-fu1 flat-code
+        (augment-code-fu flat-code
                          '(defn vec-cons "added by Blockly parser" [x coll]
                             (let [c (cons x coll)] (if (seq? c) (vec c) c)))))))
 
@@ -127,7 +127,7 @@
                                 (stop-timer nil))) ms))
     msg))
 
-(defn bindings1 [new-println new-print]
+(defn bindings [new-println new-print]
   (merge
     sicm/bindings
     {'println new-println
@@ -137,8 +137,8 @@
      'stop-timer stop-timer
      }))
 
-(defn run-code [edn-code1 error]
-  (let [aug-edn-code1 (augment-code1 edn-code1)
+(defn run-code [edn-code error]
+  (let [aug-edn-code (augment-code edn-code)
         theout (atom "")
         str-width 41
         new-println (fn [& x]
@@ -146,37 +146,37 @@
         new-print (fn [& x]
                     (swap! theout str (my-str x str-width)) nil)
 
-        bindings2 (bindings1 new-println new-print)
-        cbr1 (code->break-str1 str-width aug-edn-code1)
-        erg1 (try (sci/eval-string cbr1 {:bindings bindings2})
+        bindings2 (bindings new-println new-print)
+        cbr (code->break-str str-width aug-edn-code)
+        erg (try (sci/eval-string cbr {:bindings bindings2})
                   (catch js/Error e (.-message e)))]
     (when dev
       (println "-------")
-      (println cbr1)
+      (println cbr)
       (println error)
       (println "-------")
       (when @theout (println @theout))
-      (println erg1))
+      (println erg))
     (swap! state assoc
            :stdout @theout
            :result
-           (cond (some? erg1) (my-str erg1 str-width)
-                 (= "nil" (str (last edn-code1))) "nil"
+           (cond (some? erg) (my-str erg str-width)
+                 (= "nil" (str (last edn-code))) "nil"
                  :else "")
            :result1
-           (cond (some? erg1) (my-str erg1 str-width)
-                 (= "nil" (str (last edn-code1))) "nil"
+           (cond (some? erg) (my-str erg str-width)
+                 (= "nil" (str (last edn-code))) "nil"
                  :else "")
            :code
            (if error
              "Cannot even parse the blocks"
-             cbr1)
+             cbr)
            :code1 (if error
                     "Cannot even parse the blocks"
-                    cbr1)
+                    cbr)
            :edn-code
-           aug-edn-code1
-           :edn-code1 aug-edn-code1)))
+           aug-edn-code
+           :edn-code1 aug-edn-code)))
 
 (defn ^:export startsci []
   (let [xml-str (->> (.-mainWorkspace blockly)
@@ -217,13 +217,13 @@
         "Go to Rocket Launch example"]]
       [:button {:on-click startsci} "Run"])]])
 
-(defn filter-defns1 [edn-code fu]
+(defn filter-defns [edn-code fu]
   (conj
     (vec (filter #(= (symbol "defn") (first %)) edn-code))
     (list fu)
     (last edn-code)))
 
-(defn to-kw1 [edn-code sy]
+(defn to-kw [edn-code sy]
   (cond
     (symbol? sy)
     (let [s (str sy)]
@@ -236,7 +236,7 @@
     (if (:on-click sy)
       (assoc sy
              :on-click
-             #(run-code (filter-defns1 edn-code (:on-click sy))
+             #(run-code (filter-defns edn-code (:on-click sy))
                         nil))
       sy)
     (list? sy)
@@ -244,16 +244,16 @@
          (catch js/Error e (.-message e)))
     :else sy))
 
-(defn transform-vec1 [vect edn-code]
-  (w/postwalk #(to-kw1 edn-code %)
+(defn transform-vec [vect edn-code]
+  (w/postwalk #(to-kw edn-code %)
               vect))
 
-(defn reagent-comp1 []
+(defn reagent-comp []
   (let [v? #(when (vector? %) %)
         last-vec (v? (last (:edn-code1 @state)))]
     (when (= (symbol ":div") (first last-vec))
       [:div
-       (transform-vec1 last-vec (:edn-code1 @state))])))
+       (transform-vec last-vec (:edn-code1 @state))])))
 
 (defn out-comp []
   (rc/create-class
@@ -265,7 +265,7 @@
           [:input {:type "text" :value (pr-str @thexml) :id "xmltext"
                    :read-only true}])
         [tutorials-comp]
-        [reagent-comp1]
+        [reagent-comp]
         (when (:result @state)
           (let [showcode? (or dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
             (when (< (:tutorial-no @state) (dec (count tutorials)))
