@@ -159,24 +159,11 @@
       (println erg))
     (swap! state assoc
            :stdout @theout
-           :result
-           (cond (some? erg) (my-str erg str-width)
-                 (= "nil" (str (last edn-code))) "nil"
-                 :else "")
-           :result1
-           (cond (some? erg) (my-str erg str-width)
-                 (= "nil" (str (last edn-code))) "nil"
-                 :else "")
-           :code
-           (if error
-             "Cannot even parse the blocks"
-             cbr)
-           :code1 (if error
-                    "Cannot even parse the blocks"
-                    cbr)
-           :edn-code
-           aug-edn-code
-           :edn-code1 aug-edn-code)))
+           :result (cond (some? erg) (my-str erg str-width)
+                         (= "nil" (str (last edn-code))) "nil"
+                         :else "")
+           :code (if error "Cannot even parse the blocks" cbr)
+           :edn-code aug-edn-code)))
 
 (defn ^:export startsci []
   (let [xml-str (->> (.-mainWorkspace blockly)
@@ -187,9 +174,9 @@
         (when (seq (:content edn-xml))
           (try {:code (edn->code/parse edn-xml)}
                (catch js/Error e {:error (.-message e)})))
-        edn-code1 (when code (or (:dat code) [code]))]
+        edn-code (when code (or (:dat code) [code]))]
     (reset! thexml xml-str)
-    (run-code edn-code1 error)))
+    (run-code edn-code error)))
 
 (defn tutorials-comp []
   [:div
@@ -250,10 +237,10 @@
 
 (defn reagent-comp []
   (let [v? #(when (vector? %) %)
-        last-vec (v? (last (:edn-code1 @state)))]
+        last-vec (v? (last (:edn-code @state)))]
     (when (= (symbol ":div") (first last-vec))
       [:div
-       (transform-vec last-vec (:edn-code1 @state))])))
+       (transform-vec last-vec (:edn-code @state))])))
 
 (defn out-comp []
   (rc/create-class
