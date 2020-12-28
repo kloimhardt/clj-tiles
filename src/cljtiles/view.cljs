@@ -359,7 +359,8 @@
 #_(reagent-comp)
 
 (defn reagent-comp1 []
-  (let [last-vec (last (:edn-code1 @state))]
+  (let [v? #(when (vector? %) %)
+        last-vec (v? (last (:edn-code1 @state)))]
     (when (= (symbol ":div") (first last-vec))
       [:div
        (transform-vec1 last-vec (:edn-code1 @state))])))
@@ -376,7 +377,7 @@
                    :read-only true}])
         [tutorials-comp]
         [reagent-comp]
-        [reagent-comp1]
+        #_[reagent-comp1]
         (when (:result @state)
           (let [showcode? (or dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
             (when (< (:tutorial-no @state) (dec (count tutorials)))
