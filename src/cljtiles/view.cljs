@@ -36,6 +36,12 @@
 
 (def chapnames (concat t-s/chapnames t-0/chapnames))
 
+(defn filldesc [desc vect]
+  (if (empty? desc) (repeat (count vect) "") desc))
+
+(def desc (mapcat #(apply filldesc %)
+                  [[t-s/desc t-s/vect] [t-0/desc t-0/vect]]))
+
 (def rocket-no 49)
 
 (defn page->chapter [page-no]
@@ -57,7 +63,7 @@
   (load-workspace (get tutorials page-no))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset! state
-          {:stdout nil :result nil :code nil :tutorial-no page-no})
+          {:stdout (nth desc page-no) :result nil :code nil :tutorial-no page-no})
   (reset! app-state 0))
 
 (defn tutorial-fu [inc-or-dec]
@@ -260,14 +266,16 @@
                    :read-only true}])
         [tutorials-comp]
         [reagent-comp]
-        (when (:result @state)
+        (when (or (:stdout @state) (:result @state))
           (let [showcode? (or dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
             (when (< (:tutorial-no @state) (dec (count tutorials)))
               [:table {:style {:width "100%"}}
                [:thead
                 [:tr {:align :left}
-                 [:th {:style {:width "50%"}} "Output"]
-                 (when showcode? [:th "Code"])]]
+                 [:th {:style {:width "50%"}}
+                  (if (:result @state) "Output"
+                      (when (seq (:stdout @state)) "Description"))]
+                 (when (and showcode? (:result @state)) [:th "Code"])]]
                [:tbody
                 [:tr
                  [:td {:align :top}
