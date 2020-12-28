@@ -25,8 +25,17 @@
 
 (def tutorials (vec (concat t-s/vect t-0/vect)))
 
-(def chapnames [" I" "II" "III" "IV" " V" "VI"])
-(def chaps [11 6 14 9 9 1])
+(defn countup [chaps vect]
+  (let [d (- (count vect) (reduce + chaps))]
+    (if (pos? d)
+      (update chaps (dec (count chaps)) #(+ % d)) chaps)))
+
+(def chaps
+  (mapcat #(apply countup %)
+          [[t-s/chaps t-s/vect] [t-0/chaps t-0/vect]]))
+
+(def chapnames (concat t-s/chapnames t-0/chapnames))
+
 (def rocket-no 49)
 
 (defn page->chapter [page-no]

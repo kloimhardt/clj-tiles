@@ -1,6 +1,10 @@
 (ns cljtiles.tutorials-0
   (:require [cljtiles.genblocks :as gb]))
 
+(def chaps [11 6 14 9 9 1])
+
+(def chapnames [" I" "II" "III" "IV" " V" "VI"])
+
 (def vect
   (gb/chapter
    (gb/page (gb/shift-coords 1 [0 0])

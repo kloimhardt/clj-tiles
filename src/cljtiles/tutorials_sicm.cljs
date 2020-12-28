@@ -1,6 +1,8 @@
 (ns cljtiles.tutorials-sicm
   (:require [cljtiles.genblocks :as gb]))
 
+(def chaps [1])
+(def chapnames ["sicm"])
 (def vect
   [
    (gb/rpg []
