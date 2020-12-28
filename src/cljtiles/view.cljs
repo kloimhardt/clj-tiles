@@ -163,7 +163,11 @@
 
 (defn run-code [edn-code &[edn-code1 error]]
   (let [aug-edn-code (augment-code edn-code)
+        _ (def j edn-code)
+        _ (def k edn-code1)
+        _ (def h aug-edn-code)
         aug-edn-code1 (augment-code1 edn-code1)
+        _ (def i aug-edn-code1)
         theout (atom "")
         str-width 41
         bindings (merge
@@ -183,11 +187,13 @@
 
         bindings2 (bindings1 new-println new-print)
         cbr (code->break-str str-width (:code aug-edn-code))
+        _ (def e cbr)
         cbr1 (code->break-str1 str-width aug-edn-code1)
+        _ (def f cbr1)
         erg (try (sci/eval-string cbr {:bindings bindings})
                  (catch js/Error e (.-message e)))
         _ (def c erg)
-        erg1 (try (sci/eval-string cbr {:bindings bindings})
+        erg1 (try (sci/eval-string cbr1 {:bindings bindings2})
                   (catch js/Error e (.-message e)))
         _ (def d erg1)]
     (when dev
@@ -205,14 +211,20 @@
            :stdout @theout
            :result
            (cond (some? erg) (my-str erg str-width)
-                 (some? erg1) (my-str erg1 str-width)
                  (= "nil" (str (last (get-in edn-code [:code :dat])))) "nil"
+                 :else "")
+           :result1
+           (cond (some? erg1) (my-str erg1 str-width)
                  (= "nil" (str (last edn-code1))) "nil"
                  :else "")
            :code (if (:error aug-edn-code)
                    "Cannot even parse the blocks"
                    cbr)
-           :edn-code (:code aug-edn-code))))
+           :code1 (if error
+                    "Cannot even parse the blocks"
+                    cbr1)
+           :edn-code (:code aug-edn-code)
+           :edn-code1 aug-edn-code1)))
 
 (defn ^:export startsci []
   (let [xml-str (->> (.-mainWorkspace blockly)
@@ -224,7 +236,7 @@
                         (catch js/Error e {:error (.-message e)})) "")
         {:keys [code error]}
         (when (seq (:content edn-xml))
-          (try (edn->code/parse {:code edn-xml})
+          (try {:code (edn->code/parse edn-xml)}
                (catch js/Error e {:error (.-message e)})))
         edn-code1 (when code (or (:dat code) [code]))
         _ (def a edn-code)
@@ -267,7 +279,14 @@
       (list fu)
       (last (:dat ec)))}))
 
+(defn filter-defns1 [edn-code fu]
+  (conj
+    (vec (filter #(= (symbol "defn") (first %)) edn-code))
+    (list fu)
+    (last edn-code)))
+
 (defn to-kw [edn-code sy]
+  (def p [edn-code sy])
   (cond
     (symbol? sy)
     (let [s (str sy)]
@@ -289,9 +308,42 @@
          (catch js/Error e (.-message e)))
     :else sy))
 
+(defn to-kw1 [edn-code sy]
+  (def o [edn-code sy])
+  (cond
+    (symbol? sy)
+    (let [s (str sy)]
+      (cond
+        (= ":" (first s)) (keyword (subs s 1 (count s)))
+        (= "nil" s) nil
+        (= "@app-state" s) @app-state
+        :else sy))
+    (map? sy)
+    (if (:on-click sy)
+      (assoc sy
+             :on-click
+             #(run-code
+                {:code
+                 (filter-defns1 edn-code (:on-click sy))}))
+      sy)
+    (list? sy)
+    (try (sci/eval-string (pr-str sy))
+         (catch js/Error e (.-message e)))
+    :else sy))
+
 (defn transform-vec [vect edn-code]
   (w/postwalk #(to-kw edn-code %)
               vect))
+
+(defn transform-vec1 [vect edn-code]
+  (def u [vect edn-code])
+  (w/postwalk #(to-kw1 edn-code %)
+              vect))
+
+(comment
+(= (:edn-code @state) (:edn-code1 @state))
+
+  )
 
 (defn reagent-comp []
   (let [last-vec
@@ -304,6 +356,14 @@
     (when (= (symbol ":div") (first last-vec))
       [:div
        (transform-vec last-vec (:edn-code @state))])))
+#_(reagent-comp)
+
+(defn reagent-comp1 []
+  (let [last-vec (last (:edn-code1 @state))]
+    (when (= (symbol ":div") (first last-vec))
+      [:div
+       (transform-vec1 last-vec (:edn-code1 @state))])))
+#_(reagent-comp1)
 
 (defn out-comp []
   (rc/create-class
@@ -316,6 +376,7 @@
                    :read-only true}])
         [tutorials-comp]
         [reagent-comp]
+        [reagent-comp1]
         (when (:result @state)
           (let [showcode? (or dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
             (when (< (:tutorial-no @state) (dec (count tutorials)))
