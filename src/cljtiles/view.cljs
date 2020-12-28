@@ -210,20 +210,29 @@
     (swap! state assoc
            :stdout @theout
            :result
-           (cond (some? erg) (my-str erg str-width)
+           #_(cond (some? erg) (my-str erg str-width)
                  (= "nil" (str (last (get-in edn-code [:code :dat])))) "nil"
+                 :else "")
+           (cond (some? erg1) (my-str erg1 str-width)
+                 (= "nil" (str (last edn-code1))) "nil"
                  :else "")
            :result1
            (cond (some? erg1) (my-str erg1 str-width)
                  (= "nil" (str (last edn-code1))) "nil"
                  :else "")
-           :code (if (:error aug-edn-code)
+           :code
+           #_(if (:error aug-edn-code)
                    "Cannot even parse the blocks"
                    cbr)
+           (if error
+             "Cannot even parse the blocks"
+             cbr1)
            :code1 (if error
                     "Cannot even parse the blocks"
                     cbr1)
-           :edn-code (:code aug-edn-code)
+           :edn-code
+           #_(:code aug-edn-code)
+           aug-edn-code1
            :edn-code1 aug-edn-code1)))
 
 (defn ^:export startsci []
@@ -231,7 +240,8 @@
                      (.workspaceToDom blockly/Xml)
                      (.domToPrettyText blockly/Xml))
         edn-xml (sax/xml->clj xml-str)
-        edn-code (if (seq (:content edn-xml))
+        edn-code nil
+        #_(if (seq (:content edn-xml))
                    (try {:code (edn->code/parse edn-xml)}
                         (catch js/Error e {:error (.-message e)})) "")
         {:keys [code error]}
@@ -340,11 +350,6 @@
   (w/postwalk #(to-kw1 edn-code %)
               vect))
 
-(comment
-(= (:edn-code @state) (:edn-code1 @state))
-
-  )
-
 (defn reagent-comp []
   (let [last-vec
         (cond
@@ -376,8 +381,8 @@
           [:input {:type "text" :value (pr-str @thexml) :id "xmltext"
                    :read-only true}])
         [tutorials-comp]
-        [reagent-comp]
-        #_[reagent-comp1]
+        #_[reagent-comp]
+        [reagent-comp1]
         (when (:result @state)
           (let [showcode? (or dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
             (when (< (:tutorial-no @state) (dec (count tutorials)))
