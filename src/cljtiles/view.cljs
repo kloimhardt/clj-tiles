@@ -30,7 +30,7 @@
 (def rocket-no 49)
 
 (defn page->chapter [page-no]
-   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
+  (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
 
 (defn chapter->page [chap-no]
   (if (pos? chap-no) (nth (reductions + chaps) (dec chap-no)) 0))
@@ -129,13 +129,12 @@
 
 (defn bindings [new-println new-print]
   (merge
-    sicm/bindings
-    {'println new-println
-     'print new-print
-     'app-state app-state
-     'start-timer start-timer
-     'stop-timer stop-timer
-     }))
+   sicm/bindings
+   {'println new-println
+    'print new-print
+    'app-state app-state
+    'start-timer start-timer
+    'stop-timer stop-timer}))
 
 (defn run-code [edn-code error]
   (let [aug-edn-code (augment-code edn-code)
@@ -145,11 +144,10 @@
                       (swap! theout str (my-str x str-width) "\n") nil)
         new-print (fn [& x]
                     (swap! theout str (my-str x str-width)) nil)
-
         bindings2 (bindings new-println new-print)
         cbr (code->break-str str-width aug-edn-code)
         erg (try (sci/eval-string cbr {:bindings bindings2})
-                  (catch js/Error e (.-message e)))]
+                 (catch js/Error e (.-message e)))]
     (when dev
       (println "-------")
       (println cbr)
@@ -184,7 +182,7 @@
     [:select {:value (page->chapter (:tutorial-no @state))
               :on-change (fn [el]
                            (let [chap (gstring/toNumber
-                                        (.. el -target -value))
+                                       (.. el -target -value))
                                  no (chapter->page chap)]
                              (goto-page! no)))}
      (map-indexed (fn [idx val] [:option {:key idx :value idx} val]) chapnames)]
@@ -206,9 +204,9 @@
 
 (defn filter-defns [edn-code fu]
   (conj
-    (vec (filter #(= (symbol "defn") (first %)) edn-code))
-    (list fu)
-    (last edn-code)))
+   (vec (filter #(= (symbol "defn") (first %)) edn-code))
+   (list fu)
+   (last edn-code)))
 
 (defn to-kw [edn-code sy]
   (cond
