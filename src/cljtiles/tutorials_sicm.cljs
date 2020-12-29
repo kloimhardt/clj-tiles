@@ -126,11 +126,12 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              [[time position velocity]]
              (Kinetic-Energy velocity)))
    [:div
-    [:p "The lagrangian equations are differential equations. They are constructed out of the Lagrangian function. The differential equations are applied to some path function. Here we use our specific Path-of-a-Free-Particle. The result is in general a funtion of time. We set the time to ten seconds here. If the path we fed into the equtions is a viable physical path, the result shoud be a very special function: it should be the zero vector."]]
-   [0 -100]
+    [:p "The lagrangian equations are differential equations. They are constructed out of the Lagrangian function. The differential equations are applied to some path function. Here we use our specific Path-of-a-Free-Particle. The result is in general a function of time. We set the time to ten seconds here. If the path we fed into the equtions is a viable physical path, the result shoud be a very special function: it should be the zero vector."]]
+   [0 -170]
    (gb/rpg [[0 0] [0 170] [0 280]
-            [0 410] [150 410] [300 410]
-            [400 370] [450 330] [600 290]]
+            [0 420]
+            [0 500] [150 500] [300 500]
+            [400 450] [450 400] [600 350]]
            '(defn Path-of-a-Free-Particle
               time
               (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
@@ -140,6 +141,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
+           '(tex "Title" :tiles/slot)
            '(:tiles/slot :tiles/slot)
            '(:tiles/slot :tiles/slot)
            '(Lagrange-equations :tiles/slot)
@@ -147,14 +149,10 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            'Path-of-a-Free-Particle
            '10
            )
-   "Run the code
-\\[\\begin{bmatrix}\\displaystyle{0}&
-\\displaystyle{0}\\end{bmatrix}\\]
-"
-   [0 -100]
+   "Run the code and indeed see the zero vector"
+   [0 -170]
    (gb/rpg [[0 0] [0 170] [0 280]
-            [0 410]
-            [0 500]]
+            [0 420]]
            '(defn Path-of-a-Free-Particle
               time
               (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
@@ -164,10 +162,11 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '(((Lagrange-equations Lagrangian)
-             Path-of-a-Free-Particle)
-             10)
-           '(println (tex "x^2")))
+           '(tex "Title"
+                (((Lagrange-equations Lagrangian)
+                  Path-of-a-Free-Particle)
+                 10))
+           )
    ])
 
 (def desc (reverse (take-nth 3 e-vect)))

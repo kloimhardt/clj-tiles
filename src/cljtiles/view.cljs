@@ -153,11 +153,12 @@
                                 (stop-timer nil))) ms))
     msg))
 
-(defn bindings [new-println new-print]
+(defn bindings [new-println new-print tex-print]
   (merge
    sicm/bindings
    {'println new-println
     'print new-print
+    'tex tex-print
     'app-state app-state
     'start-timer start-timer
     'stop-timer stop-timer}))
@@ -170,7 +171,9 @@
                       (swap! theout str (my-str x str-width) "\n") nil)
         new-print (fn [& x]
                     (swap! theout str (my-str x str-width)) nil)
-        bindings2 (bindings new-println new-print)
+        tex-print (fn [& x]
+                    (swap! theout #(sicm/tex (last x))) nil)
+        bindings2 (bindings new-println new-print tex-print)
         cbr (code->break-str str-width aug-edn-code)
         erg (try (sci/eval-string cbr {:bindings bindings2})
                  (catch js/Error e (.-message e)))]
