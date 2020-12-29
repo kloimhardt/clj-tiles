@@ -122,7 +122,9 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              (Kinetic-Energy velocity)))
    [:div
     [:p "The lagrangian equations are differential equations. They are constructed out of the Lagrangian function. The differential equations are applied to some path function. Here we use our specific Path-of-a-Free-Particle. The result is in general a funtion of time. We set the time to ten seconds here. If the path we fed into the equtions is a viable physical path, the result shoud be a very special function: it should be the zero vector."]]
-   (gb/rpg [[0 0] [0 170] [0 280] [0 410] [300 410]]
+   (gb/rpg [[0 0] [0 170] [0 280]
+            [0 410] [150 410] [300 410]
+            [400 370] [450 330] [600 290]]
            '(defn Path-of-a-Free-Particle
               time
               (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
@@ -132,10 +134,28 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '(Lagrange-equations :tiles/slot)
            '(:tiles/slot :tiles/slot)
+           '(:tiles/slot :tiles/slot)
+           '(Lagrange-equations :tiles/slot)
+           'Lagrangian
+           'Path-of-a-Free-Particle
+           't
            )
-
+"Run the code"
+   (gb/rpg [[0 0] [0 170] [0 280]
+            [0 410]]
+           '(defn Path-of-a-Free-Particle
+              time
+              (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
+           '(defn Kinetic-Energy
+              velocity
+              (square velocity))
+           '(defn Lagrangian
+              [[time position velocity]]
+              (Kinetic-Energy velocity))
+           '(((Lagrange-equations Lagrangian)
+             Path-of-a-Free-Particle)
+            10))
    ])
 
 (def desc (reverse (take-nth 2 e-vect)))

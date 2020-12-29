@@ -34,6 +34,8 @@
                '* gn/*
                '/ gn//
                'square gn/square
+               'Lagrange-equations lg/Lagrange-equations
+
                'valid? s/valid?
                'kind? kind?})
 
@@ -197,4 +199,4 @@
 
 ;;If you like to activate spec: (ts/instrument) If you like to deactivate spec: (ts/unstrument)
 
-(ts/instrument)
+;;(ts/instrument)

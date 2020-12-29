@@ -27,6 +27,15 @@
                          [:value {:name (str "arg_" (+ idx 1))}
                           (gen v (str (+ idx 1) "-" id))]) argsvec))))
 
+(defmethod gen :list [{:keys [argsvec inline?]} givenid]
+  (let [xml-block-type (str "list-h-" (count argsvec))
+        {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
+    (into [:block bm]
+          (map-indexed (fn [idx v]
+                         [:value {:name (str "args-" (+ idx 1))}
+                          (gen v (str (+ idx 1) "-" id))]) argsvec))))
+
+
 (defmethod gen :fun [{:keys [kopf argsvec subtype inline?]} givenid]
   (let [xml-block-type (str subtype "-" (inc (count argsvec)) "-inp")
         {:keys [id] :as bm} (blockmap xml-block-type givenid inline?)]
@@ -97,6 +106,9 @@
 (defn args [& argsvec]
   {:type :args :argsvec argsvec})
 
+(defn lst [& argsvec]
+  {:type :list :argsvec argsvec})
+
 (defn t-map [& argsvec]
   (if (> (count argsvec) 1)
     {:type :map :subtype "map-h" :argsvec argsvec}
@@ -124,6 +136,7 @@
     (let [erst (str (first l))
           appl (fn [fuct] (apply fuct erst (map parse (rest l))))]
       (cond
+        (or (list? (first l)) (= ":tiles/slot" erst)) (apply lst (map parse l))
         (= ":tiles/vert" erst) (assoc (parse (second l)) :inline? false)
         (= ":tiles/num" erst) (num (second l))
         (= "clojure.core/deref" erst) (tiles-deref (second l))
