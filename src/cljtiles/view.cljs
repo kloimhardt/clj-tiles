@@ -42,6 +42,12 @@
 (def desc (mapcat #(apply filldesc %)
                   [[t-s/desc t-s/vect] [t-0/desc t-0/vect]]))
 
+(defn fillscroll [scroll vect]
+  (if (empty? scroll) (repeat (count vect) nil) scroll))
+
+(def scroll (mapcat #(apply fillscroll %)
+                  [[t-s/scroll t-s/vect] [t-0/scroll t-0/vect]]))
+
 (def rocket-no 49)
 
 (defn page->chapter [page-no]
@@ -59,8 +65,13 @@
 
 (defonce app-state (rc/atom nil))
 
+(defn set-scrollbar [x y]
+  (when x
+    (.. blockly -mainWorkspace (scroll x y))))
+
 (defn goto-page! [page-no]
   (load-workspace (get tutorials page-no))
+  (apply set-scrollbar (nth scroll page-no))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset! state
           {:stdout (nth desc page-no) :result nil :code nil :tutorial-no page-no})
@@ -295,7 +306,7 @@
                  [:td {:align :top}
                   (when-let [so (:stdout @state)]
                     (if (:result @state)
-                      [:pre so]
+                      [tex-comp so] ;;TODO: does not reflect \n, need to correct!!
                       [tex-comp so]))
                   [:pre (:result @state)]]
                  (when showcode?

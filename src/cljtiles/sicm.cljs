@@ -12,6 +12,7 @@
             [sicmutils.calculus.derivative :as dr]
             [sicmutils.numerical.minimize :as mn]
             [sicmutils.mechanics.lagrange :as lg]
+            [sicmutils.expression.render :as render]
             [clojure.string :as cs]))
 
 (comment
@@ -28,6 +29,9 @@
 (defn kind? [e]
   (second (first (filter #(s/valid? (first %) e) (partition 2 sps)))))
 
+(defn tex [x]
+  (str "\\["  (render/->TeX (gn/simplify x)) "\\]"))
+
 (def bindings {'up st/up
                '+ gn/+
                '- gn/-
@@ -37,7 +41,8 @@
                'Lagrange-equations lg/Lagrange-equations
 
                'valid? s/valid?
-               'kind? kind?})
+               'kind? kind?
+               'tex tex})
 
 (s/def ::fn fn?)
 (s/def ::nu number?)
