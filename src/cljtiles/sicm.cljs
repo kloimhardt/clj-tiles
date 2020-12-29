@@ -29,7 +29,11 @@
   (second (first (filter #(s/valid? (first %) e) (partition 2 sps)))))
 
 (def bindings {'up st/up
+               '+ gn/+
+               '- gn/-
                '* gn/*
+               '/ gn//
+               'square gn/square
                'valid? s/valid?
                'kind? kind?})
 

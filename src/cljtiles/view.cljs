@@ -255,6 +255,20 @@
       [:div
        (transform-vec last-vec (:edn-code @state))])))
 
+(defn tex-comp [_]
+  (let [rerender
+        (fn [node]
+          (.Queue js/MathJax.Hub #js ["Typeset" (.-Hub js/MathJax) node]))]
+    (rc/create-class
+      {:reagent-render
+       (fn [txt] [:div txt])
+       :component-did-mount
+       (fn [this]
+         (rerender (rd/dom-node this)))
+       :component-did-update
+       (fn [this]
+         (rerender (rd/dom-node this)))})))
+
 (defn out-comp []
   (rc/create-class
    (merge
@@ -280,7 +294,9 @@
                 [:tr
                  [:td {:align :top}
                   (when-let [so (:stdout @state)]
-                    [:pre so])
+                    (if (:result @state)
+                      [:pre so]
+                      [tex-comp so]))
                   [:pre (:result @state)]]
                  (when showcode?
                    [:td {:align :top} [:pre (:code @state)]])]]])))])}
