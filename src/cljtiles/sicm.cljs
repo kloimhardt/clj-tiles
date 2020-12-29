@@ -6,13 +6,13 @@
             [sicmutils.generic :as gn]
             [sicmutils.structure :as st]
             [sicmutils.simplify :as sp] ;;necessary to load simplify multifunction
-            [sicmutils.value :as vl]
             [sicmutils.function :as fu] ;;necessary for ((gn/* 5 (fn[x] x)) 4)
             [sicmutils.expression :as ex]
             [sicmutils.calculus.derivative :as dr]
             [sicmutils.numerical.minimize :as mn]
             [sicmutils.mechanics.lagrange :as lg]
             [sicmutils.expression.render :as render]
+            [sicmutils.abstract.function :as af :include-macros true]
             [clojure.string :as cs]))
 
 (comment
@@ -39,6 +39,7 @@
                '/ gn//
                'square gn/square
                'Lagrange-equations lg/Lagrange-equations
+               'literal-function af/literal-function
 
                'valid? s/valid?
                'kind? kind?

@@ -149,7 +149,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            'Path-of-a-Free-Particle
            '10
            )
-   "Run the code and indeed see the zero vector"
+   "Print the result and find out whether you indeed see the zero vector."
    [0 -170]
    (gb/rpg [[0 0] [0 170] [0 280]
             [0 420]]
@@ -165,6 +165,47 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(tex "Title"
                 (((Lagrange-equations Lagrangian)
                   Path-of-a-Free-Particle)
+                 10))
+           )
+   "You replace the Path-of-a-Free-Particle. You create a vector of two arbitrary funtions. Call them q_x and q_y. Then do the replacement of the specific path with the arbitrary path. After running the workspace again, you see the general equations of motion for the free particle."
+   [0 -250]
+   (gb/rpg [[0 0] [0 170] [0 280] [0 420]
+            [0 550] [0 600] [200 600] [350 600] [550 600]]
+           '(defn Path-of-a-Free-Particle
+              time
+              (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
+           '(defn Kinetic-Energy
+              velocity
+              (square velocity))
+           '(defn Lagrangian
+              [[time position velocity]]
+              (Kinetic-Energy velocity))
+           '(tex "Title"
+                 (((Lagrange-equations Lagrangian)
+                   Path-of-a-Free-Particle)
+                  10))
+           '(up :tiles/slot :tiles/slot)
+           '(literal-function :tiles/slot)
+           'q_x
+           '(literal-function :tiles/slot)
+           'q_y
+           )
+   "hui"
+   [0 -250]
+   (gb/rpg [[0 0] [0 170] [0 280] [0 420]]
+           '(defn Path-of-a-Free-Particle
+              time
+              (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
+           '(defn Kinetic-Energy
+              velocity
+              (square velocity))
+           '(defn Lagrangian
+              [[time position velocity]]
+              (Kinetic-Energy velocity))
+           '(tex "Title"
+                (((Lagrange-equations Lagrangian)
+                  (up (literal-function 'q_x)
+                      (literal-function 'q_y)))
                  10))
            )
    ])
