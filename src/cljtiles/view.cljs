@@ -14,14 +14,11 @@
    [reagent.dom :as rd]
    [zprint.core :as zp]
    [cljtiles.tests :as tst]
-   [cljtiles.sicm :as sicm]))
+   [cljtiles.sicm :as sicm]
+   [cljtiles.blockly :as workspace!]))
 
-(def dev true)
-(if dev
-  (do
-    (def menu false)
-    (print (tst/test-pure)))
-  (def menu false))
+(when workspace!/dev
+  (print (tst/test-pure)))
 
 (def tutorials (vec (concat t-s/vect t-0/vect)))
 
@@ -89,32 +86,6 @@
                 (< -1 idx-old (count tutorials)) idx-old
                 :else 0)]
       (goto-page! idx))))
-
-(defonce workspace
-  (let [workspace-item
-        #js {:displayText "Hello World"
-             :preconditionFn (fn [scope] (println "klm uu") "enabled")
-             :callback (fn [scope] (println "klm called" scope))
-             :scopeType (.. blockly -ContextMenuRegistry -ScopeType -WORKSPACE)
-             :id "hello_world"
-             :weight 100}
-        block-item
-        #js {:displayText "Hello World Block"
-             :preconditionFn (fn [scope] (println "klm uu") "enabled")
-             :callback (fn [scope] (.log js/console scope))
-             :scopeType (.. blockly -ContextMenuRegistry -ScopeType -BLOCK)
-             :id "hello_world_blcok"
-             :weight 100}]
-    (do
-      (js/initblocks blockly)
-      (.inject blockly
-               "blocklyDiv"
-               (clj->js (merge {:scrollbars true
-                                :media "/blockly/media/"}
-                               (when menu {:toolbox (gdom/getElement "toolbox")}))))
-      (.. blockly -ContextMenuRegistry -registry (register workspace-item))
-      (.. blockly -ContextMenuRegistry -registry (register block-item))
-      )))
 
 ((tutorial-fu identity))
 
@@ -194,7 +165,7 @@
         cbr (code->break-str str-width aug-edn-code)
         erg (try (sci/eval-string cbr {:bindings bindings2})
                  (catch js/Error e (.-message e)))]
-    (when dev
+    (when workspace!/dev
       (println "-------")
       (println cbr)
       (println error)
@@ -209,7 +180,7 @@
            :code (if error "Cannot even parse the blocks" cbr)
            :edn-code aug-edn-code)))
 
-(defn ^:export startsci []
+(defn ^:export startsci [block]
   (let [xml-str (->> (.-mainWorkspace blockly)
                      (.workspaceToDom blockly/Xml)
                      (.domToPrettyText blockly/Xml))
@@ -240,13 +211,13 @@
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
-    (if (and (not dev) (= (:tutorial-no @state) 0))
+    (if (and (not workspace!/dev) (= (:tutorial-no @state) 0))
       [:span
-       [:button {:on-click startsci} "Run this Hello World example"]
+       [:button {:on-click #(startsci nil)} "Run this Hello World example"]
        " "
        [:button {:on-click #(goto-page! rocket-no)}
         "Go to Rocket Launch example"]]
-      [:button {:on-click startsci} "Run"])]])
+      [:button {:on-click #(startsci nil)} "Run"])]])
 
 (defn filter-defns [edn-code fu]
   (conj
@@ -306,13 +277,13 @@
     {:reagent-render
      (fn []
        [:div
-        (when menu
+        (when workspace!/menu
           [:input {:type "text" :value (pr-str @thexml) :id "xmltext"
                    :read-only true}])
         [tutorials-comp]
         [reagent-comp]
         (when (or (:stdout @state) (:result @state))
-          (let [showcode? (or dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
+          (let [showcode? (or workspace!/dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
             (when (< (:tutorial-no @state) (dec (count tutorials)))
               [:table {:style {:width "100%"}}
                [:thead
@@ -331,7 +302,7 @@
                   [:pre (:result @state)]]
                  (when showcode?
                    [:td {:align :top} [:pre (:code @state)]])]]])))])}
-    (when menu
+    (when workspace!/menu
       {:component-did-update (fn []
                                (.select (gdom/getElement "xmltext"))
                                (.execCommand js/document "copy"))}))))
