@@ -5,7 +5,7 @@
    [goog.dom.forms :as gforms]
    [sci.core :as sci]
    ["blockly" :as blockly]
-   [cljtiles.xmlparse :as edn->code]
+   [cljtiles.xmlparse-2 :as edn->code]
    [cljtiles.tutorials-0 :as t-0]
    [cljtiles.tutorials-sicm :as t-s]
    [clojure.walk :as w]
@@ -185,13 +185,9 @@
                      (.workspaceToDom blockly/Xml)
                      (.domToPrettyText blockly/Xml))
         edn-xml (sax/xml->clj xml-str)
-        {:keys [code error]}
-        (when (seq (:content edn-xml))
-          (try {:code (edn->code/parse edn-xml)}
-               (catch js/Error e {:error (.-message e)})))
-        edn-code (when code (or (:dat code) [code]))]
+        edn-code (edn->code/parse edn-xml)]
     (reset! thexml xml-str)
-    (run-code edn-code error)))
+    (run-code edn-code nil)))
 
 (defn tutorials-comp []
   [:div

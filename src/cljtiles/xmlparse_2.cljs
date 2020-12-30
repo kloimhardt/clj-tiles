@@ -25,8 +25,14 @@
   (or (first (:content (first content))) " "))
 
 (defmethod type-m "funs" [_ content]
-  (apply list (symbol (first (:content (first content))))
-         (map tag-m (rest content))))
+  (let [erg
+        (apply list (symbol (first (:content (first content))))
+               (map tag-m (rest content)))
+        augment-arg (fn [e] (if (vector? e) e [e]))]
+    (if (= 'defn (first erg))
+      (apply list 'defn (nth erg 1) (augment-arg (nth erg 2))
+             (drop 3 erg))
+      erg)))
 
 (defmethod type-m "num_" [_ content]
   (symbol (first (:content (first content)))))
@@ -36,6 +42,9 @@
 
 (defmethod type-m "args" [_ content]
   (mapv tag-m content))
+
+(defmethod type-m "list" [_ content]
+  (map tag-m content))
 
 (defn to-hashmap [v]
   (let [c (/ (count v) 2)]
@@ -48,10 +57,3 @@
 
 (defn parse [edn]
   (tag-m edn))
-
-(comment
-
-  (do (println "------------")
-      {:dat (tag-m edn)})
-
-  )
