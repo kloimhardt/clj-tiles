@@ -29,7 +29,7 @@
           "World" " "
           ["str" gb/slot gb/slot gb/slot gb/slot]
           "Hello," "!")
-   (gb/pg [[0 0] [50 0] [100 0] [150 0] [0 50]]
+   (gb/pg [[0 0] [50 0] [100 0] [200 0] [0 50]]
           1 2 " " " "
           ["str" 3 gb/slot gb/slot " " ["str" gb/slot gb/slot "Blast off!"]])
    (gb/pg [[0 0] [0 50] [150 50] [0 100] [0 150] [100 150]]

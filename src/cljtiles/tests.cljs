@@ -11,6 +11,7 @@
    [tubax.core :as sax]
    [cljtiles.xmlparse :as edn->code]
    [cljtiles.xmlparse-orig :as edn->code-orig]
+   [cljtiles.xmlparse-2 :as edn->code-2]
    [clojure.string :as cs]
    [clojure.data :as cd]
    ["blockly" :as blockly]))
@@ -76,16 +77,38 @@
       (analyze "pipe tests failed"
                "pipe all ok!")))
 
+(defn edn->code-parse-2 [hccp strict? orig?]
+  (let [parse-function (if orig? edn->code-orig/parse edn->code-2/parse)
+        clj-code (if strict?
+                   (parse-function hccp)
+                   (try (parse-function hccp)
+                        (catch js/Error e {:error (.-message e)})))]
+     clj-code))
+
+(defn test-consistency-2 [pipeit!?]
+  (let [orig t-0s/vect-code
+        proc (mapv #(edn->code-parse-2 (gen-hiccup % pipeit!?) true false)
+                   t-0s/vect)
+        tests (map #(= (repls %1) (str %2)) orig proc)]
+    (def orig2 orig)
+    (def proc2 proc)
+    (analyze tests "con-2 tests failed" "test con-2 all ok!")))
+
 (defn test-pure []
   (map second [(test-consistency false)
-               (test-original false)]))
+               (test-original false)
+               (test-consistency-2 false)]))
 
 (defn test-all-pipe! []
   (map second [(test-pipe!)
-              (test-consistency true)
-              (test-original true)]))
+               (test-consistency true)
+               (test-original true)
+               (test-consistency-2 true)]))
+
 
 (comment
+
+  (test-consistency-2 true)
 
   (test-all-pipe!)
   (test-pure)
