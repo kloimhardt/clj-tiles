@@ -46,7 +46,7 @@
   (if (empty? scroll) (repeat (count vect) nil) scroll))
 
 (def scroll (mapcat #(apply fillscroll %)
-                  [[t-s/scroll t-s/vect] [t-0/scroll t-0/vect]]))
+                    [[t-s/scroll t-s/vect] [t-0/scroll t-0/vect]]))
 
 (def rocket-no 49)
 
@@ -91,13 +91,30 @@
       (goto-page! idx))))
 
 (defonce workspace
-  (do
-    (js/initblocks blockly)
-    (.inject blockly
-             "blocklyDiv"
-             (clj->js (merge {:scrollbars true
-                              :media "/blockly/media/"}
-                             (when menu {:toolbox (gdom/getElement "toolbox")}))))))
+  (let [workspace-item
+        #js {:displayText "Hello World"
+             :preconditionFn (fn [scope] (println "klm uu") "enabled")
+             :callback (fn [scope] (println "klm called" scope))
+             :scopeType (.. blockly -ContextMenuRegistry -ScopeType -WORKSPACE)
+             :id "hello_world"
+             :weight 100}
+        block-item
+        #js {:displayText "Hello World Block"
+             :preconditionFn (fn [scope] (println "klm uu") "enabled")
+             :callback (fn [scope] (.log js/console scope))
+             :scopeType (.. blockly -ContextMenuRegistry -ScopeType -BLOCK)
+             :id "hello_world_blcok"
+             :weight 100}]
+    (do
+      (js/initblocks blockly)
+      (.inject blockly
+               "blocklyDiv"
+               (clj->js (merge {:scrollbars true
+                                :media "/blockly/media/"}
+                               (when menu {:toolbox (gdom/getElement "toolbox")}))))
+      (.. blockly -ContextMenuRegistry -registry (register workspace-item))
+      (.. blockly -ContextMenuRegistry -registry (register block-item))
+      )))
 
 ((tutorial-fu identity))
 
@@ -274,14 +291,14 @@
         (fn [node]
           (.Queue js/MathJax.Hub #js ["Typeset" (.-Hub js/MathJax) node]))]
     (rc/create-class
-      {:reagent-render
-       (fn [txt] [:div txt])
-       :component-did-mount
-       (fn [this]
-         (rerender (rd/dom-node this)))
-       :component-did-update
-       (fn [this]
-         (rerender (rd/dom-node this)))})))
+     {:reagent-render
+      (fn [txt] [:div txt])
+      :component-did-mount
+      (fn [this]
+        (rerender (rd/dom-node this)))
+      :component-did-update
+      (fn [this]
+        (rerender (rd/dom-node this)))})))
 
 (defn out-comp []
   (rc/create-class
