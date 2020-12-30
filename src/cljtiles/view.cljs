@@ -87,8 +87,6 @@
                 :else 0)]
       (goto-page! idx))))
 
-((tutorial-fu identity))
-
 (def thexml (atom ""))
 
 (defn code->break-str [width edn-code]
@@ -185,7 +183,8 @@
                      (.workspaceToDom blockly/Xml)
                      (.domToPrettyText blockly/Xml))
         edn-xml (sax/xml->clj xml-str)
-        edn-code (edn->code/parse edn-xml)]
+        inspect-id (when block (.-id (get (js->clj block) "block")))
+        edn-code (edn->code/parse edn-xml inspect-id)]
     (reset! thexml xml-str)
     (run-code edn-code nil)))
 
@@ -302,6 +301,9 @@
       {:component-did-update (fn []
                                (.select (gdom/getElement "xmltext"))
                                (.execCommand js/document "copy"))}))))
+
+(workspace!/init startsci)
+((tutorial-fu identity))
 
 (defn theview []
   [:div

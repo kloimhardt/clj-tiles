@@ -55,5 +55,5 @@
 (defmethod type-m "map-" [_ content]
   (to-hashmap (map tag-m content)))
 
-(defn parse [edn]
+(defn parse [edn inspect-id]
   (tag-m edn))
