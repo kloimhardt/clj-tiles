@@ -16,18 +16,18 @@
   (when @load?
     (reset! load? false)
     (let [workspace-item
-          #js {:displayText "Hello World"
+          #js {:displayText "Run Workspace"
                :preconditionFn (fn [_scope] "enabled")
                :callback (fn [scope] (startfun scope))
                :scopeType (.. blockly -ContextMenuRegistry -ScopeType -WORKSPACE)
-               :id "hello_world"
+               :id "run_workspace"
                :weight 100}
           block-item
-          #js {:displayText "Hello World Block"
+          #js {:displayText "Inspect"
                :preconditionFn (fn [_scope] "enabled")
                :callback (fn [scope] (startfun scope))
                :scopeType (.. blockly -ContextMenuRegistry -ScopeType -BLOCK)
-               :id "hello_world_blcok"
+               :id "inspect"
                :weight 100}]
       (do
         (js/initblocks blockly)
