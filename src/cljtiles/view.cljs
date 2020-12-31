@@ -172,7 +172,9 @@
                      (.domToPrettyText blockly/Xml))
         edn-xml (sax/xml->clj xml-str)
         inspect-id (when block (.-id (get (js->clj block) "block")))
-        edn-code (edn->code/parse edn-xml inspect-id)]
+        inspect-fn #(list 'do (list 'tex "inspect" %) %)
+        edn-code (edn->code/parse edn-xml {:id inspect-id
+                                           :fun inspect-fn})]
     (run-code edn-code nil)))
 
 (defn tutorials-comp []

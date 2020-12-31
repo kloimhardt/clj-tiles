@@ -110,7 +110,6 @@
                (test-original true)
                (test-consistency-2 true)]))
 
-
 (comment
   (test-consistency-2 true)
   (test-break?-2 false)

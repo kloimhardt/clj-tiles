@@ -19,35 +19,41 @@
 (defmethod tag-m :field [{:keys [content]} _id]
   (first content))
 
+(defn inspect [attributes {:keys [id fun]} expre]
+  (if (= id (:id attributes))
+    (fun expre) expre))
+
 (defmethod type-m :default [_ content _id] content)
 
-(defmethod type-m "text" [_ content _id]
-  (or (first (:content (first content))) " "))
+(defmethod type-m "text" [attributes content id]
+  (->> (or (first (:content (first content))) " ")
+       (inspect attributes id)))
 
-(defmethod type-m "funs" [_ content id]
+(defmethod type-m "funs" [attributes content id]
   (let [erg
         (apply list (symbol (first (:content (first content))))
                (map #(tag-m % id) (rest content)))
-        augment-arg (fn [e] (if (and (symbol? e) (not= "[" (first (str e)))) [e] e))]
-    (if (and (= 'defn (first erg)) true (> (count erg) 2))
-      (apply list 'defn (nth erg 1) (augment-arg (nth erg 2))
-             (drop 3 erg))
-      erg)))
+        augment-arg (fn [e] (if (and (symbol? e) (not= "[" (first (str e)))) [e] e))
+        modi-erg ;; modify (defn x x) -> (defn [x] x)
+        (if (and (= 'defn (first erg)) true (> (count erg) 2))
+          (apply list 'defn (nth erg 1) (augment-arg (nth erg 2))
+                 (drop 3 erg))
+          erg)]
+    (->> modi-erg
+         #_(inspect attributes id))
+    ))
 
 (defmethod type-m "num_" [attributes content id]
-  (def u [attributes content id])
-  (let [erg (symbol (first (:content (first content))))]
-    (if (= id (:id attributes))
-      (list 'do (list 'println "inspect" erg) erg)
-      erg)))
+  (->> (symbol (first (:content (first content))))
+       (inspect attributes id)))
 
-(defmethod type-m "infi" [_ content id]
+(defmethod type-m "infi" [attributes content id]
   (type-m {:type "funs"} content id))
 
-(defmethod type-m "args" [_ content id]
+(defmethod type-m "args" [attributes content id]
   (mapv #(tag-m % id) content))
 
-(defmethod type-m "list" [_ content id]
+(defmethod type-m "list" [attributes content id]
   (map #(tag-m % id) content))
 
 (defn to-hashmap [v]
@@ -56,7 +62,7 @@
                   (take c v)
                   (take-last c v)))))
 
-(defmethod type-m "map-" [_ content id]
+(defmethod type-m "map-" [attributes content id]
   (to-hashmap (map #(tag-m % id) content)))
 
 (defn parse [edn inspect-id]
