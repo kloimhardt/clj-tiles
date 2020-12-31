@@ -71,7 +71,7 @@
   (apply set-scrollbar (nth scroll page-no))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset! state
-          {:desc (nth desc page-no) :stdout [] :result nil :code nil :tutorial-no page-no})
+          {:desc (nth desc page-no) :stdout [] :inspect [] :result nil :code nil :tutorial-no page-no})
   (reset! app-state 0))
 
 (defn tutorial-fu [inc-or-dec]
@@ -137,11 +137,13 @@
                                 (stop-timer nil))) ms))
     msg))
 
-(defn bindings [new-println tex-print]
+(defn bindings [new-println tex-print inspect tex-inspect]
   (merge
    sicm/bindings
    {'println new-println
     'tex tex-print
+    'inspect inspect
+    'tex-inspect tex-inspect
     'app-state app-state
     'start-timer start-timer
     'stop-timer stop-timer}))
@@ -154,9 +156,12 @@
        tex-print
         (fn [& x] (swap! state #(update % :stdout conj
                                         (sicm/tex (last x)))) nil)
-        bindings2 (bindings new-println tex-print)
+        inspect (fn [x] (swap! state #(update % :inspect conj (str x))) x)
+        tex-inspect (fn [x] (swap! state #(update % :inspect conj (sicm/tex x))) x)
+        bindings2 (bindings new-println tex-print inspect tex-inspect)
         cbr (code->break-str str-width aug-edn-code)
         _ (swap! state assoc :stdout [])
+        _ (swap! state assoc :inspect [])
         erg (try (sci/eval-string cbr {:bindings bindings2})
                  (catch js/Error e (.-message e)))]
     (swap! state assoc
@@ -166,15 +171,14 @@
            :code (if error "Cannot even parse the blocks" cbr)
            :edn-code aug-edn-code)))
 
-(defn ^:export startsci [block]
+(defn ^:export startsci [context]
   (let [xml-str (->> (.-mainWorkspace blockly)
                      (.workspaceToDom blockly/Xml)
                      (.domToPrettyText blockly/Xml))
         edn-xml (sax/xml->clj xml-str)
-        inspect-id (when block (.-id (get (js->clj block) "block")))
-        inspect-fn #(list 'do (list 'tex "inspect" %) %)
+        inspect-id (when context (.-id (get context "block")))
         edn-code (edn->code/parse edn-xml {:id inspect-id
-                                           :fun inspect-fn})]
+                                           :fun (:inspect-fn context)})]
     (run-code edn-code nil)))
 
 (defn tutorials-comp []
@@ -253,6 +257,12 @@
   (let [flex50 {:style {:flex "50%"}}]
     [:div {:style {:display "flex"}}
      [:div flex50
+      [:div
+       (map-indexed (fn [idx v]
+                      ^{:key idx}[:div
+                                  [tex-comp v]
+                                  [:hr]])
+                    (:inspect @state))]
       [:div
        (map-indexed (fn [idx v]
                       ^{:key idx}[tex-comp v])

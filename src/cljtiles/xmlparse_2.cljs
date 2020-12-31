@@ -40,21 +40,23 @@
                  (drop 3 erg))
           erg)]
     (->> modi-erg
-         #_(inspect attributes id))
-    ))
+         (inspect attributes id))))
 
 (defmethod type-m "num_" [attributes content id]
   (->> (symbol (first (:content (first content))))
        (inspect attributes id)))
 
-(defmethod type-m "infi" [attributes content id]
-  (type-m {:type "funs"} content id))
+(defmethod type-m "infi" [{:keys [id] :as attributes} content select-id]
+  (->> (type-m {:type "funs" :id id} content select-id)
+       (inspect attributes id)))
 
 (defmethod type-m "args" [attributes content id]
-  (mapv #(tag-m % id) content))
+  (->> (mapv #(tag-m % id) content)
+       (inspect attributes id)))
 
 (defmethod type-m "list" [attributes content id]
-  (map #(tag-m % id) content))
+  (->> (map #(tag-m % id) content)
+       (inspect attributes id)))
 
 (defn to-hashmap [v]
   (let [c (/ (count v) 2)]
@@ -63,7 +65,8 @@
                   (take-last c v)))))
 
 (defmethod type-m "map-" [attributes content id]
-  (to-hashmap (map #(tag-m % id) content)))
+  (->> (to-hashmap (map #(tag-m % id) content))
+       (inspect attributes id)))
 
 (defn parse [edn inspect-id]
   (tag-m edn inspect-id))
