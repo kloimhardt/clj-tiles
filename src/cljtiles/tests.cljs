@@ -94,6 +94,11 @@
     (def proc2 proc)
     (analyze tests "con-2 tests failed" "test con-2 all ok!")))
 
+(defn test-break?-2 [pipeit!?]
+  (let [proc (mapv #(edn->code-parse-2 (gen-hiccup % pipeit!?) true false)
+                   t-0/vect)]
+    (def proc3 proc)))
+
 (defn test-pure []
   (map second [(test-consistency false)
                (test-original false)
@@ -107,8 +112,8 @@
 
 
 (comment
-
   (test-consistency-2 true)
+  (test-break?-2 false)
 
   (test-all-pipe!)
   (test-pure)

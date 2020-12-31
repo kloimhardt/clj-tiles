@@ -71,7 +71,7 @@
   (apply set-scrollbar (nth scroll page-no))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset! state
-          {:desc (nth desc page-no) :strout nil :result nil :code nil :tutorial-no page-no})
+          {:desc (nth desc page-no) :stdout [] :result nil :code nil :tutorial-no page-no})
   (reset! app-state 0))
 
 (defn tutorial-fu [inc-or-dec]
@@ -137,11 +137,10 @@
                                 (stop-timer nil))) ms))
     msg))
 
-(defn bindings [new-println new-print tex-print]
+(defn bindings [new-println tex-print]
   (merge
    sicm/bindings
    {'println new-println
-    'print new-print
     'tex tex-print
     'app-state app-state
     'start-timer start-timer
@@ -149,27 +148,18 @@
 
 (defn run-code [edn-code error]
   (let [aug-edn-code (augment-code edn-code)
-        theout (atom "")
         str-width 41
-        new-println (fn [& x]
-                      (swap! theout str (my-str x str-width) "\n") nil)
-        new-print (fn [& x]
-                    (swap! theout str (my-str x str-width)) nil)
-        tex-print (fn [& x]
-                    (swap! theout #(sicm/tex (last x))) nil)
-        bindings2 (bindings new-println new-print tex-print)
+        new-println
+        (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
+       tex-print
+        (fn [& x] (swap! state #(update % :stdout conj
+                                        (sicm/tex (last x)))) nil)
+        bindings2 (bindings new-println tex-print)
         cbr (code->break-str str-width aug-edn-code)
+        _ (swap! state assoc :stdout [])
         erg (try (sci/eval-string cbr {:bindings bindings2})
                  (catch js/Error e (.-message e)))]
-    (when workspace!/dev
-      (println "-------")
-      (println cbr)
-      (println error)
-      (println "-------")
-      (when @theout (println @theout))
-      (println erg))
     (swap! state assoc
-           :stdout @theout
            :result (cond (some? erg) (my-str erg str-width)
                          (= "nil" (str (last edn-code))) "nil"
                          :else "")
@@ -257,48 +247,14 @@
       (fn [this]
         (rerender (rd/dom-node this)))})))
 
-(comment
-  (defn out-comp-2 []
-    (fn []
-      [:div
-       [tutorials-comp]
-       [reagent-comp]
-       (when (or (:stdout @state) (:result @state))
-         (let [showcode? (or workspace!/dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
-           (when (< (:tutorial-no @state) (dec (count tutorials)))
-             [:table {:style {:width "100%"}}
-              [:thead
-               [:tr {:align :left}
-                [:th {:style {:width "50%"}}
-                 (if (:result @state) "Output"
-                     (when (seq (:stdout @state)) "Description"))]
-                (when (and showcode? (:result @state)) [:th "Code"])]]
-              [:tbody
-               [:tr
-                [:td {:align :top}
-                 (when-let [so (:stdout @state)]
-                   (if (:result @state)
-                     [tex-comp so] ;;TODO: does not reflect \n, need to correct!!
-                     [tex-comp so]))
-                 [:pre (:result @state)]]
-                (when showcode?
-                  [:td {:align :top} [:pre (:code @state)]])]]])))])
-    )
-
-  (defn result-comp-2 []
-    [:table {:style {:width "100%"}}
-     [:tbody
-      [:tr
-       [:td {:align :top :style {:width "50%"}}
-        [tex-comp (:stdout @state)]
-        [:pre (:result @state)]]
-       [:td {:align :top} [:pre (:code @state)]]]]]))
-
 (defn result-comp []
   (let [flex50 {:style {:flex "50%"}}]
     [:div {:style {:display "flex"}}
      [:div flex50
-      [tex-comp (:stdout @state)]
+      [:div
+       (map-indexed (fn [idx v]
+                      ^{:key idx}[tex-comp v])
+                    (:stdout @state))]
       [:pre (:result @state)]]
      [:div flex50
       [:pre (:code @state)]]]))

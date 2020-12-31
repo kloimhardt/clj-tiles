@@ -28,8 +28,8 @@
   (let [erg
         (apply list (symbol (first (:content (first content))))
                (map #(tag-m % id) (rest content)))
-        augment-arg (fn [e] (if (vector? e) e [e]))]
-    (if (= 'defn (first erg))
+        augment-arg (fn [e] (if (and (symbol? e) (not= "[" (first (str e)))) [e] e))]
+    (if (and (= 'defn (first erg)) true (> (count erg) 2))
       (apply list 'defn (nth erg 1) (augment-arg (nth erg 2))
              (drop 3 erg))
       erg)))
