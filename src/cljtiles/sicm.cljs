@@ -24,13 +24,44 @@
 
   )
 
-(def sps [::nu "Number" ::fn "Function" ::sy "Symbol" ::up "Column Vector"])
-
-(defn kind? [e]
-  (second (first (filter #(s/valid? (first %) e) (partition 2 sps)))))
-
 (defn tex [x]
   (str "\\["  (render/->TeX (gn/simplify x)) "\\]"))
+
+(defn inline-tex [x]
+  (render/->TeX (gn/simplify x)))
+
+(def sps [::nu "Number" #_::sfunction #_"SicmFunction" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differentiation"])
+
+(def u (atom []))
+
+(defn kind-s? [e]
+  (let [[spc text] (first (filter #(s/valid? (first %) e) (partition 2 sps)))
+        differential (fn [^dr/Differential e1] (let [t (.-terms  e1)] [(second (first t)) (last (last t))]))]
+    (swap! u conj e)
+    (cond
+      (= spc ::up)
+      (str text "\\ " (inline-tex (apply st/up (map kind-s? e))))
+      (= spc ::dow)
+      (str text "\\ " (inline-tex (apply st/down (map kind-s? e))))
+      (#{::nu ::sy} spc)
+      (str text "\\ " (inline-tex e))
+      (= spc ::differential)
+      (str text ":\\ " (apply #(str %1 "\\rightarrow " %2) (map kind-s? (differential e))))
+      :else
+      (or text "not\\ yet\\ specified"))))
+
+(defn kind? [e] (tex (kind-s? e)))
+
+(comment
+  (s/valid? ::up (let [t (.-terms (first (first @u)))] [(second (first t)) (last (last t))])
+            )
+  (s/explain ::up (last @u))
+
+  (s/explain ::dow (seq (fn? (last @u))))
+
+
+
+  )
 
 (def bindings {'up st/up
                '+ gn/+
@@ -88,7 +119,7 @@
 (s/def ::eexpression (s/keys :req-un [::type ::expression]))
 (s/def ::nu-sy-eex (s/or :ns ::nu-sy :eex ::eexpression))
 
-(defn the-terms [f] nil #_(.terms f)) ;; a hack as .terms does not cljs compile
+(defn the-terms [^dr/Differential f] (.-terms f))
 
 (s/def ::differential (s/and #(instance?
                               sicmutils.calculus.derivative.Differential %)
@@ -104,7 +135,8 @@
                    #(> (count %) 1)
                    #(< (count %) 4)
                    #(#{:sicmutils.structure/up} (vl/kind %))
-                   #(s/valid? ::up-args (seq %))))
+                   ;;#(s/valid? ::up-args (seq %)) ;;hack removed
+                   ))
 
 (s/def ::nu-sy-eex-dr-fn-up (s/or :nse ::nu-sy-eex :fn fn? :up ::up :dr ::differential))
 (s/def ::dow-args (s/cat :a-dow ::nu-sy-eex-dr-fn-up
@@ -115,7 +147,8 @@
                     #(> (count %) 1)
                     #(< (count %) 4)
                     #(#{:sicmutils.structure/down} (vl/kind %))
-                    #(s/valid? ::dow-args (seq %))))
+                    ;; #(s/valid? ::dow-args (seq %)) ;;hack-removed
+                    ))
 
 (s/def ::nu-sy-eex-dr-fn-up-dow (s/or :nsedfu ::nu-sy-eex-dr-fn-up :dow ::dow))
 

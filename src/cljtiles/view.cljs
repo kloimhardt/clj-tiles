@@ -157,7 +157,7 @@
         (fn [& x] (swap! state #(update % :stdout conj
                                         (sicm/tex (last x)))) nil)
         inspect (fn [x] (swap! state #(update % :inspect conj (str x))) x)
-        tex-inspect (fn [x] (swap! state #(update % :inspect conj (sicm/tex x))) x)
+        tex-inspect (fn [x] (swap! state #(update % :inspect conj (str (sicm/kind? x)))) x)
         bindings2 (bindings new-println tex-print inspect tex-inspect)
         cbr (code->break-str str-width aug-edn-code)
         _ (swap! state assoc :stdout [])
