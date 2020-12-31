@@ -71,7 +71,7 @@
   (apply set-scrollbar (nth scroll page-no))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset! state
-          {:stdout (nth desc page-no) :result nil :code nil :tutorial-no page-no})
+          {:desc (nth desc page-no) :strout nil :result nil :code nil :tutorial-no page-no})
   (reset! app-state 0))
 
 (defn tutorial-fu [inc-or-dec]
@@ -86,8 +86,6 @@
                 (< -1 idx-old (count tutorials)) idx-old
                 :else 0)]
       (goto-page! idx))))
-
-(def thexml (atom ""))
 
 (defn code->break-str [width edn-code]
   (apply str (interpose "\n" (map #(zp/zprint-str % width) edn-code))))
@@ -185,7 +183,6 @@
         edn-xml (sax/xml->clj xml-str)
         inspect-id (when block (.-id (get (js->clj block) "block")))
         edn-code (edn->code/parse edn-xml inspect-id)]
-    (reset! thexml xml-str)
     (run-code edn-code nil)))
 
 (defn tutorials-comp []
@@ -206,13 +203,7 @@
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
-    (if (and (not workspace!/dev) (= (:tutorial-no @state) 0))
-      [:span
-       [:button {:on-click #(startsci nil)} "Run this Hello World example"]
-       " "
-       [:button {:on-click #(goto-page! rocket-no)}
-        "Go to Rocket Launch example"]]
-      [:button {:on-click #(startsci nil)} "Run"])]])
+    [:button {:on-click #(startsci nil)} "Run"]]])
 
 (defn filter-defns [edn-code fu]
   (conj
@@ -266,48 +257,65 @@
       (fn [this]
         (rerender (rd/dom-node this)))})))
 
-(defn out-comp []
-  (rc/create-class
-   (merge
-    {:reagent-render
-     (fn []
-       [:div
-        (when workspace!/menu
-          [:input {:type "text" :value (pr-str @thexml) :id "xmltext"
-                   :read-only true}])
-        [tutorials-comp]
-        [reagent-comp]
-        (when (or (:stdout @state) (:result @state))
-          (let [showcode? (or workspace!/dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
-            (when (< (:tutorial-no @state) (dec (count tutorials)))
-              [:table {:style {:width "100%"}}
-               [:thead
-                [:tr {:align :left}
-                 [:th {:style {:width "50%"}}
-                  (if (:result @state) "Output"
-                      (when (seq (:stdout @state)) "Description"))]
-                 (when (and showcode? (:result @state)) [:th "Code"])]]
-               [:tbody
-                [:tr
-                 [:td {:align :top}
-                  (when-let [so (:stdout @state)]
-                    (if (:result @state)
-                      [tex-comp so] ;;TODO: does not reflect \n, need to correct!!
-                      [tex-comp so]))
-                  [:pre (:result @state)]]
-                 (when showcode?
-                   [:td {:align :top} [:pre (:code @state)]])]]])))])}
-    (when workspace!/menu
-      {:component-did-update (fn []
-                               (.select (gdom/getElement "xmltext"))
-                               (.execCommand js/document "copy"))}))))
+(comment
+  (defn out-comp-2 []
+    (fn []
+      [:div
+       [tutorials-comp]
+       [reagent-comp]
+       (when (or (:stdout @state) (:result @state))
+         (let [showcode? (or workspace!/dev (not (#{0 1 rocket-no} (:tutorial-no @state))))]
+           (when (< (:tutorial-no @state) (dec (count tutorials)))
+             [:table {:style {:width "100%"}}
+              [:thead
+               [:tr {:align :left}
+                [:th {:style {:width "50%"}}
+                 (if (:result @state) "Output"
+                     (when (seq (:stdout @state)) "Description"))]
+                (when (and showcode? (:result @state)) [:th "Code"])]]
+              [:tbody
+               [:tr
+                [:td {:align :top}
+                 (when-let [so (:stdout @state)]
+                   (if (:result @state)
+                     [tex-comp so] ;;TODO: does not reflect \n, need to correct!!
+                     [tex-comp so]))
+                 [:pre (:result @state)]]
+                (when showcode?
+                  [:td {:align :top} [:pre (:code @state)]])]]])))])
+    )
+
+  (defn result-comp-2 []
+    [:table {:style {:width "100%"}}
+     [:tbody
+      [:tr
+       [:td {:align :top :style {:width "50%"}}
+        [tex-comp (:stdout @state)]
+        [:pre (:result @state)]]
+       [:td {:align :top} [:pre (:code @state)]]]]]))
+
+(defn result-comp []
+  (let [flex50 {:style {:flex "50%"}}]
+    [:div {:style {:display "flex"}}
+     [:div flex50
+      [tex-comp (:stdout @state)]
+      [:pre (:result @state)]]
+     [:div flex50
+      [:pre (:code @state)]]]))
+
+(defn description-comp []
+  [:div {:style {:column-count 2}}
+   [tex-comp (:desc @state)]])
 
 (workspace!/init startsci)
 ((tutorial-fu identity))
 
 (defn theview []
   [:div
-   [out-comp]])
+   [tutorials-comp]
+   [reagent-comp]
+   [result-comp]
+   [description-comp]])
 
 (defn ^{:export true :dev/after-load true} output []
   (rd/render [theview] (gdom/getElement "out")))
