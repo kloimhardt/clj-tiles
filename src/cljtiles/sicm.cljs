@@ -12,17 +12,7 @@
             [sicmutils.numerical.minimize :as mn]
             [sicmutils.mechanics.lagrange :as lg]
             [sicmutils.expression.render :as render]
-            [sicmutils.abstract.function :as af :include-macros true]
-            [clojure.string :as cs]))
-
-(comment
-
-  (def spsi (filter #(cs/starts-with? (str %) ":cljtiles") (map first (s/registry))))
-  (filter #(s/valid? % (st/up 3 4)) sps)
-  (s/valid? ::sfunction (st/up 3 4))
-(kind? kind?)
-
-  )
+            [sicmutils.abstract.function :as af :include-macros true]))
 
 (defn tex [x]
   (str "\\["  (render/->TeX (gn/simplify x)) "\\]"))
@@ -30,38 +20,39 @@
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
 
-(def sps [::nu "Number" #_::sfunction #_"SicmFunction" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differentiation"])
-
-(def u (atom []))
+(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differentiation" ::literal-expression "LiteralExpression" ::literal-function "LiteralFunction"])
 
 (defn kind-s? [e]
   (let [[spc text] (first (filter #(s/valid? (first %) e) (partition 2 sps)))
         differential (fn [^dr/Differential e1] (let [t (.-terms  e1)] [(second (first t)) (last (last t))]))]
-    (swap! u conj e)
     (cond
       (= spc ::up)
       (str text "\\ " (inline-tex (apply st/up (map kind-s? e))))
       (= spc ::dow)
       (str text "\\ " (inline-tex (apply st/down (map kind-s? e))))
-      (#{::nu ::sy} spc)
+      (#{::nu ::sy ::literal-expression ::literal-function}
+       spc)
       (str text "\\ " (inline-tex e))
       (= spc ::differential)
       (str text ":\\ " (apply #(str %1 "\\rightarrow " %2) (map kind-s? (differential e))))
       :else
       (or text "not\\ yet\\ specified"))))
 
-(defn kind? [e] (tex (kind-s? e)))
+(defn kind? [e]
+  (tex (kind-s? e)))
 
 (comment
-  (s/valid? ::up (let [t (.-terms (first (first @u)))] [(second (first t)) (last (last t))])
-            )
-  (s/explain ::up (last @u))
+  (s/valid? ::up (let [t (.-terms (first (first @u)))] [(second (first t)) (last (last t))]))
+  (s/explain ::differential (first (first @u)))
 
-  (s/explain ::dow (seq (fn? (last @u))))
+  (s/valid? ::literal-expression (first (last @u)))
 
+  (instance? sicmutils.expression/Literal (last @u))
+  (s/valid? ::nu (second (first (.-terms (first (first @u))))))
+  (s/valid? ::nu-sy-eex-eliteral (second (first (.-terms (first (first @u))))))
 
-
-  )
+  (instance? sicmutils.abstract.function/Function (last @u))
+  (s/explain ::differential (first (first @u))))
 
 (def bindings {'up st/up
                '+ gn/+
@@ -76,54 +67,61 @@
                'kind? kind?
                'tex tex})
 
+(s/def ::string string?)
+(s/def ::nil nil?)
+(s/def ::literal-expression #(instance? sicmutils.expression/Literal %))
+(s/def ::literal-function #(instance? sicmutils.abstract.function/Function %))
 (s/def ::fn fn?)
+
 (s/def ::nu number?)
 (s/def ::sy symbol?)
 (s/def ::nu-sy (s/or :nu ::nu :sy ::sy))
 (s/def ::expression
-      (s/or :exp2 ::expression-2 :exp-q ::expression-q :exp-U ::expression-U
-            :exp3 ::expression-3 :exp2-7 ::expression-gt2 :ns ::nu-sy))
+  (s/or :exp2 ::expression-2 :exp-q ::expression-q :exp-U ::expression-U
+        :exp3 ::expression-3 :exp2-7 ::expression-gt2 :ns ::nu-sy))
 
 (s/def ::expression-gt2
-      (s/and seq?
-             #(> (count %) 2)
-             (s/cat :a-gt2 #{'* '+} :rest (s/+ ::expression))))
+  (s/and seq?
+         #(> (count %) 2)
+         (s/cat :a-gt2 #{'* '+} :rest (s/+ ::expression))))
 (s/def ::expression-3
-      (s/and seq?
-             #(= (count %) 3)
-             (s/cat :a-3 #{'- '/ 'expt} :rest (s/+ ::expression))))
+  (s/and seq?
+         #(= (count %) 3)
+         (s/cat :a-3 #{'- '/ 'expt} :rest (s/+ ::expression))))
 (s/def ::expression-U
-      (s/and seq?
-             #(= (count %) 2)
-             (s/cat :a-U #{'U '(D U) '((expt D 2) U)}
-                    :rest ::expression)))
+  (s/and seq?
+         #(= (count %) 2)
+         (s/cat :a-U #{'U '(D U) '((expt D 2) U)}
+                :rest ::expression)))
 
 (s/def ::expression-2
-      (s/and seq?
-             #(= (count %) 2)
-             (s/cat :a-2 #{'sin 'cos '- 'sqrt 'atan} :rest ::expression)))
+  (s/and seq?
+         #(= (count %) 2)
+         (s/cat :a-2 #{'sin 'cos '- 'sqrt 'atan} :rest ::expression)))
 
 (s/def ::expression-q
-      (s/and seq?
-             #(= (count %) 2)
-             (s/cat :a-q #{'q '(D q) '((expt D 2) q)
-                           'x '(D x) '((expt D 2) x)
-                           'y '(D y) '((expt D 2) y)
-                           'z '(D z) '((expt D 2) z)
-                           'r '(D r) '((expt D 2) r)
-                           'phi '(D phi) '((expt D 2) phi)
-                           'theta '(D theta) '((expt D 2) theta)}
-                    :rest ::nu-sy)))
+  (s/and seq?
+         #(= (count %) 2)
+         (s/cat :a-q #{'q '(D q) '((expt D 2) q)
+                       'x '(D x) '((expt D 2) x)
+                       'y '(D y) '((expt D 2) y)
+                       'z '(D z) '((expt D 2) z)
+                       'r '(D r) '((expt D 2) r)
+                       'phi '(D phi) '((expt D 2) phi)
+                       'theta '(D theta) '((expt D 2) theta)}
+                :rest ::nu-sy)))
 
 (s/def ::type #{:sicmutils.expression/numerical-expression})
 (s/def ::eexpression (s/keys :req-un [::type ::expression]))
 (s/def ::nu-sy-eex (s/or :ns ::nu-sy :eex ::eexpression))
 
+(s/def ::nu-sy-eex-eliteral (s/or :nsx ::nu-sy-eex :lex ::literal-expression))
+
 (defn the-terms [^dr/Differential f] (.-terms f))
 
 (s/def ::differential (s/and #(instance?
-                              sicmutils.calculus.derivative.Differential %)
-                            #(s/valid? ::nu-sy-eex (second (first (the-terms %))))))
+                               sicmutils.calculus.derivative.Differential %)
+                             #(s/valid? ::nu-sy-eex-eliteral (second (first (the-terms %))))))
 
 (s/def ::nu-sy-eex-dr (s/or :ns ::nu-sy :dr ::differential :eex ::eexpression))
 
@@ -184,16 +182,16 @@
          :four (s/cat :a4-min fn? :b4-min number? :c4-min number? :d4-min any?)))
 
 (s/fdef lg/make-path :args
-        (s/cat :t0 number? :q0 number?
-               :t1 number? :q1 number?
-               :qs (s/spec #(s/valid? (s/+ number?) (into [] %)))))
+  (s/cat :t0 number? :q0 number?
+         :t1 number? :q1 number?
+         :qs (s/spec #(s/valid? (s/+ number?) (into [] %)))))
 
 (s/fdef lg/parametric-path-action :args
-        (s/cat :a1 fn? :a2 number? :a3 number? :a4 number? :a5 number?))
+  (s/cat :a1 fn? :a2 number? :a3 number? :a4 number? :a5 number?))
 
 (s/fdef mn/multidimensional-minimize :args
-        (s/alt :two (s/cat :a1 fn? :a2 (s/spec (s/+ number?)))
-               :three (s/cat :a1 fn? :a2 (s/spec (s/+ number?)) :a3 any?)))
+  (s/alt :two (s/cat :a1 fn? :a2 (s/spec (s/+ number?)))
+         :three (s/cat :a1 fn? :a2 (s/spec (s/+ number?)) :a3 any?)))
 
 (s/fdef lg/find-path :args (s/cat :a1 fn? :a2 number?
                                   :a3 number? :a4 number? :a5 number? :a6 int?))
@@ -203,10 +201,10 @@
 (s/fdef lg/Lagrange-equations :args (s/cat :a1 fn?))
 (s/fdef lg/L-uniform-acceleration :args (s/cat :a1 ::nu-sy :a2 ::nu-sy))
 (s/fdef lg/L-central-rectangular :args
-        (s/cat :a1 ::nu-sy-eex :a2 (s/or :o1 ::sfunction :o2 fn?)))
+  (s/cat :a1 ::nu-sy-eex :a2 (s/or :o1 ::sfunction :o2 fn?)))
 
 (s/fdef lg/L-central-polar :args
-        (s/cat :a1 ::nu-sy-eex :a2 (s/or :o1 ::sfunction :o2 fn?)))
+  (s/cat :a1 ::nu-sy-eex :a2 (s/or :o1 ::sfunction :o2 fn?)))
 
 (s/fdef lg/F->C :args (s/cat :a fn?))
 (s/fdef lg/L-free-particle :args (s/cat :a ::nu-sy))
@@ -225,11 +223,11 @@
 ;;simplify-spec-full is not used, it checks the result of a simplify call
 ;;but this check would not be deactiveted with (ts/unstrument)
 #_(defn simplify-spec-full [x]
-  (let [s (ts/with-instrument-disabled (gn/simplify x))]
-    (do
-      (if-not  (s/valid? (s/or :e ::expression :udex ::up-down-expression) s)
-        (throw (Exception. "simplify result does not conform to spec")))
-      s)))
+    (let [s (ts/with-instrument-disabled (gn/simplify x))]
+      (do
+        (if-not  (s/valid? (s/or :e ::expression :udex ::up-down-expression) s)
+          (throw (Exception. "simplify result does not conform to spec")))
+        s)))
 
 (defn simplify-spec [x]
   (ts/with-instrument-disabled (gn/simplify x)))
