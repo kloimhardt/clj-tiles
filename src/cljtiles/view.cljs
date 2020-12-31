@@ -137,12 +137,11 @@
                                 (stop-timer nil))) ms))
     msg))
 
-(defn bindings [new-println tex-print inspect tex-inspect]
+(defn bindings [new-println tex-print tex-inspect]
   (merge
    sicm/bindings
    {'println new-println
     'tex tex-print
-    'inspect inspect
     'tex-inspect tex-inspect
     'app-state app-state
     'start-timer start-timer
@@ -156,9 +155,8 @@
        tex-print
         (fn [& x] (swap! state #(update % :stdout conj
                                         (sicm/tex (last x)))) nil)
-        inspect (fn [x] (swap! state #(update % :inspect conj (str x))) x)
         tex-inspect (fn [x] (swap! state #(update % :inspect conj (str (sicm/kind? x)))) x)
-        bindings2 (bindings new-println tex-print inspect tex-inspect)
+        bindings2 (bindings new-println tex-print tex-inspect)
         cbr (code->break-str str-width aug-edn-code)
         _ (swap! state assoc :stdout [])
         _ (swap! state assoc :inspect [])

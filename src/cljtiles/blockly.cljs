@@ -21,21 +21,14 @@
                :callback (fn [_scope] (startfun nil))
                :scopeType (.. blockly -ContextMenuRegistry -ScopeType -WORKSPACE)
                :id "run_workspace"
-               :weight 100}
-          block-item-inspect
-          #js {:displayText "Inspect"
-               :preconditionFn (fn [_scope] "enabled")
-               :callback (fn [scope] (startfun (assoc (js->clj scope) :inspect-fn #(list 'inspect %))))
-               :scopeType (.. blockly -ContextMenuRegistry -ScopeType -BLOCK)
-               :id "inspect"
-               :weight 100}
+               :weight 0}
           block-item-tex-inspect
-          #js {:displayText "TeX-Inspect"
+          #js {:displayText "Watch"
                :preconditionFn (fn [_scope] "enabled")
                :callback (fn [scope] (startfun (assoc (js->clj scope) :inspect-fn #(list 'tex-inspect %))))
                :scopeType (.. blockly -ContextMenuRegistry -ScopeType -BLOCK)
                :id "tex-inspect"
-               :weight 100}
+               :weight 0}
           ]
       (do
         (js/initblocks blockly)
@@ -45,6 +38,5 @@
                                   :media "/blockly/media/"}
                                  (when menu {:toolbox (gdom/getElement "toolbox")}))))
         (.. blockly -ContextMenuRegistry -registry (register workspace-item))
-        (.. blockly -ContextMenuRegistry -registry (register block-item-inspect))
         (.. blockly -ContextMenuRegistry -registry (register block-item-tex-inspect))
         ))))
