@@ -152,7 +152,7 @@
         str-width 41
         new-println
         (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
-       tex-print
+        tex-print
         (fn [& x] (swap! state #(update % :stdout conj
                                         (sicm/tex (last x)))) nil)
         tex-inspect (fn [x] (swap! state #(update % :inspect conj (str (sicm/kind? x)))) x)
@@ -196,8 +196,9 @@
              :value (str (inc (:tutorial-no @state)) "/" (count tutorials))}]
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
-    " "
-    [:button {:on-click #(startsci nil)} "Run"]]])
+    ;;" "
+    ;;[:button {:on-click #(startsci nil)} "Run"]
+    ]])
 
 (defn filter-defns [edn-code fu]
   (conj
@@ -251,10 +252,13 @@
       (fn [this]
         (rerender (rd/dom-node this)))})))
 
+(defn description-comp []
+  [:div {:style {:column-count 2}}
+   [tex-comp (:desc @state)]])
+
 (defn result-comp []
   (let [flex50 {:style {:flex "50%"}}]
-    [:div {:style {:display "flex"}}
-     [:div flex50
+    (if (seq (:inspect @state))
       [:div
        (map-indexed (fn [idx v]
                       ^{:key idx}[:div
@@ -262,16 +266,17 @@
                                   [:hr]])
                     (:inspect @state))]
       [:div
-       (map-indexed (fn [idx v]
-                      ^{:key idx}[tex-comp v])
-                    (:stdout @state))]
-      [:pre (:result @state)]]
-     [:div flex50
-      [:pre (:code @state)]]]))
-
-(defn description-comp []
-  [:div {:style {:column-count 2}}
-   [tex-comp (:desc @state)]])
+       [:div {:style {:display "flex"}}
+        [:div flex50
+         [:div
+          (map-indexed (fn [idx v]
+                         ^{:key idx}[tex-comp v])
+                       (:stdout @state))]
+         [:pre (:result @state)]]
+        [:div flex50
+         [:pre (:code @state)]]]
+       [description-comp]
+       ])))
 
 (workspace!/init startsci)
 ((tutorial-fu identity))
@@ -281,7 +286,7 @@
    [tutorials-comp]
    [reagent-comp]
    [result-comp]
-   [description-comp]])
+   ])
 
 (defn ^{:export true :dev/after-load true} output []
   (rd/render [theview] (gdom/getElement "out")))

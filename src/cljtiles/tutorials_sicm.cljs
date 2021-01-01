@@ -1,6 +1,11 @@
 (ns cljtiles.tutorials-sicm
   (:require [cljtiles.genblocks :as gb]))
 
+(defn make-coords [rows cols]
+  (for [y (range rows)
+        x (range cols)]
+    [(* x 300) (* y 150)]))
+
 (def chaps [1])
 (def chapnames ["Tdp"])
 
@@ -208,7 +213,45 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                       (literal-function 'q_y)))
                  10))
            )
+   "ha"
+   [0 0]
+   (gb/rpg (make-coords 5 3)
+           ''sheep
+           ''fish
+           ''cow
+           ''sheep
+           '(+ :tiles/slot :tiles/slot)
+           '(* 3 :tiles/slot)
+           '(array-map :tiles/slot :tiles/slot
+                                     :tiles/slot :tiles/slot
+                                     :tiles/slot :tiles/slot)
+           '2 '1
+           )
+   "ha"
+   [0 0]
+   (gb/rpg (make-coords 5 3)
+           '(array-map 'sheep 2 'fish 3 'cow 1)
+           ""
+           '(get :tiles/slot :tiles/slot)
+           ''fish
+           '(defn count-animals [[breed quantity]]
+              :tiles/slot)
+           'quantity
+           '(* :tiles/slot :tiles/slot)
+           'breed
+           '(map count-animals :tiles/slot)
+           '"one\\ cow"
+
+
+           )
+      "ha"
    ])
+
+(defn count-animals [quantity breed]
+  (if ((hash-set 'fish 'sheep) breed)
+    (* quantity breed)
+    (str quantity " " breed "s")))
+(count-animals 3 'sheep)
 
 (def desc (reverse (take-nth 3 e-vect)))
 (def scroll (reverse (take-nth 3 (rest e-vect))))

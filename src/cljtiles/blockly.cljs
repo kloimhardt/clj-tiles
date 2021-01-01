@@ -23,7 +23,7 @@
                :id "run_workspace"
                :weight 0}
           block-item-tex-inspect
-          #js {:displayText "Watch"
+          #js {:displayText "Inspect"
                :preconditionFn (fn [_scope] "enabled")
                :callback (fn [scope] (startfun (assoc (js->clj scope) :inspect-fn #(list 'tex-inspect %))))
                :scopeType (.. blockly -ContextMenuRegistry -ScopeType -BLOCK)
