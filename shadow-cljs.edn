@@ -18,7 +18,7 @@
 ;; npm install odex
 ;; npm install complex.js
 ;; npm install fraction.js
-
+;; npm install mathjax@2
 ;; shadow-cljs watch cljtiles
 
 ;; shadow-cljs release cljtiles
