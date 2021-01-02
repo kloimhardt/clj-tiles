@@ -21,7 +21,7 @@
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
 
-(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "SciVar" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differentiation" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List"])
+(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differentiation" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean"])
 
 (defn kind-s? [e]
   (let [[spc text] (first (filter #(s/valid? (first %) e) (partition 2 sps)))
@@ -35,6 +35,8 @@
       (str text ":\\ " (apply #(str %1 "\\rightarrow " %2) (map kind-s? (differential e))))
       (= spc ::list)
       (str text "(" (apply str (map #(str (kind-s? %) "\\ ") e)) ")")
+      (= spc ::clojure-vector)
+      (str text "[" (apply str (map #(str (kind-s? %) "\\ ") e)) "]")
       (= spc ::hash-table)
       (str text "\\{" (apply str (map (fn [[k v]] (str (kind-s? k)  "\\ " (kind-s? v) "\\ ")) e))"\\}")
 
@@ -71,6 +73,8 @@
                'kind? kind?
                'tex tex})
 
+(s/def ::clojure-vector vector?)
+(s/def ::boolean boolean?)
 (s/def ::sci-var #(instance? sci.impl.vars/SciVar %))
 (s/def ::list seq?)
 (s/def ::hash-table map?)
