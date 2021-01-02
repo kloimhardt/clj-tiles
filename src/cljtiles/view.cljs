@@ -20,7 +20,7 @@
 (when workspace!/dev
   (print (tst/test-pure)))
 
-(def tutorials (vec (concat t-s/vect t-0/vect)))
+(def tutorials (vec (concat t-0/vect t-s/vect )))
 
 (defn countup [chaps vect]
   (let [d (- (count vect) (reduce + chaps))]
@@ -29,15 +29,15 @@
 
 (def chaps
   (mapcat #(apply countup %)
-          [[t-s/chaps t-s/vect] [t-0/chaps t-0/vect]]))
+          [[t-0/chaps t-0/vect] [t-s/chaps t-s/vect]]))
 
-(def chapnames (concat t-s/chapnames t-0/chapnames))
+(def chapnames (concat t-0/chapnames t-s/chapnames))
 
 (defn filldesc [desc vect]
   (if (empty? desc) (repeat (count vect) "") desc))
 
 (def desc (mapcat #(apply filldesc %)
-                  [[t-s/desc t-s/vect] [t-0/desc t-0/vect]]))
+                  [[t-0/desc t-0/vect] [t-s/desc t-s/vect]]))
 
 (defn fillscroll [scroll vect]
   (if (empty? scroll) (repeat (count vect) nil) scroll))
@@ -196,8 +196,8 @@
              :value (str (inc (:tutorial-no @state)) "/" (count tutorials))}]
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
-    ;;" "
-    ;;[:button {:on-click #(startsci nil)} "Run"]
+    " "
+    [:button {:on-click #(startsci nil)} "Run"]
     ]])
 
 (defn filter-defns [edn-code fu]

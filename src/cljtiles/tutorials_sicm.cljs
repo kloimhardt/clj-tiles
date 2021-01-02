@@ -7,10 +7,31 @@
     [(* x 300) (* y 150)]))
 
 (def chaps [1])
-(def chapnames ["Tdp"])
+(def chapnames ["SICM"])
 
 (def e-vect
-  [
+  ["Farming"
+   [0 0]
+   (gb/rpg [[0 0] [150 0] [300 0]
+            [0 50] [300 50]
+            [0 100] [300 100]
+            [0 150] [300 250] [400 250] [550 250]
+            [0 300]]
+           ''sheep
+           '(+ :tiles/slot :tiles/slot)
+           ''sheep
+           ''fish
+           '(* 'ca20 :tiles/slot)
+           '(array-map :tiles/slot :tiles/slot
+                       :tiles/slot :tiles/slot)
+           '2
+           '(defn count-animals [[breed quantity]]
+              :tiles/slot)
+           'quantity
+           '(* :tiles/slot :tiles/slot)
+           'breed
+           '(map count-animals :tiles/slot)
+           )
    [:div
     [:p "We start by creating a function Path-of-a-Free-Particle. Newtons first law states that in some inertial frame of reference, an object continues to move in space at a constant velocity. This movement takes time, so our function depends on time. It returns a vector of two elements because we choose our path to live in two dimensions."]
     [:p "
@@ -195,7 +216,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(literal-function :tiles/slot)
            'q_y
            )
-   "hui"
+   "Run the workspace to see the general equations of motion for the free particle."
    [0 -250]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]]
            '(defn Path-of-a-Free-Particle
@@ -213,28 +234,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                       (literal-function 'q_y)))
                  10))
            )
-   "Farming"
-   [0 0]
-   (gb/rpg [[0 0] [150 0] [300 0]
-            [0 50] [300 50]
-            [0 100] [300 100]
-            [0 150] [300 250] [400 250] [550 250]
-            [0 300]]
-           ''sheep
-           '(+ :tiles/slot :tiles/slot)
-           ''sheep
-           ''fish
-           '(* 'ca20 :tiles/slot)
-           '(array-map :tiles/slot :tiles/slot
-                       :tiles/slot :tiles/slot)
-           '2
-           '(defn count-animals [[breed quantity]]
-              :tiles/slot)
-           'quantity
-           '(* :tiles/slot :tiles/slot)
-           'breed
-           '(map count-animals :tiles/slot)
-           )
+
   ])
 
 (defn count-animals [quantity breed]
@@ -243,6 +243,6 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     (str quantity " " breed "s")))
 (count-animals 3 'sheep)
 
-(def desc (reverse (take-nth 3 e-vect)))
-(def scroll (reverse (take-nth 3 (rest e-vect))))
-(def vect (reverse (take-nth 3 (rest (rest e-vect)))))
+(def desc (take-nth 3 e-vect))
+(def scroll (take-nth 3 (rest e-vect)))
+(def vect (take-nth 3 (rest (rest e-vect))))
