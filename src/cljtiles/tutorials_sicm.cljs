@@ -213,39 +213,29 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                       (literal-function 'q_y)))
                  10))
            )
-   "ha"
+   "Farming"
    [0 0]
-   (gb/rpg (make-coords 5 3)
-           ''sheep
-           ''fish
-           ''cow
+   (gb/rpg [[0 0] [150 0] [300 0]
+            [0 50] [300 50]
+            [0 100] [300 100]
+            [0 150] [300 250] [400 250] [550 250]
+            [0 300]]
            ''sheep
            '(+ :tiles/slot :tiles/slot)
-           '(* 3 :tiles/slot)
-           '(array-map :tiles/slot :tiles/slot
-                                     :tiles/slot :tiles/slot
-                                     :tiles/slot :tiles/slot)
-           '2 '1
-           )
-   "ha"
-   [0 0]
-   (gb/rpg (make-coords 5 3)
-           '(array-map 'sheep 2 'fish 3 'cow 1)
-           ""
-           '(get :tiles/slot :tiles/slot)
+           ''sheep
            ''fish
+           '(* 'ca20 :tiles/slot)
+           '(array-map :tiles/slot :tiles/slot
+                       :tiles/slot :tiles/slot)
+           '2
            '(defn count-animals [[breed quantity]]
               :tiles/slot)
            'quantity
            '(* :tiles/slot :tiles/slot)
            'breed
            '(map count-animals :tiles/slot)
-           '"one\\ cow"
-
-
            )
-      "ha"
-   ])
+  ])
 
 (defn count-animals [quantity breed]
   (if ((hash-set 'fish 'sheep) breed)

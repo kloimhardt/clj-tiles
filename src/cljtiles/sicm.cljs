@@ -12,7 +12,8 @@
             [sicmutils.numerical.minimize :as mn]
             [sicmutils.mechanics.lagrange :as lg]
             [sicmutils.expression.render :as render]
-            [sicmutils.abstract.function :as af :include-macros true]))
+            [sicmutils.abstract.function :as af :include-macros true]
+            [sci.impl.vars]))
 
 (defn tex [x]
   (str "\\["  (render/->TeX (gn/simplify x)) "\\]"))
@@ -20,7 +21,7 @@
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
 
-(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differentiation" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List"])
+(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "SciVar" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differentiation" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List"])
 
 (defn kind-s? [e]
   (let [[spc text] (first (filter #(s/valid? (first %) e) (partition 2 sps)))
@@ -30,9 +31,6 @@
       (str text "\\ " (inline-tex (apply st/up (map kind-s? e))))
       (= spc ::dow)
       (str text "\\ " (inline-tex (apply st/down (map kind-s? e))))
-      (#{::string ::nu ::sy ::literal-expression ::literal-function}
-       spc)
-      (str text "\\ " (inline-tex e))
       (= spc ::differential)
       (str text ":\\ " (apply #(str %1 "\\rightarrow " %2) (map kind-s? (differential e))))
       (= spc ::list)
@@ -41,7 +39,7 @@
       (str text "\\{" (apply str (map (fn [[k v]] (str (kind-s? k)  "\\ " (kind-s? v) "\\ ")) e))"\\}")
 
       :else
-      (or text "not\\ yet\\ specified"))))
+      (str (or text "UnknownType") "\\ " (inline-tex e)))))
 
 (defn kind? [e]
   (tex (kind-s? e)))
@@ -73,6 +71,7 @@
                'kind? kind?
                'tex tex})
 
+(s/def ::sci-var #(instance? sci.impl.vars/SciVar %))
 (s/def ::list seq?)
 (s/def ::hash-table map?)
 (s/def ::string string?)
