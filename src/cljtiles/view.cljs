@@ -241,7 +241,9 @@
 (defn tex-comp [_]
   (let [rerender
         (fn [node]
-          (.Queue js/MathJax.Hub #js ["Typeset" (.-Hub js/MathJax) node]))]
+          (try (.Queue js/MathJax.Hub
+                       #js ["Typeset" (.-Hub js/MathJax) node])
+               (catch js/Error e (println (.-message e)))))]
     (rc/create-class
      {:reagent-render
       (fn [txt] [:div txt])
