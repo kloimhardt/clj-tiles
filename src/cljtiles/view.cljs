@@ -8,6 +8,7 @@
    [cljtiles.xmlparse-2 :as edn->code]
    [cljtiles.tutorials-0 :as t-0]
    [cljtiles.tutorials-sicm :as t-s]
+   [cljs.reader :as edn]
    [clojure.walk :as w]
    [tubax.core :as sax]
    [reagent.core :as rc]
@@ -16,6 +17,25 @@
    [cljtiles.tests :as tst]
    [cljtiles.sicm :as sicm]
    [cljtiles.blockly :as workspace!]))
+
+(comment
+
+  (def hui "
+  [[0 0] [170 0] [300 50] [350 100] [0 140] [0 200] [0 250] [0 300]]
+  (defn :tiles/slot :tiles/slot :tiles/slot)
+  (do (println \"chatty-average function called\")
+       :tiles/slot :tiles/slot :tiles/slot)
+  '[a b]
+  'chatty-average
+  '(/ (+ a b) 2)
+  '(println \"** first argument:\" a)
+  '(println \"** second argument:\" b)
+  '(chatty-average (:tiles/num \"5.0\") (:tiles/num \"10.0\"))
+")
+
+  (edn/read-string (str "[" hui "]"))
+
+  )
 
 (when workspace!/dev
   (print (tst/test-pure)))
@@ -181,6 +201,9 @@
 
 (defn tutorials-comp []
   [:div
+   [:button {:on-click (fn []
+                         (.. js/navigator -clipboard readText (then (fn [c] (println "hii " c)))))} "Paste"]
+   " "
    [:span
     [:select {:value (page->chapter (:tutorial-no @state))
               :on-change (fn [el]
@@ -280,15 +303,16 @@
        [description-comp]
        ])))
 
-(workspace!/init startsci)
-((tutorial-fu identity))
-
 (defn theview []
   [:div
    [tutorials-comp]
    [reagent-comp]
-   [result-comp]
-   ])
+   [result-comp]])
 
-(defn ^{:export true :dev/after-load true} output []
+(defn ^{:dev/after-load true} render []
   (rd/render [theview] (gdom/getElement "out")))
+
+(defn ^{:export true} output []
+  (workspace!/init startsci)
+  ((tutorial-fu identity))
+  (render))
