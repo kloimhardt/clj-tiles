@@ -45,7 +45,7 @@
   (if (empty? scroll) (repeat (count vect) nil) scroll))
 
 (def scroll (mapcat #(apply fillscroll %)
-                    [[t-s/scroll t-s/vect] [t-0/scroll t-0/vect]]))
+                    [[t-0/scroll t-0/vect] [t-s/scroll t-s/vect]]))
 
 (def rocket-no 49)
 
@@ -296,9 +296,9 @@
    [result-comp]])
 
 (defn ^{:dev/after-load true} render []
+  ((tutorial-fu identity))
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
   (workspace!/init startsci)
-  ((tutorial-fu identity))
   (render))

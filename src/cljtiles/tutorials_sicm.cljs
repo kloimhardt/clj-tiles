@@ -194,7 +194,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                  10))
            )
    "You replace the Path-of-a-Free-Particle. You create a vector of two arbitrary funtions. Call them q_x and q_y. Then do the replacement of the specific path with the arbitrary path. After running the workspace again, you see the general equations of motion for the free particle."
-   [0 -250]
+   [0 -200]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]
             [0 550] [0 600] [200 600] [350 600] [550 600]]
            '(defn Path-of-a-Free-Particle
@@ -217,7 +217,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            'q_y
            )
    "Run the workspace to see the general equations of motion for the free particle."
-   [0 -250]
+   [0 -200]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]]
            '(defn Path-of-a-Free-Particle
               time
