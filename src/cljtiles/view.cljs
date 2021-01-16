@@ -301,10 +301,10 @@
 
 (defn ^{:export true} output []
   (workspace!/init startsci)
-  (if-let [pg (-> (.. js/window -location -search)
-                  js/URLSearchParams.
-                  (.get "page")
-                  js/parseInt
-                  dec)]
-    (goto-page! pg))
+  (some-> (not-empty (.. js/window -location -search))
+          js/URLSearchParams.
+          (.get "page")
+          js/parseInt
+          dec
+          goto-page!)
   (render))
