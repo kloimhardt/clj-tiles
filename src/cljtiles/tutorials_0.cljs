@@ -3,7 +3,7 @@
 
 (def chaps [11 6 14 9 9 1])
 
-(def chapnames [" I" "II" "III" "IV" " V" "VI"])
+(def chapnames [" I" "II" "III" "IV" " V" "Rocket"])
 
 (def scroll [])
 (def desc [])
