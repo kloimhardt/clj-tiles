@@ -73,7 +73,7 @@
   (apply set-scrollbar (nth scroll page-no))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset! state
-          {:desc (nth desc page-no) :stdout [] :inspect [] :result nil :code nil :tutorial-no page-no})
+          {:desc (nth desc page-no) :stdout [] :inspect [] :sci-error nil :result nil :code nil :tutorial-no page-no})
   (reset! app-state 0))
 
 (defn tutorial-fu [inc-or-dec]
@@ -97,13 +97,13 @@
          (interpose "\n"
                     (map (partial apply str)
                          (partition-all width s)))))
+(defn my-str [x]
+  (if (nil? x) "nil" (str x)))
 
-(defn my-str [e width]
-  (let [f (fn [x]
-            (if (nil? x) "nil" (str x)))]
-    (if (seq? e)
-      (part-str width (apply str (interpose " " (map f e))))
-      (part-str width (f e)))))
+(defn my-str-brk [e width]
+  (if (seq? e)
+    (part-str width (apply str (interpose " " (map my-str e))))
+    (part-str width (my-str e))))
 
 (defn augment-code-fu [edn-code flat-code fn-code]
   (if (seq (filter #{(second fn-code)} flat-code))
@@ -162,10 +162,11 @@
         cbr (code->break-str str-width aug-edn-code)
         _ (swap! state assoc :stdout [])
         _ (swap! state assoc :inspect [])
+        _ (swap! state assoc :sci-error nil)
         erg (try (sci/eval-string cbr {:bindings bindings2})
-                 (catch js/Error e (.-message e)))]
+                 (catch js/Error e (swap! state assoc :sci-error (.-message e)) nil))]
     (swap! state assoc
-           :result (cond (some? erg) (my-str erg str-width)
+           :result (cond (some? erg) (my-str erg)
                          (= "nil" (str (last edn-code))) "nil"
                          :else "")
            :code (if error "Cannot even parse the blocks" cbr)
@@ -240,63 +241,57 @@
   (w/postwalk #(to-kw edn-code %)
               vect))
 
-(defn reagent-comp []
+(defn is-last-div []
   (let [v? #(when (vector? %) %)
         last-vec (v? (last (:edn-code @state)))]
     (when (= (symbol ":div") (first last-vec))
-      [:div
-       (transform-vec last-vec (:edn-code @state))])))
+      last-vec)))
 
-(defn tex-comp [_]
-  (let [rerender
-        (fn [node]
-          (try (.Queue js/MathJax.Hub
-                       #js ["Typeset" (.-Hub js/MathJax) node])
-               (catch js/Error e (println (.-message e)))))]
-    (rc/create-class
-     {:reagent-render
-      (fn [txt] [:div txt])
-      :component-did-mount
-      (fn [this]
-        (rerender (rd/dom-node this)))
-      :component-did-update
-      (fn [this]
-        (rerender (rd/dom-node this)))})))
+(defn reagent-comp [last-vec]
+  (transform-vec last-vec (:edn-code @state)))
 
-(defn description-comp []
-  [:div {:style {:column-count 2}}
-   [tex-comp (:desc @state)]])
+(defn tex-comp [txt]
+  [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
+                                    #js ["Typeset" (.-Hub js/MathJax) el])
+                            (catch js/Error e (println (.-message e)))))}
+   txt])
+
+(defn mixed-comp [txt]
+  (if (re-find #"(\\\(|\\\[)" txt)
+    [tex-comp txt]
+    [:pre txt]))
 
 (defn result-comp []
-  (let [flex50 {:style {:flex "50%"}}]
-    (if (seq (:inspect @state))
-      [:div
-       (map-indexed (fn [idx v]
-                      ^{:key idx}[:div
-                                  [tex-comp v]
-                                  [:hr]])
-                    (:inspect @state))]
-      [:div
+  [:<>
+   (map-indexed (fn [idx v]
+                  ^{:key idx}[:<>
+                              [mixed-comp v]
+                              [:hr]])
+                (:inspect @state))
+   (map-indexed (fn [idx v]
+                  ^{:key idx} [mixed-comp v])
+                (:stdout @state))
+   (when (:sci-error @state)
+     (let [flex50 {:style {:flex "50%"}}]
        [:div {:style {:display "flex"}}
         [:div flex50
-         [:div
-          (map-indexed (fn [idx v]
-                         ^{:key idx}[tex-comp v])
-                       (:stdout @state))]
-         [:pre (:result @state)]]
+         [:h3 "Error"]
+         [:pre (:sci-error @state)]]
         [:div flex50
-         [:pre (:code @state)]]]
-       [description-comp]
-       ])))
+         [:h3 "Code"]
+         [:pre (:code @state)]]]))
+   (if-let [last-vec (is-last-div)]
+     [reagent-comp last-vec]
+     [:pre (:result @state)])
+   [:div {:style {:column-count 2}}
+    [tex-comp (:desc @state)]]])
 
 (defn theview []
   [:div
    [tutorials-comp]
-   [reagent-comp]
    [result-comp]])
 
 (defn ^{:dev/after-load true} render []
-  ((tutorial-fu identity))
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
@@ -307,4 +302,5 @@
           js/parseInt
           dec
           goto-page!)
+  ((tutorial-fu identity))
   (render))
