@@ -67,6 +67,12 @@
 
 (defonce state (rc/atom nil))
 
+(defn reset-state [tutorial-no]
+  (reset! state
+          {:desc (nth desc tutorial-no) :stdout [] :inspect [] :sci-error nil :result nil
+           :code nil :edn-code nil
+           :tutorial-no tutorial-no :reagent-error nil}))
+
 (defonce app-state (rc/atom nil))
 
 (defn set-scrollbar [x y]
@@ -77,8 +83,7 @@
   (load-workspace (get tutorials page-no))
   (apply set-scrollbar (nth scroll page-no))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
-  (reset! state
-          {:desc (nth desc page-no) :stdout [] :inspect [] :sci-error nil :result nil :code nil :tutorial-no page-no})
+  (reset-state page-no)
   (reset! app-state 0))
 
 (defn tutorial-fu [inc-or-dec]
@@ -165,9 +170,7 @@
         tex-inspect (fn [x] (swap! state #(update % :inspect conj (str (sicm/kind? x)))) x)
         bindings2 (bindings new-println tex-print tex-inspect)
         cbr (code->break-str str-width aug-edn-code)
-        _ (swap! state assoc :stdout [])
-        _ (swap! state assoc :inspect [])
-        _ (swap! state assoc :sci-error nil)
+        _ (reset-state (:tutorial-no @state))
         erg (try (sci/eval-string cbr {:bindings bindings2})
                  (catch js/Error e (swap! state assoc :sci-error (my-str-brk (.-message e) str-width)) nil))]
     (swap! state assoc
@@ -292,10 +295,22 @@
    [:div {:style {:column-count 2}}
     [tex-comp (:desc @state)]]])
 
+(defn error-boundary [comp]
+  (rc/create-class
+    {:component-did-catch (fn [this e info] nil)
+     :get-derived-state-from-error (fn [e]
+                                     (swap! state assoc :reagent-error e)
+                                     #js {})
+     :reagent-render (fn [comp]
+                       (if (:reagent-error @state)
+                         [:pre "Something went wrong."]
+                         comp))}))
+
 (defn theview []
   [:div
    [tutorials-comp]
-   [result-comp]])
+   [error-boundary
+    [result-comp]]])
 
 (defn ^{:dev/after-load true} render []
   (rd/render [theview] (gdom/getElement "out")))
