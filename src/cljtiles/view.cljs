@@ -22,7 +22,7 @@
 (when workspace!/dev
   (print (tst/test-pure)))
 
-(def tutorials (vec (concat t-0/vect t-s/vect )))
+(def tutorials (vec (concat t-0/vect t-s/vect)))
 
 (defn countup [chaps vect]
   (let [d (- (count vect) (reduce + chaps))]
@@ -59,6 +59,11 @@
   (.. blockly/Xml
       (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-text))
                                     (.getMainWorkspace blockly))))
+
+(defn append-to-workspace [xml-text]
+  (.. blockly/Xml
+      (appendDomToWorkspace (.. blockly/Xml (textToDom xml-text))
+                            (.getMainWorkspace blockly))))
 
 (defonce state (rc/atom nil))
 
@@ -164,7 +169,7 @@
         _ (swap! state assoc :inspect [])
         _ (swap! state assoc :sci-error nil)
         erg (try (sci/eval-string cbr {:bindings bindings2})
-                 (catch js/Error e (swap! state assoc :sci-error (.-message e)) nil))]
+                 (catch js/Error e (swap! state assoc :sci-error (my-str-brk (.-message e) str-width)) nil))]
     (swap! state assoc
            :result (cond (some? erg) (my-str erg)
                          (= "nil" (str (last edn-code))) "nil"
@@ -186,9 +191,11 @@
   [:div
    [:button {:on-click (fn []
                          (.. js/navigator -clipboard readText
-                                 (then (fn [c] (->> (edn/read-string (str "[" c "]"))
-                                                    (apply gb/rpg)
-                                                    load-workspace)))))}
+                             (then (fn [c]
+                                     (let [a (edn/read-string (str "[" c "]"))]
+                                       (if (list? (first a))
+                                         (append-to-workspace (apply gb/rpg (cons [] a)))
+                                         (load-workspace (apply gb/rpg a))))))))}
     "Paste"]
    " "
    [:span
@@ -207,8 +214,7 @@
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
-    [:button {:on-click #(startsci nil)} "Run"]
-    ]])
+    [:button {:on-click #(startsci nil)} "Run"]]])
 
 (defn filter-defns [edn-code fu]
   (conj
@@ -264,9 +270,9 @@
 (defn result-comp []
   [:<>
    (map-indexed (fn [idx v]
-                  ^{:key idx}[:<>
-                              [mixed-comp v]
-                              [:hr]])
+                  ^{:key idx} [:<>
+                               [mixed-comp v]
+                               [:hr]])
                 (:inspect @state))
    (map-indexed (fn [idx v]
                   ^{:key idx} [mixed-comp v])
