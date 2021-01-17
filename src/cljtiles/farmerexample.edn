@@ -1,0 +1,19 @@
+  [[0 0] [150 0] [300 0]
+   [0 50] [300 50]
+   [0 100] [300 100]
+   [0 150] [300 250] [400 250] [550 250]
+   [0 300]]
+'sheep
+(+ :tiles/slot :tiles/slot)
+'sheep
+'fish
+(* 'ca20 :tiles/slot)
+(array-map :tiles/slot :tiles/slot
+           :tiles/slot :tiles/slot)
+2
+(defn count-animals [[breed quantity]]
+  :tiles/slot)
+quantity
+(* :tiles/slot :tiles/slot)
+breed
+(map count-animals :tiles/slot)
