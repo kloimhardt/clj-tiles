@@ -246,7 +246,7 @@ second you introduce the mass \\(m\\) into the kinetic energy. You throw away th
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
                   't)))
-   "Now we model a particle in the gravitational field by introducing the potential energy. It depends on
+   "Now you model a particle in the gravitational field by introducing the potential energy. It depends on
 the hight of the particle above ground. It is \\(m \\times g \\times hight\\), where \\(g\\) is \\(9.81 \\frac{m}{s^2}\\), the acceleration due to the gravity of the earth. The Lagrangain is kintic energy minus potential energy. And the Lagrangian now depends on the hight."
    [0 0]
    (gb/rpg [[0 0] [0 150]
@@ -308,12 +308,6 @@ are delivered."
                        (literal-function 'q_y)))
                   't)))
    ])
-
-(defn count-animals [quantity breed]
-  (if ((hash-set 'fish 'sheep) breed)
-    (* quantity breed)
-    (str quantity " " breed "s")))
-(count-animals 3 'sheep)
 
 (def desc (take-nth 3 e-vect))
 (def scroll (take-nth 3 (rest e-vect)))

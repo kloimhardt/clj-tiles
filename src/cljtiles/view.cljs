@@ -47,8 +47,6 @@
 (def scroll (mapcat #(apply fillscroll %)
                     [[t-0/scroll t-0/vect] [t-s/scroll t-s/vect]]))
 
-(def rocket-no 49)
-
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
 
@@ -188,7 +186,27 @@
         inspect-id (when context (.-id (get context "block")))
         edn-code (edn->code/parse edn-xml {:id inspect-id
                                            :fun (:inspect-fn context)})]
+    (def a edn-code)
+    (def b (:inspect-fn context))
     (run-code edn-code nil)))
+
+(comment
+
+  (def inspect-fn-name (first (b 0)))
+
+   (defn get-inspect-form [s fname]
+    (when (coll? s)
+      (if (= (first s) fname)
+        s
+        (reduce (fn [v vs] (or v (get-inspect-form vs fname))) nil s))))
+
+  (get-inspect-form (nth a 2) inspect-fn-name)
+  (def u (nth a 2))
+
+  (concat (take 3 u)
+          (conj (drop 3 u) (get-inspect-form u inspect-fn-name) ))
+
+  )
 
 (defn tutorials-comp []
   [:div
