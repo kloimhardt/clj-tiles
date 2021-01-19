@@ -68,6 +68,10 @@
                'square gn/square
                'Lagrange-equations lg/Lagrange-equations
                'literal-function af/literal-function
+               'sin gn/sin
+               'cos gn/cos
+               'compose fu/compose
+               'F->C lg/F->C
 
                'valid? s/valid?
                'kind? kind?

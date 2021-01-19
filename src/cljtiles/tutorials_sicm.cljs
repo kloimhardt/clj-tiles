@@ -255,7 +255,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
             [0 300]
             [450 300] [550 300] [600 300]
             [300 400] [450 400] [650 400]
-            [0 450]]
+            [0 500]]
            '(defn Kinetic-Energy
               velocity
               (* (/ 'm 2) (square velocity)))
@@ -285,13 +285,12 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
                   't)))
-   "Run the workspace and Newtons equations of motion for the particle in the homogeneous gravitational field
-are delivered."
+   "Run the workspace and Newtons equations of motion for the particle in the homogeneous gravitational field are delivered."
    [0 0]
    (gb/rpg [[0 0]
             [0 150]
             [0 300]
-            [0 450]]
+            [0 500]]
            '(defn Kinetic-Energy
               velocity
               (* (/ 'm 2) (square velocity)))
@@ -307,6 +306,81 @@ are delivered."
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
                   't)))
+   "To get the equations for the pendulum, you introduce a transformation of coordiantes. The new single coordinate is the angle between the rod and its position at rest. So the old coordinates become dependent on each other. The horizontal position x of the bob is \\( l \\times \\sin(angle)\\), where l is the length of the pendulum. The hight of the bob is \\(h - l \\times \\cos(angle)\\) (h is the hight of the pivot). The Lagangian of the pendulum is obtained by prepending the transformation. In this function composition, the Lagrangian of the independently moving particle is reused completely unchanged. The new Lagrangian equations are now applied to some function \\(\\phi\\). You can do the functional replacements using the blcks you just built."
+   [0 -400]
+   (gb/rpg [[0 0]
+            [0 150]
+            [0 300]
+            [100 450]
+            [0 470] [100 500] [200 500] [300 500] [400 500] [500 500]
+            [100 570] [200 570] [300 570] [400 570] [500 570]
+            [200 630] [300 630] [400 630] [500 630] [600 630] [700 630]
+            [0 700]
+            [0 830] [200 830] [350 830] [500 830]
+            [450 930] [550 930] [750 930]]
+           '(defn Kinetic-Energy
+              velocity
+              (* (/ 'm 2) (square velocity)))
+           '(defn Potential-Energy
+              hight
+              (* (* 'm 'g) hight))
+           '(defn Lagrangian
+              [[time [_ hight] velocity]]
+              (- (Kinetic-Energy velocity)
+                 (Potential-Energy hight)))
+           'Rectangular-Angle
+           '(defn :tiles/slot
+              :tiles/slot
+              :tiles/slot)
+           [:tiles/slot]
+           [:tiles/slot :tiles/slot] '_ [:tiles/slot] 'angle
+           '(:tiles/vert
+            (up :tiles/slot :tiles/slot))
+           ''l '(* :tiles/slot :tiles/slot) '(sin :tiles/slot) 'angle
+           ''h '(- :tiles/slot :tiles/slot)
+           ''l '(* :tiles/slot :tiles/slot)
+           '(cos :tiles/slot) 'angle
+           '(tex "Title"
+                 (((Lagrange-equations Lagrangian)
+                   (up (literal-function 'q_x)
+                       (literal-function 'q_y)))
+                  't))
+           '(compose :tiles/slot :tiles/slot)
+           'Lagrangian
+           '(F->C :tiles/slot)
+           'Rectangular-Angle
+           '(up :tiles/slot)
+           '(literal-function :tiles/slot)
+           ''phi
+           )
+   "Running the workbook delivers the equations for the pendulum."
+   [0 -400]
+   (gb/rpg [[0 0]
+            [0 150]
+            [0 300]
+            [0 470]
+            [0 700]]
+           '(defn Kinetic-Energy
+              velocity
+              (* (/ 'm 2) (square velocity)))
+           '(defn Potential-Energy
+              hight
+              (* (* 'm 'g) hight))
+           '(defn Lagrangian
+              [[time [_ hight] velocity]]
+              (- (Kinetic-Energy velocity)
+                 (Potential-Energy hight)))
+           '(defn Rectangular-Angle
+              [[_ [angle]]]
+              (:tiles/vert
+               (up (* 'l (sin angle))
+                   (- 'h (* 'l (cos angle))))))
+           '(tex "Title"
+                 (((Lagrange-equations
+                     (compose Lagrangian (F->C Rectangular-Angle)))
+                   (up (literal-function 'phi)))
+                  't)))
+
    ])
 
 (def desc (take-nth 3 e-vect))

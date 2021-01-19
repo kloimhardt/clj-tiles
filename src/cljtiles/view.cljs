@@ -331,6 +331,7 @@
     [result-comp]]])
 
 (defn ^{:dev/after-load true} render []
+  ((tutorial-fu identity))
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
