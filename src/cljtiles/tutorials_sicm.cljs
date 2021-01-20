@@ -130,7 +130,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
               (Kinetic-Energy velocity)))
    [:div
     [:p "The lagrangian equations are differential equations. They are constructed out of the Lagrangian function. The differential equations are applied to some path function. Here we use our specific Path-of-a-Free-Particle. The result is in general a function of time. We set the time to ten seconds here. If the path we fed into the equtions is a viable physical path, the result shoud be a very special function: it should be the zero vector."]]
-   [0 -170]
+   [0 0]
    (gb/rpg [[0 0] [0 170] [0 280]
             [0 420]
             [0 500] [150 500] [300 500]
@@ -152,7 +152,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            'Path-of-a-Free-Particle
            '10)
    "Print the result and find out whether you indeed see the zero vector."
-   [0 -170]
+   [0 0]
    (gb/rpg [[0 0] [0 170] [0 280]
             [0 420]]
            '(defn Path-of-a-Free-Particle
@@ -169,9 +169,10 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                    Path-of-a-Free-Particle)
                   10)))
    "You replace the Path-of-a-Free-Particle. You create a vector of two arbitrary funtions. Call them q_x and q_y. Then do the replacement of the specific path with the arbitrary path. After running the workspace again, you see the general equations of motion for the free particle."
-   [0 -200]
+   [0 0]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]
-            [0 550] [0 600] [200 600] [350 600] [550 600]]
+            [0 500]
+            [0 550] [200 550] [350 550] [550 550]]
            '(defn Path-of-a-Free-Particle
               time
               (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
@@ -191,7 +192,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(literal-function :tiles/slot)
            'q_y)
    "Run the workspace to see the general equations of motion for the free particle."
-   [0 -200]
+   [0 0]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]]
            '(defn Path-of-a-Free-Particle
               time
@@ -209,7 +210,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                   10)))
    "Now, you want to make the equations prettier. First, you replace 10 by some time \\(t\\),
 second you introduce the mass \\(m\\) into the kinetic energy. You throw away the specific path, it is not needed anymore."
-   [0 -200]
+   [0 0]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]
             [0 550] [150 550] [300 550] [350 550] [700 550]]
            '(defn Path-of-a-Free-Particle
@@ -233,7 +234,7 @@ second you introduce the mass \\(m\\) into the kinetic energy. You throw away th
            '2
            ''t)
    "After running, you see Newtons equations of motion for the two dimensional free particle in their standard form."
-   [0 0]
+   [0 130]
    (gb/rpg [[0 0] [0 150] [0 300]]
            '(defn Kinetic-Energy
               velocity
@@ -353,7 +354,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            '(literal-function :tiles/slot)
            ''phi
            )
-   "Running the workbook delivers the equations for the pendulum."
+   "Run the workbook and get the equations for the pendulum delivered."
    [0 -400]
    (gb/rpg [[0 0]
             [0 150]
@@ -375,6 +376,72 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
               (:tiles/vert
                (up (* 'l (sin angle))
                    (- 'h (* 'l (cos angle))))))
+           '(tex "Title"
+                 (((Lagrange-equations
+                     (compose Lagrangian (F->C Rectangular-Angle)))
+                   (up (literal-function 'phi)))
+                  't)))
+   "In the last step, you introduce the function Hight-of-Pivot as a driver to the pendulum. It is an arbitrary funtion of time. The replacement is easily done, but notice that the transformation of coordinates now becomes time dependent. And with this, the Lagrangian becomes time dependent in an explicit manner."
+   [0 -400]
+   (gb/rpg [[0 0]
+            [0 150]
+            [0 300]
+            [100 450]
+            [0 470] [100 500] [100 540] [200 540] [400 540] [500 540]
+            [0 600] [500 630] [500 750] [700 750]
+            [0 850]]
+           '(defn Kinetic-Energy
+              velocity
+              (* (/ 'm 2) (square velocity)))
+           '(defn Potential-Energy
+              hight
+              (* (* 'm 'g) hight))
+           '(defn Lagrangian
+              [[time [_ hight] velocity]]
+              (- (Kinetic-Energy velocity)
+                 (Potential-Energy hight)))
+           'Hight-of-Pivot
+           '(defn :tiles/slot :tiles/slot :tiles/slot)
+           'time
+           '(:tiles/slot :tiles/slot) '(literal-function :tiles/slot) ''h 'time
+           '(defn Rectangular-Angle
+              [[_ [angle]]]
+              (:tiles/vert
+               (up (* 'l (sin angle))
+                   (- 'h (* 'l (cos angle))))))
+           'time
+           '(Hight-of-Pivot :tiles/slot) 'time
+           '(tex "Title"
+                 (((Lagrange-equations
+                     (compose Lagrangian (F->C Rectangular-Angle)))
+                   (up (literal-function 'phi)))
+                  't)))
+   "Running the workspace yields the equation for the driven pendulum."
+   [0 -400]
+   (gb/rpg [[0 0]
+            [0 150]
+            [0 300]
+            [0 470]
+            [0 600]
+            [0 850]]
+           '(defn Kinetic-Energy
+              velocity
+              (* (/ 'm 2) (square velocity)))
+           '(defn Potential-Energy
+              hight
+              (* (* 'm 'g) hight))
+           '(defn Lagrangian
+              [[time [_ hight] velocity]]
+              (- (Kinetic-Energy velocity)
+                 (Potential-Energy hight)))
+           '(defn Hight-of-Pivot
+              time
+              ((literal-function 'h) time))
+           '(defn Rectangular-Angle
+              [[time [angle]]]
+              (:tiles/vert
+               (up (* 'l (sin angle))
+                   (- (Hight-of-Pivot time) (* 'l (cos angle))))))
            '(tex "Title"
                  (((Lagrange-equations
                      (compose Lagrangian (F->C Rectangular-Angle)))
