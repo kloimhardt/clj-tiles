@@ -316,9 +316,10 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
             [0 470] [100 500] [200 500] [300 500] [400 500] [500 500]
             [100 570] [200 570] [300 570] [400 570] [500 570]
             [200 630] [300 630] [400 630] [500 630] [600 630] [700 630]
-            [0 700]
-            [0 830] [200 830] [350 830] [500 830]
-            [450 930] [550 930] [750 930]]
+            [0 750] [200 750] [350 750] [500 750]
+            [450 850] [550 850] [750 850]
+            [0 900]
+            ]
            '(defn Kinetic-Energy
               velocity
               (* (/ 'm 2) (square velocity)))
@@ -341,11 +342,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            ''h '(- :tiles/slot :tiles/slot)
            ''l '(* :tiles/slot :tiles/slot)
            '(cos :tiles/slot) 'angle
-           '(tex "Title"
-                 (((Lagrange-equations Lagrangian)
-                   (up (literal-function 'q_x)
-                       (literal-function 'q_y)))
-                  't))
+           
            '(compose :tiles/slot :tiles/slot)
            'Lagrangian
            '(F->C :tiles/slot)
@@ -353,6 +350,11 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            '(up :tiles/slot)
            '(literal-function :tiles/slot)
            ''phi
+           '(tex "Title"
+                 (((Lagrange-equations Lagrangian)
+                   (up (literal-function 'q_x)
+                       (literal-function 'q_y)))
+                  't))
            )
    "Run the workbook and get the equations for the pendulum delivered."
    [0 -400]
@@ -360,7 +362,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
             [0 150]
             [0 300]
             [0 470]
-            [0 700]]
+            [0 900]]
            '(defn Kinetic-Energy
               velocity
               (* (/ 'm 2) (square velocity)))
@@ -388,8 +390,8 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
             [0 300]
             [100 450]
             [0 470] [100 500] [100 540] [200 540] [400 540] [500 540]
-            [0 600] [500 630] [500 750] [700 750]
-            [0 850]]
+            [0 650] [500 680] [500 800] [700 800]
+            [0 900]]
            '(defn Kinetic-Energy
               velocity
               (* (/ 'm 2) (square velocity)))
@@ -422,8 +424,8 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
             [0 150]
             [0 300]
             [0 470]
-            [0 600]
-            [0 850]]
+            [0 650]
+            [0 900]]
            '(defn Kinetic-Energy
               velocity
               (* (/ 'm 2) (square velocity)))
