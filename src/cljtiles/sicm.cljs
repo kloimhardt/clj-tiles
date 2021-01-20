@@ -21,7 +21,7 @@
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
 
-(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differentiation" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean"])
+(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean"])
 
 (defn kind-s? [e]
   (let [[spc text] (first (filter #(s/valid? (first %) e) (partition 2 sps)))

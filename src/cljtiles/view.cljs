@@ -178,35 +178,44 @@
            :code (if error "Cannot even parse the blocks" cbr)
            :edn-code aug-edn-code)))
 
+(defn inspect-form [s fname]
+  (when (coll? s)
+    (if (= (first s) fname)
+      s
+      (reduce (fn [v vs] (or v (inspect-form vs fname))) nil s))))
+
+(defn inspect-froms [edn-code fname]
+  (map (fn [form]
+         (when (and (list? form)
+                    (= 4 (count form))
+                    (= (first form) 'defn))
+           (inspect-form (nth form 2) fname)))
+       edn-code))
+
+(defn insert-inspect [edn-code inspect-form]
+    (if inspect-form
+      (concat (take 3 edn-code)
+              (conj (drop 3 edn-code) inspect-form))
+      edn-code))
+
+(defn get-edn-code [xml-str inspect-id inspect-fn]
+  (let [edn-xml (sax/xml->clj xml-str)
+        eci (edn->code/parse edn-xml {:id inspect-id :fun inspect-fn})
+        inspect-fn-name (when inspect-fn (first (inspect-fn 0)))
+        ifo (inspect-froms eci inspect-fn-name)]
+    (if (not-every? nil? ifo)
+      (let [ec (edn->code/parse edn-xml {:id nil :fun nil})]
+        (map insert-inspect ec ifo))
+      eci)))
+
 (defn ^:export startsci [context]
   (let [xml-str (->> (.-mainWorkspace blockly)
                      (.workspaceToDom blockly/Xml)
                      (.domToPrettyText blockly/Xml))
-        edn-xml (sax/xml->clj xml-str)
-        inspect-id (when context (.-id (get context "block")))
-        edn-code (edn->code/parse edn-xml {:id inspect-id
-                                           :fun (:inspect-fn context)})]
-    (def a edn-code)
-    (def b (:inspect-fn context))
+        edn-code (get-edn-code xml-str
+                               (when context (.-id (get context "block")))
+                               (:inspect-fn context))]
     (run-code edn-code nil)))
-
-(comment
-
-  (def inspect-fn-name (first (b 0)))
-
-   (defn get-inspect-form [s fname]
-    (when (coll? s)
-      (if (= (first s) fname)
-        s
-        (reduce (fn [v vs] (or v (get-inspect-form vs fname))) nil s))))
-
-  (get-inspect-form (nth a 2) inspect-fn-name)
-  (def u (nth a 2))
-
-  (concat (take 3 u)
-          (conj (drop 3 u) (get-inspect-form u inspect-fn-name) ))
-
-  )
 
 (defn tutorials-comp []
   [:div
@@ -290,14 +299,15 @@
 
 (defn result-comp []
   [:<>
-   (map-indexed (fn [idx v]
-                  ^{:key idx} [:<>
-                               [mixed-comp v]
-                               [:hr]])
-                (:inspect @state))
-   (map-indexed (fn [idx v]
-                  ^{:key idx} [mixed-comp v])
-                (:stdout @state))
+   (if (seq (:inspect @state))
+     (map-indexed (fn [idx v]
+                    ^{:key idx} [:<>
+                                 [mixed-comp v]
+                                 [:hr]])
+                  (:inspect @state))
+     (map-indexed (fn [idx v]
+                    ^{:key idx} [mixed-comp v])
+                  (:stdout @state)))
    (when (:sci-error @state)
      (let [flex50 {:style {:flex "50%"}}]
        [:div {:style {:display "flex"}}
