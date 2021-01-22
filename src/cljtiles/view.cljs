@@ -316,31 +316,31 @@
     [:pre txt]))
 
 (defn result-comp []
-  [:<>
-   (if (seq (:inspect @state))
+  (if (seq (:inspect @state))
+    [:<>
      (map-indexed (fn [idx v]
                     ^{:key idx} [:<>
                                  [mixed-comp v]
                                  [:hr]])
-                  (:inspect @state))
-     [:<>
-      (map-indexed (fn [idx v]
-                     ^{:key idx} [mixed-comp v])
-                   (:stdout @state))
-      (when (:sci-error @state)
-        (let [flex50 {:style {:flex "50%"}}]
-          [:div {:style {:display "flex"}}
-           [:div flex50
-            [:h3 "Error"]
-            [:pre (:sci-error @state)]]
-           [:div flex50
-            [:h3 "Code"]
-            [:pre (:code @state)]]]))
-      (if-let [last-vec (is-last-div)]
-        [reagent-comp last-vec]
-        [:pre (:result @state)])])
-   [:div {:style {:column-count 2}}
-    [tex-comp (:desc @state)]]])
+                  (:inspect @state))]
+    [:<>
+     (map-indexed (fn [idx v]
+                    ^{:key idx} [mixed-comp v])
+                  (:stdout @state))
+     (when (:sci-error @state)
+       (let [flex50 {:style {:flex "50%"}}]
+         [:div {:style {:display "flex"}}
+          [:div flex50
+           [:h3 "Error"]
+           [:pre (:sci-error @state)]]
+          [:div flex50
+           [:h3 "Code"]
+           [:pre (:code @state)]]]))
+     (if-let [last-vec (is-last-div)]
+       [reagent-comp last-vec]
+       [:pre (:result @state)])
+     [:div {:style {:column-count 2}}
+      [tex-comp (:desc @state)]]]))
 
 (defn error-boundary [comp]
   (rc/create-class

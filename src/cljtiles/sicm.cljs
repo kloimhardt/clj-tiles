@@ -145,7 +145,7 @@
                         :c-up (s/? ::nu-sy-eex-dr-fn-up)))
 
 (s/def ::up (s/and #(instance? sicmutils.structure.Structure %)
-                   #(> (count %) 1)
+                   #(> (count %) 0)
                    #(< (count %) 4)
                    #(#{:sicmutils.structure/up} (vl/kind %))
                    ;;#(s/valid? ::up-args (seq %)) ;;hack removed
@@ -157,7 +157,7 @@
                          :c-dow (s/? ::nu-sy-eex-dr-fn-up)))
 
 (s/def ::dow (s/and #(instance? sicmutils.structure.Structure %)
-                    #(> (count %) 1)
+                    #(> (count %) 0)
                     #(< (count %) 4)
                     #(#{:sicmutils.structure/down} (vl/kind %))
                     ;; #(s/valid? ::dow-args (seq %)) ;;hack-removed

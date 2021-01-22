@@ -51,25 +51,30 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
      " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]]
 
    [0 0]
-   (gb/rpg [[0 0]
-            [0 90]
-            [0 130]
-            [0 180]
-            [0 250] [100 250] [250 250] [350 250] [500 250]
-            [0 300] [100 300] [250 300] [350 300] [500 300]]
-           '(defn :tiles/slot :tiles/slot :tiles/slot)
-           'Path-of-a-Free-Particle
-           'time
-           '(:tiles/vert (up :tiles/slot :tiles/slot))
-           2
-           '(+ :tiles/slot :tiles/slot)
+   (gb/rpg [[0 0] [100 0] [250 0]
+            [400 0] [500 0]
+            [0 50]
+            [300 100]
+            [350 110]
+            [0 150] [150 150]
+            [0 250] [150 250]
+            [0 350] [150 350]
+            ]
            5
            '(* :tiles/slot :tiles/slot)
-           'time
-           3
-           '(+ :tiles/slot :tiles/slot)
            4
+           2
+           '(+ :tiles/slot :tiles/slot)
+           '(:tiles/vert (up :tiles/slot :tiles/slot))
+           3
+           'time
+
+
+           '(defn :tiles/slot :tiles/slot :tiles/slot)
+           'Path-of-a-Free-Particle
            '(* :tiles/slot :tiles/slot)
+           'time
+           '(+ :tiles/slot :tiles/slot)
            'time)
    "You run the program, but the output does not convey much yet."
    [0 0]
@@ -160,7 +165,7 @@ If you now apply this operator to the Path-of-a-Free-Particle, the zero row vect
 "The mathematical expressions here can only be some kind of guide. To understand how it all fits together, you have to play with the blocks. A full understanding is not needed for playing and investigating. However, the theoretical underpinnings can be found in " [:a {:href "ftp://publications.ai.mit.edu/ai-publications/2002/AIM-2002-018.ps"} "this paper"]
 "."]
     ]
-   [0 0]
+   [0 -150]
    (gb/rpg [[0 0] [0 170] [0 280]
             [0 420]
             [0 500] [150 500] [300 500]
@@ -182,7 +187,7 @@ If you now apply this operator to the Path-of-a-Free-Particle, the zero row vect
            'Path-of-a-Free-Particle
            '10)
    "Print the result and find out whether you indeed see the zero vector."
-   [0 0]
+   [0 -150]
    (gb/rpg [[0 0] [0 170] [0 280]
             [0 420]]
            '(defn Path-of-a-Free-Particle
@@ -229,7 +234,7 @@ my not be linear in time."
 \\]
 "]
     ]
-   [0 0]
+   [0 -150]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]
             [0 500]
             [0 550] [200 550] [350 550] [550 550]]
@@ -252,7 +257,7 @@ my not be linear in time."
            '(literal-function :tiles/slot)
            'q_y)
    "Run the workspace to see the general equations of motion for the free particle."
-   [0 0]
+   [0 -150]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]]
            '(defn Path-of-a-Free-Particle
               time
@@ -279,31 +284,34 @@ second you introduce the mass \\(m\\) into the kinetic energy. You throw away th
 \\left[ m \\frac{d^2 q_x(\\tau)}{d\\tau^2}\\Bigg|_{\\tau=t}\\ \\ m \\frac{d^2 q_y(\\tau)}{d\\tau^2}\\Bigg|_{\\tau=t}\\right]
 \\]
 "]]
-   [0 0]
-   (gb/rpg [[0 0] [0 170] [0 280] [0 420]
-            [0 550] [150 550] [300 550] [350 550] [700 550]]
+   [0 -150]
+   (gb/rpg [[0 0] [0 170]
+            [350 170] [400 170] [550 170]
+            [350 230]
+            [0 280]
+            [900 380]
+            [0 420]]
            '(defn Path-of-a-Free-Particle
               time
               (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
            '(defn Kinetic-Energy
               velocity
               (square velocity))
+           ''m
+           '(/ :tiles/slot :tiles/slot)
+           '2
+           '(* :tiles/slot :tiles/slot)
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
+           ''t
            '(tex "Title"
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
-                  10))
-
-           '(* :tiles/slot :tiles/slot)
-           '(/ :tiles/slot :tiles/slot)
-           ''m
-           '2
-           ''t)
+                  10)))
    "After running, you see Newtons equations of motion for the two dimensional free particle in their standard form."
-   [0 130]
+   [0 0]
    (gb/rpg [[0 0] [0 150] [0 300]]
            '(defn Kinetic-Energy
               velocity
@@ -385,9 +393,9 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
             [0 470] [100 500] [200 500] [300 500] [400 500] [500 500]
             [100 570] [200 570] [300 570] [400 570] [500 570]
             [200 630] [300 630] [400 630] [500 630] [600 630] [700 630]
-            [0 750] [200 750] [350 750] [500 750]
-            [450 850] [550 850] [750 850]
-            [0 900]
+            [0 700] [200 700] [350 700] [500 700]
+            [700 700] [800 700] [1000 700]
+            [0 750]
             ]
            '(defn Kinetic-Energy
               velocity
@@ -431,7 +439,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
             [0 150]
             [0 300]
             [0 470]
-            [0 900]]
+            [0 750]]
            '(defn Kinetic-Energy
               velocity
               (* (/ 'm 2) (square velocity)))
@@ -493,8 +501,8 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
             [0 150]
             [0 300]
             [0 470]
-            [0 650]
-            [0 900]]
+            [400 470]
+            [0 750]]
            '(defn Kinetic-Energy
               velocity
               (* (/ 'm 2) (square velocity)))

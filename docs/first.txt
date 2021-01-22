@@ -1,0 +1,73 @@
+Hello, today I'd like to explain in detail the first step for constructing the equation of motion for the driven pendulum. This first step consists of creating a function that describes the motion of a free particle. The most basic building block of our theory are numbers which can be added and multiplied. Here we have the number 5
+
+And the number 4
+
+We multiply them to give 20
+
+We add 2 resulting in 22
+
+Now we have here a block called up. Inspecting it
+
+gives an error. The block does not mean anything by itself. But if we connect the formula we just created
+
+we get a column vector. If we connect the number 3,
+
+we get a proper column vector in two dimensions. Now we want to make the vector time dependent. If we inspect this variable time,
+
+we get an error. This is another block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle,
+
+it has one argument, which is the time.
+
+Let's say this function returns the time multiplied by 4.
+
+Inspecting the function as such,
+
+gives some cryptic output of unknown type. We need to add a block whic calls the function. Let's make one and inspect it.
+
+We get the number 40. By inspecting the parameter of the function,
+
+we see that time is set to 10, as we would expect from looking at the block just created. But here comes a crucial step: Not only can we call a function with a number, but we can call it with a symbol. For this, we create a new calling block with the symbol t as the argument.
+
+Inspect the t to verify its type
+
+and Inspect the whole block
+
+which gives us yet another new type: an Expression. It is four times t. Now we can finish our construction of the function describing the motion of a free particle.
+
+Inspection of the first calling block leads to
+
+the vector 52 over 43. But more interestingly, inspection of the second block
+
+leads to the time dependent vector we more traditionally associate with the motion of a particle with constant velocity. The most important fact comes up, when we inspect the parameter time of the function:
+
+The block changes its type during the course of the program. It is first a number, than a symbol. This result, that blocks change their type, is very general. If we move to the last step of this pendulum example
+
+
+We see that the hight of the pivot
+
+can be of type Differential as well as of type Expression. I think the most important type is still the number as it connects the theory to experiment. But this type seems to be the most elusive one, as we have all kinds of types in this final result,
+
+but no numbers. Thanks for watching.
+
+The steps:
+
+To get to the final equation though, many steps are needed. Although I will focus on giving an easy explanation on the first step, as an overview, I will now quickly show all of them.
+
+1) Creating a function which describes the motion of the free particle
+
+2) Defining the Kinetic Energy
+
+3) Defining the Lagrangian function
+
+4) Constructing the Lagrangian equations and applying them to the motion of the free particle
+
+5)+6) Replacing the Free Particle by some general function.
+
+7) Introducing a gravitational field
+
+8) Make a transformation of coordinates to create a pendulum out of the general particle
+
+9) Aaand: Indroduce a driver to the pendulum.
+
+Thus we see the equation of motion of the driven pendulum.
+
