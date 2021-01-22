@@ -217,16 +217,34 @@
                                (:inspect-fn context))]
     (run-code edn-code nil)))
 
+(def modal-element (atom nil))
+
+(def textarea-element (atom nil))
+
+(defn modal-comp []
+  (let [close (fn [] (set! (.. @modal-element -style -display) "none"))]
+    [:div {:id "myModal", :class "modal"
+           :ref (fn [e] (reset! modal-element e))}
+     [:div {:class "modal-content"}
+      [:div
+       [:textarea {:cols 125 :rows 10 :ref (fn [e] (reset! textarea-element e))}]]
+      [:button {:on-click
+                #(do (let [a (edn/read-string (str "[" (.-value @textarea-element) "]"))]
+                       (if (list? (first a))
+                         (run! (fn [c] (append-to-workspace (gb/rpg [] c))) a)
+                         (load-workspace (apply gb/rpg a))))
+                     (set! (.-value @textarea-element) "")
+                     (close))}
+       "Insert" ]
+      [:button {:style {:float "right"} :on-click close}
+       "Cancel"]]]))
+
 (defn tutorials-comp []
   [:div
    [:button {:on-click (fn []
-                         (.. js/navigator -clipboard readText
-                             (then (fn [c]
-                                     (let [a (edn/read-string (str "[" c "]"))]
-                                       (if (list? (first a))
-                                         (append-to-workspace (apply gb/rpg (cons [] a)))
-                                         (load-workspace (apply gb/rpg a))))))))}
-    "Paste"]
+                         (set! (.. @modal-element -style -display) "block")
+                         (.focus @textarea-element))}
+    "Insert"]
    " "
    [:span
     [:select {:value (page->chapter (:tutorial-no @state))
@@ -305,21 +323,22 @@
                                  [mixed-comp v]
                                  [:hr]])
                   (:inspect @state))
-     (map-indexed (fn [idx v]
-                    ^{:key idx} [mixed-comp v])
-                  (:stdout @state)))
-   (when (:sci-error @state)
-     (let [flex50 {:style {:flex "50%"}}]
-       [:div {:style {:display "flex"}}
-        [:div flex50
-         [:h3 "Error"]
-         [:pre (:sci-error @state)]]
-        [:div flex50
-         [:h3 "Code"]
-         [:pre (:code @state)]]]))
-   (if-let [last-vec (is-last-div)]
-     [reagent-comp last-vec]
-     [:pre (:result @state)])
+     [:<>
+      (map-indexed (fn [idx v]
+                     ^{:key idx} [mixed-comp v])
+                   (:stdout @state))
+      (when (:sci-error @state)
+        (let [flex50 {:style {:flex "50%"}}]
+          [:div {:style {:display "flex"}}
+           [:div flex50
+            [:h3 "Error"]
+            [:pre (:sci-error @state)]]
+           [:div flex50
+            [:h3 "Code"]
+            [:pre (:code @state)]]]))
+      (if-let [last-vec (is-last-div)]
+        [reagent-comp last-vec]
+        [:pre (:result @state)])])
    [:div {:style {:column-count 2}}
     [tex-comp (:desc @state)]]])
 
@@ -336,6 +355,7 @@
 
 (defn theview []
   [:div
+   [modal-comp]
    [tutorials-comp]
    [error-boundary
     [result-comp]]])
