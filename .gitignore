@@ -5,6 +5,5 @@ node_modules/
 package-lock.json
 package.json
 public/.DS_Store
-public/rocket.png
 public/target/
 src/.DS_Store

@@ -105,7 +105,8 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     [:div bold "Description"]
     [:p "Now for the Lagrangian function. For our free particle, the Lagrangian is just the kinetic energy. In general, a Lagrangian does not only depend on the velocity, but also on time and position. We are not using time and position here, but they nevertheless have to appear in the input vector."]
     [:div bold "Explanation"]
-    [:p "The Lagrangian is a function of three parameters: position, velocity and time, \\( L=L(\\vec{x}, \\vec{v}, t) \\), so the Lagrangian is a function of two functions and a number. At the moment, \\(L\\) depends only on the velocity, \\(L=L(\\vec{v})\\)."]
+    [:p "The term \"input vector\" is maybe misleading, it should better be called \"arguments of the function\" or \"function parameters\"."]
+    [:p "The Lagrangian always is a function of three parameters: time, position and velocity, \\( L=L(t, \\vec{x}, \\vec{v}) \\), so the Lagrangian is a function of a number and in general two functions. At the moment, \\(L\\) only depends on the velocity, \\(L=L(\\vec{v})\\)."]
     [:p "You come to the conclusion: The Lagrangian always is a function of the parameter time which at the moment does not depend on time at all. This sounds paradoxical only due to the limits of usual mathematical notation and natural language usage. The conclusion is completely right. Time appears in the arguments of the function, but not in its body."]]
    [0 0]
    (gb/rpg [[0 0] [0 170] [0 280] [150 280] [150 330] [350 330]
@@ -139,7 +140,26 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
               [[time position velocity]]
               (Kinetic-Energy velocity)))
    [:div
-    [:p "The lagrangian equations are differential equations. They are constructed out of the Lagrangian function. The differential equations are applied to some path function. Here we use our specific Path-of-a-Free-Particle. The result is in general a function of time. We set the time to ten seconds here. If the path we fed into the equtions is a viable physical path, the result shoud be a very special function: it should be the zero vector."]]
+    [:div bold "Description"]
+    [:p "The lagrangian equations are differential equations. They are constructed out of the Lagrangian function. The differential equations are applied to some path function. Here we use our specific Path-of-a-Free-Particle. The result is in general a function of time. We set the time to ten seconds here. If the path we fed into the equtions is a viable physical path, the result shoud be a very special function: it should be the zero vector."]
+    [:div bold "Explanation"]
+    [:p "What is called here the Lagrangian equations can be illustrated with the following mathematical expression:
+\\[
+m
+\\frac{d^2 \\vec{x}(t)}{dt^2}
+\\]
+It represents Newton's equation without the \\(=0\\) part. The name Lagrangian equations is thus maybe misleading, Lagrangian differential operator would be more exact. Or more accurate: a two dimensional row vector of differential operators:
+\\[
+\\left[ m \\frac{d^2 }{dt^2} \\ \\ m \\frac{d^2 }{dt^2} \\right]
+\\]
+This operator is produced by the"
+     [:img {:src "LagrangianBlock.png" :alt "(Lagrange-equations Lagrangin)"}]
+     " block.
+If you now apply this operator to the Path-of-a-Free-Particle, the zero row vector is obtained becuase Path-of-a-Free-Particle is only linear in time and thus its second derivative is zero. And the above program shows exactly this. Even if you do not understand the insanely complex last block, you still have the consolation that it works."]
+[:p
+"The mathematical expressions here can only be some kind of guide. To understand how it all fits together, you have to play with the blocks. A full understanding is not needed for playing and investigating. However, the theoretical underpinnings can be found in " [:a {:href "ftp://publications.ai.mit.edu/ai-publications/2002/AIM-2002-018.ps"} "this paper"]
+"."]
+    ]
    [0 0]
    (gb/rpg [[0 0] [0 170] [0 280]
             [0 420]
@@ -178,7 +198,37 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                  (((Lagrange-equations Lagrangian)
                    Path-of-a-Free-Particle)
                   10)))
-   "You replace the Path-of-a-Free-Particle. You create a vector of two arbitrary funtions. Call them q_x and q_y. Then do the replacement of the specific path with the arbitrary path. After running the workspace again, you see the general equations of motion for the free particle."
+   [:div
+    [:div bold "Description"]
+    [:p
+     "You replace the Path-of-a-Free-Particle. You create a vector of two arbitrary funtions. Call them q_x and q_y. Then do the replacement of the specific path with the arbitrary path. After running the workspace again, you see the general equations of motion for the free particle."]
+    [:div bold "Explanation"]
+    [:p
+     " You make the replacement
+\\[
+     \\begin{pmatrix}
+     2 + 5t \\\\
+     3 + 4t
+     \\end{pmatrix}
+\\rightarrow
+     \\begin{pmatrix}
+     q_x(t) \\\\
+     q_y(t)
+     \\end{pmatrix}
+     \\]
+The result of the program cannot be the zero vector anymore, as the new function
+ \\(\\big(\\begin{smallmatrix}
+  q_x\\\\
+  q_y
+\\end{smallmatrix}\\big)\\)
+my not be linear in time."
+     ]
+     [:p "The actual result is
+\\[
+\\left[ 2 \\frac{d^2 q_x(t)}{dt^2}\\Bigg|_{t=10}\\ \\ 2 \\frac{d^2 q_y(t)}{dt^2}\\Bigg|_{t=10}\\right]
+\\]
+"]
+    ]
    [0 0]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]
             [0 500]
@@ -218,8 +268,17 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
                   10)))
-   "Now, you want to make the equations prettier. First, you replace 10 by some time \\(t\\),
-second you introduce the mass \\(m\\) into the kinetic energy. You throw away the specific path, it is not needed anymore."
+   [:div
+    [:div bold "Description"]
+    [:p
+     "Now, you want to make the equations prettier. First, you replace 10 by some time \\(t\\),
+second you introduce the mass \\(m\\) into the kinetic energy. You throw away the specific path, it is not needed anymore. After running, you see Newtons equations of motion for the two dimensional free particle in their standard form." ]
+    [:div bold "Explanation"]
+    [:p "The result now is
+\\[
+\\left[ m \\frac{d^2 q_x(\\tau)}{d\\tau^2}\\Bigg|_{\\tau=t}\\ \\ m \\frac{d^2 q_y(\\tau)}{d\\tau^2}\\Bigg|_{\\tau=t}\\right]
+\\]
+"]]
    [0 0]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]
             [0 550] [150 550] [300 550] [350 550] [700 550]]
