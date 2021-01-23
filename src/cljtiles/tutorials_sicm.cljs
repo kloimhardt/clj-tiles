@@ -6,8 +6,6 @@
         x (range cols)]
     [(* x 300) (* y 150)]))
 
-(def chaps [1])
-(def chapnames ["SICM"])
 (def bold {:style {:font-weight "bold"}})
 (def e-vect
   [[:div
@@ -532,3 +530,6 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
 (def desc (take-nth 3 e-vect))
 (def scroll (take-nth 3 (rest e-vect)))
 (def vect (take-nth 3 (rest (rest e-vect))))
+
+(def chapnames ["SICM"])
+(def chaps [(count vect)])

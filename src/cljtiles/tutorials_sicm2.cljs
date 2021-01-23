@@ -2,8 +2,7 @@
 
 (def bold {:style {:font-weight "bold"}})
 
-[{:chapter "SICM2"
-  :pages
+(def e-vect
   [{:description
     [:div
      [:div bold "Description"]
@@ -43,6 +42,8 @@ In familiar notation, the path is denoted by:
 and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \\frac{m}{s}\\) in \\(y\\) direction. Imagine the body as a "
       [:a {:href "https://www.youtube.com/watch?v=z74OwRy8o9I"} "Pizza in space"]
       " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]]
+    :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
+           "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :scroll [0 0]
     :blockpos [[0 0] [100 0] [250 0]
                [400 0] [500 0]
@@ -51,7 +52,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                [350 110]
                [0 150] [150 150]
                [0 250] [150 250]
-               [0 350] [150 350]]
+               [0 300] [150 300]]
     :code [5
            '(* :tiles/slot :tiles/slot)
            4
@@ -73,4 +74,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     :code
     '(defn Path-of-a-Free-Particle
        time
-       (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))}]}]
+       (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))}])
+
+(def chapnames ["SICM2"])
+(def chaps [(count e-vect)])

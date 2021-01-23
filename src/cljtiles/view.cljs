@@ -9,6 +9,7 @@
    [cljtiles.tutorials-0 :as t-0]
    [cljtiles.genblocks :as gb]
    [cljtiles.tutorials-sicm :as t-s]
+   [cljtiles.tutorials-sicm2 :as t-s2]
    [cljs.reader :as edn]
    [clojure.walk :as w]
    [tubax.core :as sax]
@@ -22,47 +23,28 @@
 (when workspace!/dev
   (print (tst/test-pure)))
 
-(def old-tuts (vec (concat t-0/vect t-s/vect)))
+(def chaps (concat t-0/chaps t-s/chaps t-s2/chaps))
 
-(defn countup [chaps vect]
-  (let [d (- (count vect) (reduce + chaps))]
-    (if (pos? d)
-      (update chaps (dec (count chaps)) #(+ % d)) chaps)))
+(def chapnames (concat t-0/chapnames t-s/chapnames t-s2/chapnames))
 
-(comment
+(def tutorials_clj (map (fn [xml-code]
+                       {:xml-code xml-code})
+                     t-0/vect))
 
-(defn slice [n c]
-  (if (seq n)
-    (cons (take (first n) c) (slice (rest n) (drop (first n) c)))
-    n))
+(def tutorials_scm (map (fn [description scroll xml-code]
+                          {:description description
+                           :scroll scroll
+                           :xml-code xml-code})
+                        t-s/desc
+                        t-s/scroll
+                        t-s/vect))
 
-(slice [3 2 1] [1 2 3 4 5 6])
+(defn generate-xml [pages]
+  (map #(assoc % :xml-code (apply gb/rpg (:blockpos %) (:code %))) pages))
 
-)
-
-(defn filldesc [desc vect]
-  (if (empty? desc) (repeat (count vect) "") desc))
-
-(def old-dsc (mapcat #(apply filldesc %)
-                  [[t-0/desc t-0/vect] [t-s/desc t-s/vect]]))
-
-(defn fillscroll [scroll vect]
-  (if (empty? scroll) (repeat (count vect) nil) scroll))
-
-(def old-scl (mapcat #(apply fillscroll %)
-                    [[t-0/scroll t-0/vect] [t-s/scroll t-s/vect]]))
-
-(def chaps
-  (mapcat #(apply countup %)
-          [[t-0/chaps t-0/vect] [t-s/chaps t-s/vect]]))
-
-(def chapnames (concat t-0/chapnames t-s/chapnames))
-
-(def tutorials2 (map (fn [description scroll xml-code]
-                       {:description description
-                        :scroll scroll
-                        :xml-code xml-code})
-                     old-dsc old-scl old-tuts))
+(def tutorials (concat tutorials_clj
+                       tutorials_scm
+                       (generate-xml t-s2/e-vect)))
 
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
@@ -84,7 +66,7 @@
 
 (defn reset-state [tutorial-no]
   (reset! state
-          {:desc (:description (nth tutorials2 tutorial-no)) :stdout [] :inspect [] :sci-error nil :result nil
+          {:desc (:description (nth tutorials tutorial-no)) :stdout [] :inspect [] :sci-error nil :result nil
            :code nil :edn-code nil
            :tutorial-no tutorial-no :reagent-error nil
            :modal-style-display "none"}))
@@ -96,8 +78,8 @@
     (.. blockly -mainWorkspace (scroll x y))))
 
 (defn goto-page! [page-no]
-  (load-workspace (:xml-code (nth tutorials2 page-no)))
-  (apply set-scrollbar (:scroll (nth tutorials2 page-no)))
+  (load-workspace (:xml-code (nth tutorials page-no)))
+  (apply set-scrollbar (:scroll (nth tutorials page-no)))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset-state page-no)
   (reset! app-state 0))
@@ -108,10 +90,10 @@
           idx-old  (gstring/toNumber (gforms/getValue el))
           idx-new (inc-or-dec idx-old)
           idx (cond
-                (< -1 idx-new (count tutorials2)) idx-new
+                (< -1 idx-new (count tutorials)) idx-new
                 (> 0 idx-new) 0
-                (< (dec (count tutorials2)) idx-new) (dec (count tutorials2))
-                (< -1 idx-old (count tutorials2)) idx-old
+                (< (dec (count tutorials)) idx-new) (dec (count tutorials))
+                (< -1 idx-old (count tutorials)) idx-old
                 :else 0)]
       (goto-page! idx))))
 
@@ -259,6 +241,14 @@
                      :ref (fn [e] (reset! textarea-element e) (some-> e .focus))}]]
         [:button {:on-click #(do (run-parser) (close-modal))}
          "Insert"]
+        " "
+        (when-let [h (:hint (nth tutorials (:tutorial-no @state)))]
+          (let [i (atom 0)]
+            [:button {:on-click (fn []
+                                  (set! (.-value @textarea-element)
+                                        (get h @i))
+                                  (swap! i inc))}
+             "Hint"]))
         [:button {:style {:float "right"} :on-click close-modal}
          "Cancel"]]])))
 
@@ -275,8 +265,8 @@
     " "
     [:button {:on-click (tutorial-fu dec)} "<"]
     " "
-    [:input {:read-only true :size (inc (* 2 (count (str (count tutorials2)))))
-             :value (str (inc (:tutorial-no @state)) "/" (count tutorials2))}]
+    [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
+             :value (str (inc (:tutorial-no @state)) "/" (count tutorials))}]
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
