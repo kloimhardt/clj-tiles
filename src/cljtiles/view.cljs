@@ -69,7 +69,8 @@
   (reset! state
           {:desc (nth desc tutorial-no) :stdout [] :inspect [] :sci-error nil :result nil
            :code nil :edn-code nil
-           :tutorial-no tutorial-no :reagent-error nil}))
+           :tutorial-no tutorial-no :reagent-error nil
+           :modal-style-display "none"}))
 
 (defonce app-state (rc/atom nil))
 
@@ -217,35 +218,32 @@
                                (:inspect-fn context))]
     (run-code edn-code nil)))
 
-(def modal-element (atom nil))
-
-(def textarea-element (atom nil))
-
 (defn open-modal []
-  (set! (.. @modal-element -style -display) "block")
-  (.focus @textarea-element))
-
-(defn close-modal []
-  (set! (.-value @textarea-element) "")
-  (set! (.. @modal-element -style -display) "none"))
-
-(defn run-parser []
-  (let [a (edn/read-string (str "[" (.-value @textarea-element) "]"))]
-    (if (list? (first a))
-      (run! (fn [c] (append-to-workspace (gb/rpg [] c))) a)
-      (load-workspace (apply gb/rpg a))))
-  (close-modal))
+  (swap! state assoc :modal-style-display "block"))
 
 (defn modal-comp []
-  [:div {:id "myModal", :class "modal"
-         :ref (fn [e] (reset! modal-element e))}
-   [:div {:class "modal-content"}
-    [:div
-     [:textarea {:cols 125 :rows 10 :ref (fn [e] (reset! textarea-element e))}]]
-    [:button {:on-click run-parser}
-     "Insert" ]
-    [:button {:style {:float "right"} :on-click close-modal}
-     "Cancel"]]])
+  (let [textarea-element (atom nil)
+        run-parser
+        (fn  []
+          (let [a (edn/read-string (str "[" (.-value @textarea-element) "]"))]
+            (if (list? (first a))
+              (run! (fn [c] (append-to-workspace (gb/rpg [] c))) a)
+              (load-workspace (apply gb/rpg a)))))
+        close-modal
+        (fn []
+          (set! (.-value @textarea-element) "")
+          (swap! state assoc :modal-style-display "none"))]
+    (fn []
+      [:div {:id "myModal", :class "modal"
+             :style {:display (:modal-style-display @state)}}
+       [:div {:class "modal-content"}
+        [:div
+         [:textarea {:cols 80 :rows 10
+                     :ref (fn [e] (reset! textarea-element e) (some-> e .focus))}]]
+        [:button {:on-click #(do (run-parser) (close-modal))}
+         "Insert"]
+        [:button {:style {:float "right"} :on-click close-modal}
+         "Cancel"]]])))
 
 (defn tutorials-comp []
   [:div
