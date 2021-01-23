@@ -33,6 +33,14 @@
   (mapcat #(apply countup %)
           [[t-0/chaps t-0/vect] [t-s/chaps t-s/vect]]))
 
+(comment
+(defn slice [n c]
+  (if (seq n)
+    (cons (take (first n) c) (slice (rest n) (drop (first n) c)))
+    n))
+
+  (slice [3 2 1] [1 2 3 4 5 6]))
+
 (def chapnames (concat t-0/chapnames t-s/chapnames))
 
 (defn filldesc [desc vect]
@@ -46,6 +54,12 @@
 
 (def scroll (mapcat #(apply fillscroll %)
                     [[t-0/scroll t-0/vect] [t-s/scroll t-s/vect]]))
+
+(def tutorials2 (map (fn [description scroll xml-code]
+                       {:description description
+                        :scroll scroll
+                        :xml-code xml-code})
+                     desc scroll tutorials))
 
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
