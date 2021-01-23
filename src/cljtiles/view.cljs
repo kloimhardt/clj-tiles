@@ -22,44 +22,47 @@
 (when workspace!/dev
   (print (tst/test-pure)))
 
-(def tutorials (vec (concat t-0/vect t-s/vect)))
+(def old-tuts (vec (concat t-0/vect t-s/vect)))
 
 (defn countup [chaps vect]
   (let [d (- (count vect) (reduce + chaps))]
     (if (pos? d)
       (update chaps (dec (count chaps)) #(+ % d)) chaps)))
 
-(def chaps
-  (mapcat #(apply countup %)
-          [[t-0/chaps t-0/vect] [t-s/chaps t-s/vect]]))
-
 (comment
+
 (defn slice [n c]
   (if (seq n)
     (cons (take (first n) c) (slice (rest n) (drop (first n) c)))
     n))
 
-  (slice [3 2 1] [1 2 3 4 5 6]))
+(slice [3 2 1] [1 2 3 4 5 6])
 
-(def chapnames (concat t-0/chapnames t-s/chapnames))
+)
 
 (defn filldesc [desc vect]
   (if (empty? desc) (repeat (count vect) "") desc))
 
-(def desc (mapcat #(apply filldesc %)
+(def old-dsc (mapcat #(apply filldesc %)
                   [[t-0/desc t-0/vect] [t-s/desc t-s/vect]]))
 
 (defn fillscroll [scroll vect]
   (if (empty? scroll) (repeat (count vect) nil) scroll))
 
-(def scroll (mapcat #(apply fillscroll %)
+(def old-scl (mapcat #(apply fillscroll %)
                     [[t-0/scroll t-0/vect] [t-s/scroll t-s/vect]]))
+
+(def chaps
+  (mapcat #(apply countup %)
+          [[t-0/chaps t-0/vect] [t-s/chaps t-s/vect]]))
+
+(def chapnames (concat t-0/chapnames t-s/chapnames))
 
 (def tutorials2 (map (fn [description scroll xml-code]
                        {:description description
                         :scroll scroll
                         :xml-code xml-code})
-                     desc scroll tutorials))
+                     old-dsc old-scl old-tuts))
 
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
@@ -81,7 +84,7 @@
 
 (defn reset-state [tutorial-no]
   (reset! state
-          {:desc (nth desc tutorial-no) :stdout [] :inspect [] :sci-error nil :result nil
+          {:desc (:description (nth tutorials2 tutorial-no)) :stdout [] :inspect [] :sci-error nil :result nil
            :code nil :edn-code nil
            :tutorial-no tutorial-no :reagent-error nil
            :modal-style-display "none"}))
@@ -93,8 +96,8 @@
     (.. blockly -mainWorkspace (scroll x y))))
 
 (defn goto-page! [page-no]
-  (load-workspace (get tutorials page-no))
-  (apply set-scrollbar (nth scroll page-no))
+  (load-workspace (:xml-code (nth tutorials2 page-no)))
+  (apply set-scrollbar (:scroll (nth tutorials2 page-no)))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset-state page-no)
   (reset! app-state 0))
@@ -105,10 +108,10 @@
           idx-old  (gstring/toNumber (gforms/getValue el))
           idx-new (inc-or-dec idx-old)
           idx (cond
-                (< -1 idx-new (count tutorials)) idx-new
+                (< -1 idx-new (count tutorials2)) idx-new
                 (> 0 idx-new) 0
-                (< (dec (count tutorials)) idx-new) (dec (count tutorials))
-                (< -1 idx-old (count tutorials)) idx-old
+                (< (dec (count tutorials2)) idx-new) (dec (count tutorials2))
+                (< -1 idx-old (count tutorials2)) idx-old
                 :else 0)]
       (goto-page! idx))))
 
@@ -272,8 +275,8 @@
     " "
     [:button {:on-click (tutorial-fu dec)} "<"]
     " "
-    [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
-             :value (str (inc (:tutorial-no @state)) "/" (count tutorials))}]
+    [:input {:read-only true :size (inc (* 2 (count (str (count tutorials2)))))
+             :value (str (inc (:tutorial-no @state)) "/" (count tutorials2))}]
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
