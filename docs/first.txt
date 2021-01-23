@@ -1,4 +1,4 @@
-Hello, today I'd like to explain in detail the first step for constructing the equation of motion for the driven pendulum. This first step consists of creating a function that describes the motion of a free particle. The most basic building block of our theory are numbers which can be added and multiplied. Here we have the number 5
+Hello, today I'd like to explain in detail the modelling of the motion of a free particle. The most basic building block of our model are numbers which can be added and multiplied. Here we have the number 5
 
 And the number 4
 

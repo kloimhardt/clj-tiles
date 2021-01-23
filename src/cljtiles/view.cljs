@@ -221,31 +221,34 @@
 
 (def textarea-element (atom nil))
 
+(defn open-modal []
+  (set! (.. @modal-element -style -display) "block")
+  (.focus @textarea-element))
+
+(defn close-modal []
+  (set! (.-value @textarea-element) "")
+  (set! (.. @modal-element -style -display) "none"))
+
+(defn run-parser []
+  (let [a (edn/read-string (str "[" (.-value @textarea-element) "]"))]
+    (if (list? (first a))
+      (run! (fn [c] (append-to-workspace (gb/rpg [] c))) a)
+      (load-workspace (apply gb/rpg a))))
+  (close-modal))
+
 (defn modal-comp []
-  (let [close (fn [] (set! (.. @modal-element -style -display) "none"))]
-    [:div {:id "myModal", :class "modal"
-           :ref (fn [e] (reset! modal-element e))}
-     [:div {:class "modal-content"}
-      [:div
-       [:textarea {:cols 125 :rows 10 :ref (fn [e] (reset! textarea-element e))}]]
-      [:button {:on-click
-                #(do (let [a (edn/read-string (str "[" (.-value @textarea-element) "]"))]
-                       (if (list? (first a))
-                         (run! (fn [c] (append-to-workspace (gb/rpg [] c))) a)
-                         (load-workspace (apply gb/rpg a))))
-                     (set! (.-value @textarea-element) "")
-                     (close))}
-       "Insert" ]
-      [:button {:style {:float "right"} :on-click close}
-       "Cancel"]]]))
+  [:div {:id "myModal", :class "modal"
+         :ref (fn [e] (reset! modal-element e))}
+   [:div {:class "modal-content"}
+    [:div
+     [:textarea {:cols 125 :rows 10 :ref (fn [e] (reset! textarea-element e))}]]
+    [:button {:on-click run-parser}
+     "Insert" ]
+    [:button {:style {:float "right"} :on-click close-modal}
+     "Cancel"]]])
 
 (defn tutorials-comp []
   [:div
-   [:button {:on-click (fn []
-                         (set! (.. @modal-element -style -display) "block")
-                         (.focus @textarea-element))}
-    "Insert"]
-   " "
    [:span
     [:select {:value (page->chapter (:tutorial-no @state))
               :on-change (fn [el]
@@ -365,7 +368,7 @@
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
-  (workspace!/init startsci)
+  (workspace!/init startsci open-modal)
   (some-> (not-empty (.. js/window -location -search))
           js/URLSearchParams.
           (.get "page")
