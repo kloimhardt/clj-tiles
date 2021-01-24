@@ -54,7 +54,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
         (cond
           (= frm 'time) (msg-fn '(nil time-error) nil)
           :else
-          (str "Maybe you can rearrange things so that " frm " is called before the error occurs."))))
+          (str "An error occured. Maybe you can rearrange things so that " frm " is called before the error occurs."))))
     :message-fn
     (fn [ifo result]
       (println "msg " ifo)
@@ -97,7 +97,6 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            'Path-of-a-Free-Particle-sym
            "This is yet another new type: an Expression. It is four times t. Now you start to finish the construction of the function describing the motion of a free particle.
 "
-
            }
           last-ifo)))
 

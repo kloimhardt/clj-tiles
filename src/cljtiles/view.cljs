@@ -335,9 +335,9 @@
           (when-let [msg-fn (:message-fn tut)]
             [:p (msg-fn ifo (:inspect @state))])]
          [:<>
-          [mixed-comp (str "Evaluation error for: " (last ifo))]
-          (when-let [error-msg-fn (:error-message-fn tut)]
-            [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut))])
+          (if-let [error-msg-fn (:error-message-fn tut)]
+            [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut))]
+            [mixed-comp (str "Evaluation error for: " (last ifo))])
           (when (:sci-error @state) [error-comp])])])
     [:<>
      (map-indexed (fn [idx v]
