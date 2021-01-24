@@ -39,9 +39,10 @@
       (str text "[" (apply str (map #(str (kind-s? %) "\\ ") e)) "]")
       (= spc ::hash-table)
       (str text "\\{" (apply str (map (fn [[k v]] (str (kind-s? k)  "\\ " (kind-s? v) "\\ ")) e))"\\}")
-
       :else
-      (str (or text "UnknownType") "\\ " (inline-tex e)))))
+      (if text
+        (str text "\\ " (inline-tex e))
+        (str "UnknownType" "\\ " e)))))
 
 (defn kind? [e]
   (tex (kind-s? e)))

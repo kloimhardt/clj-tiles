@@ -329,15 +329,15 @@
           (map-indexed (fn [idx v]
                          (println v)
                          ^{:key idx} [:<>
-                                      [mixed-comp (str (sicm/kind? v))]
+                                      [mixed-comp (sicm/kind? v)]
                                       [:hr]])
                        (:inspect @state))
-          (when-let [msg ((:message-fn tut) ifo (:edn-code @state))]
-            [:p msg])]
+          (when-let [msg-fn (:message-fn tut)]
+            [:p (msg-fn ifo (:inspect @state))])]
          [:<>
           [mixed-comp (str "Evaluation error for: " (last ifo))]
-          (when-let [msg ((:error-message-fn tut) ifo (:edn-code @state) (:sci-error @state) (:message-fn tut))]
-            [:p msg])
+          (when-let [error-msg-fn (:error-message-fn tut)]
+            [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut))])
           (when (:sci-error @state) [error-comp])])])
     [:<>
      (map-indexed (fn [idx v]

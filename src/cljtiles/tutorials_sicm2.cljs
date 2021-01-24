@@ -46,19 +46,20 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :error-message-fn
-    (fn [ifo code error msg-fn]
+    (fn [ifo error msg-fn]
       (println "err-msg " ifo)
       (def io ifo)
+      (def err error)
       (let [frm (last ifo)]
         (cond
-          (= frm '(up)) (msg-fn '(nil (up-error)) code)
-          (= frm 'time) (msg-fn '(nil time-error) code)
+          (= frm 'time) (msg-fn '(nil time-error) nil)
           :else
           (str "Maybe you can rearrange things so that " frm " is called before the error occurs."))))
     :message-fn
-    (fn [ifo code]
+    (fn [ifo result]
       (println "msg " ifo)
       (def i ifo)
+      (def r result)
       (let [frm (last ifo)
             last-ifo (cond
                        (and (coll? frm) (= (first frm) 'Path-of-a-Free-Particle))
@@ -75,15 +76,15 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            "and add 2 resulting in ..."
            (list '+ (symbol :2) (list '* (symbol :5) (symbol :4)))
            "Now we have here a block called up. Inspecting it..."
-           '(up-error)
-           "gives an error. The block does not mean anything by itself. But if we connect the formula we just created...
+           '(up)
+           "gives an unknown type. The block does not mean anything by itself. But if we connect the formula we just created...
 "
            (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))))
            "we get a column vector. If we connect the number 3, ..."
            (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))) (symbol :3))
            "we get a proper column vector in two dimensions. Now we want to make the vector time dependent. But if we inspect the variable \"time\", ..."
            'time-error
-           "we again get an error. This is another block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle, it has one argument, which is the time and returns the (4 * time). Inspecting the function..."
+           "we get an error. This is another block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle, it has one argument, which is the time and returns the (4 * time). Inspecting the function..."
            (list 'defn 'Path-of-a-Free-Particle ['time]
                  (list '* (symbol :4) 'time))
            "gives some cryptic output of unknown type. We need to add a block which calls the function. You open the parser, and create the call statement"
