@@ -322,8 +322,7 @@
 
 (defn result-comp []
   (if-let [ifo (ca/inspect-form (:edn-code @state) workspace!/inspect-fn-sym)]
-    (let [msgs-fn (:messages (nth tutorials (:tutorial-no @state)))
-          msg (msgs-fn ifo (:edn-code @state) (:sci-error @state))]
+    (let [tut (nth tutorials (:tutorial-no @state))]
       [:<>
        (if (seq (:inspect @state))
          [:<>
@@ -332,10 +331,12 @@
                                       [mixed-comp v]
                                       [:hr]])
                        (:inspect @state))
-          (when msg [:p msg])]
+          (when-let [msg ((:message-fn tut) ifo (:edn-code @state))]
+            [:p msg])]
          [:<>
-          [mixed-comp (str "Evaluation error: " (last ifo))]
-          (when msg [:p msg])
+          [mixed-comp (str "Evaluation error for: " (last ifo))]
+          (when-let [msg ((:error-message-fn tut) ifo (:edn-code @state) (:sci-error @state) (:message-fn tut))]
+            [:p msg])
           (when (:sci-error @state) [error-comp])])])
     [:<>
      (map-indexed (fn [idx v]
