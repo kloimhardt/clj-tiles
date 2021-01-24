@@ -166,7 +166,7 @@
         tex-print
         (fn [& x] (swap! state #(update % :stdout conj
                                         (sicm/tex (last x)))) nil)
-        tex-inspect (fn [x] (swap! state #(update % :inspect conj (str (sicm/kind? x)))) x)
+        tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
         bindings2 (bindings new-println tex-print tex-inspect)
         cbr (code->break-str str-width aug-edn-code)
         _ (reset-state (:tutorial-no @state))
@@ -327,8 +327,9 @@
        (if (seq (:inspect @state))
          [:<>
           (map-indexed (fn [idx v]
+                         (println v)
                          ^{:key idx} [:<>
-                                      [mixed-comp v]
+                                      [mixed-comp (str (sicm/kind? v))]
                                       [:hr]])
                        (:inspect @state))
           (when-let [msg ((:message-fn tut) ifo (:edn-code @state))]
