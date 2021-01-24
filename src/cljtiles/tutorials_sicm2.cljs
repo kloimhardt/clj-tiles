@@ -59,30 +59,47 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     (fn [ifo code]
       (println "msg " ifo)
       (def i ifo)
-      (get
-        {(symbol :5) "And the number 4..."
-         (symbol :4) "We multiply them to give ..."
-         (list '* (symbol :5) (symbol :4))
-         "and add 2 resulting in ..."
-         (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2))
-         "Now we have here a block called up. Inspecting it..."
-         '(up-error)
-         "gives an error. The block does not mean anything by itself. But if we connect the formula we just created...
+      (let [frm (last ifo)
+            last-ifo (cond
+                       (and (coll? frm) (= (first frm) 'Path-of-a-Free-Particle))
+                       (if (js/isNaN (js/parseInt (last frm)))
+                         'Path-of-a-Free-Particle-sym
+                         'Path-of-a-Free-Particle-num)
+                       (= (str frm) "'t")
+                       't-symbol
+                       :else frm)]
+        (get
+          {(symbol :5) "And the number 4..."
+           (symbol :4) "We multiply them to give ..."
+           (list '* (symbol :5) (symbol :4))
+           "and add 2 resulting in ..."
+           (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2))
+           "Now we have here a block called up. Inspecting it..."
+           '(up-error)
+           "gives an error. The block does not mean anything by itself. But if we connect the formula we just created...
 "
-         (list 'up (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2)))
-         "we get a column vector. If we connect the number 3, ..."
-         (list 'up (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2)) (symbol :3))
-         "we get a proper column vector in two dimensions. Now we want to make the vector time dependent. But if we inspect the variable \"time\", ..."
-         'time-error
-         "we again get an error. This is another block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle, it has one argument, which is the time and returns the (4 * time). Inspecting the function..."
-         (list 'defn 'Path-of-a-Free-Particle ['time]
-               (list '* (symbol :4) 'time))
-         "gives some cryptic output of unknown type. We need to add a block which calls the function. You open the parser, and create the call statement"
+           (list 'up (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2)))
+           "we get a column vector. If we connect the number 3, ..."
+           (list 'up (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2)) (symbol :3))
+           "we get a proper column vector in two dimensions. Now we want to make the vector time dependent. But if we inspect the variable \"time\", ..."
+           'time-error
+           "we again get an error. This is another block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle, it has one argument, which is the time and returns the (4 * time). Inspecting the function..."
+           (list 'defn 'Path-of-a-Free-Particle ['time]
+                 (list '* (symbol :4) 'time))
+           "gives some cryptic output of unknown type. We need to add a block which calls the function. You open the parser, and create the call statement"
+           'Path-of-a-Free-Particle-num
+           "We get a number. By inspecting the parameter \"time\" of the function itself, ..."
+           'time
+           "we see that time is also a number, as we would expect from looking at the block just created. But here comes a crucial step: Not only can we call a function with a number, but we can call it with a symbol. For this, we create a new calling block with a symbol 't as the argument. You open the parser again..."
+           't-symbol
+           "It is indeed a symbol"
+           'Path-of-a-Free-Particle-sym
+           "This is yet another new type: an Expression. It is four times t. Now you start to finish the construction of the function describing the motion of a free particle.
+"
 
+           }
+          last-ifo)))
 
-         }
-
-        (last ifo)))
     :scroll [0 0]
     :blockpos [[0 0] [100 0] [250 0]
                [400 0] [500 0]
