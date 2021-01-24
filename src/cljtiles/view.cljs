@@ -18,7 +18,8 @@
    [zprint.core :as zp]
    [cljtiles.tests :as tst]
    [cljtiles.sicm :as sicm]
-   [cljtiles.blockly :as workspace!]))
+   [cljtiles.blockly :as workspace!]
+   [cljtiles.code-analysis :as ca]))
 
 (when workspace!/dev
   (print (tst/test-pure)))
@@ -178,20 +179,6 @@
            :code (if error "Cannot even parse the blocks" cbr)
            :edn-code aug-edn-code)))
 
-(defn inspect-form [s fname]
-  (when (coll? s)
-    (if (= (first s) fname)
-      s
-      (reduce (fn [v vs] (or v (inspect-form vs fname))) nil s))))
-
-(defn inspect-froms [edn-code fname]
-  (map (fn [form]
-         (when (and (list? form)
-                    (= 4 (count form))
-                    (= (first form) 'defn))
-           (inspect-form (nth form 2) fname)))
-       edn-code))
-
 (defn insert-inspect [edn-code inspect-form]
     (if inspect-form
       (concat (take 3 edn-code)
@@ -202,7 +189,7 @@
   (let [edn-xml (sax/xml->clj xml-str)
         eci (edn->code/parse edn-xml {:id inspect-id :fun inspect-fn})
         inspect-fn-name (when inspect-fn (first (inspect-fn 0)))
-        ifo (inspect-froms eci inspect-fn-name)]
+        ifo (ca/inspect-froms eci inspect-fn-name)]
     (if (not-every? nil? ifo)
       (let [ec (edn->code/parse edn-xml {:id nil :fun nil})]
         (map insert-inspect ec ifo))
@@ -323,32 +310,39 @@
     [tex-comp txt]
     [:pre txt]))
 
+(defn error-comp []
+  (let [flex50 {:style {:flex "50%"}}]
+    [:div {:style {:display "flex"}}
+     [:div flex50
+      [:h3 "Error"]
+      [:pre (:sci-error @state)]]
+     [:div flex50
+      [:h3 "Code"]
+      [:pre (:code @state)]]]))
+
 (defn result-comp []
-  (if (seq (:inspect @state))
-    (let [ifo (inspect-form (:edn-code @state) workspace!/inspect-fn-sym)
-          msgs (:messages (nth tutorials (:tutorial-no @state)))
-          msg (get msgs (last ifo))]
+  (if-let [ifo (ca/inspect-form (:edn-code @state) workspace!/inspect-fn-sym)]
+    (let [msgs-fn (:messages (nth tutorials (:tutorial-no @state)))
+          msg (msgs-fn ifo (:edn-code @state) (:sci-error @state))]
       [:<>
-       (when msg
-         [:p msg])
-       (map-indexed (fn [idx v]
-                      ^{:key idx} [:<>
-                                   [mixed-comp v]
-                                   [:hr]])
-                    (:inspect @state))])
+       (if (seq (:inspect @state))
+         [:<>
+          (map-indexed (fn [idx v]
+                         ^{:key idx} [:<>
+                                      [mixed-comp v]
+                                      [:hr]])
+                       (:inspect @state))
+          (when msg [:p msg])]
+         [:<>
+          [mixed-comp (str "Evaluation error: " (last ifo))]
+          (when msg [:p msg])
+          (when (:sci-error @state) [error-comp])])])
     [:<>
      (map-indexed (fn [idx v]
                     ^{:key idx} [mixed-comp v])
                   (:stdout @state))
      (when (:sci-error @state)
-       (let [flex50 {:style {:flex "50%"}}]
-         [:div {:style {:display "flex"}}
-          [:div flex50
-           [:h3 "Error"]
-           [:pre (:sci-error @state)]]
-          [:div flex50
-           [:h3 "Code"]
-           [:pre (:code @state)]]]))
+       [error-comp])
      (if-let [last-vec (is-last-div)]
        [reagent-comp last-vec]
        [:pre (:result @state)])
@@ -374,7 +368,7 @@
     [result-comp]]])
 
 (defn ^{:dev/after-load true} render []
-  ((tutorial-fu identity))
+  ;;((tutorial-fu identity))
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []

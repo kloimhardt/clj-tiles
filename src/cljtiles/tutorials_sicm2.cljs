@@ -1,4 +1,5 @@
-(ns cljtiles.tutorials-sicm2)
+(ns cljtiles.tutorials-sicm2
+  (:require [cljtiles.code-analysis :as ca]))
 
 (def bold {:style {:font-weight "bold"}})
 
@@ -44,7 +45,34 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
       " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]]
     :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
-    :messages {(list '* (symbol :5) (symbol :4)) "hui"}
+    :messages
+    (fn [ifo code error]
+      (def i ifo)
+      (get
+        {(symbol :5) "And the number 4..."
+         (symbol :4) "We multiply them to give ..."
+         (list '* (symbol :5) (symbol :4))
+         "and add 2 resulting in ..."
+         (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2))
+         "Now we have here a block called up. Inspecting it..."
+         '(up)
+         "gives an error. The block does not mean anything by itself. But if we connect the formula we just created...
+"
+         (list 'up (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2)))
+         "we get a column vector. If we connect the number 3, ..."
+         (list 'up (list '+ (list '* (symbol :5) (symbol :4)) (symbol :2)) (symbol :3))
+         "we get a proper column vector in two dimensions. Now we want to make the vector time dependent. But if we inspect the variable \"time\", ..."
+         'time
+         "we again get an error. This is another block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle, it has one argument, which is the time and returns the (4 * time). Inspecting the function..."
+         (list 'defn 'Path-of-a-Free-Particle ['time]
+               (list '* (symbol :4) 'time))
+         "gives some cryptic output of unknown type. We need to add a block which calls the function. You open the parser, and create the call statement"
+
+
+
+         }
+
+        (last ifo)))
     :scroll [0 0]
     :blockpos [[0 0] [100 0] [250 0]
                [400 0] [500 0]
