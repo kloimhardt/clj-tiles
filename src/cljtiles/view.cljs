@@ -152,7 +152,7 @@
    sicm/bindings
    {'println new-println
     'tex tex-print
-    'tex-inspect tex-inspect
+    workspace!/inspect-fn-sym tex-inspect
     'app-state app-state
     'start-timer start-timer
     'stop-timer stop-timer}))
@@ -325,12 +325,17 @@
 
 (defn result-comp []
   (if (seq (:inspect @state))
-    [:<>
-     (map-indexed (fn [idx v]
-                    ^{:key idx} [:<>
-                                 [mixed-comp v]
-                                 [:hr]])
-                  (:inspect @state))]
+    (let [ifo (inspect-form (:edn-code @state) workspace!/inspect-fn-sym)
+          msgs (:messages (nth tutorials (:tutorial-no @state)))
+          msg (get msgs (last ifo))]
+      [:<>
+       (when msg
+         [:p msg])
+       (map-indexed (fn [idx v]
+                      ^{:key idx} [:<>
+                                   [mixed-comp v]
+                                   [:hr]])
+                    (:inspect @state))])
     [:<>
      (map-indexed (fn [idx v]
                     ^{:key idx} [mixed-comp v])

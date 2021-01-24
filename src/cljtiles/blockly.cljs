@@ -10,6 +10,8 @@
   (def menu false)
   (def menu false))
 
+(def inspect-fn-sym 'tex-inspect)
+
 (defn init [startfun open-modal]
   (js/initblocks blockly)
   (.inject blockly
@@ -32,7 +34,7 @@
               :weight 0}
          #js {:displayText "Inspect"
               :preconditionFn (fn [_scope] "enabled")
-              :callback (fn [scope] (startfun (assoc (js->clj scope) :inspect-fn #(list 'tex-inspect %))))
+              :callback (fn [scope] (startfun (assoc (js->clj scope) :inspect-fn #(list inspect-fn-sym %))))
               :scopeType (.. blockly -ContextMenuRegistry -ScopeType -BLOCK)
               :id "tex-inspect"
               :weight 0}]))

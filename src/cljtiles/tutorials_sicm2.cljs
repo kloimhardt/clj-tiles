@@ -44,6 +44,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
       " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]]
     :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
+    :messages {(list '* (symbol :5) (symbol :4)) "hui"}
     :scroll [0 0]
     :blockpos [[0 0] [100 0] [250 0]
                [400 0] [500 0]
