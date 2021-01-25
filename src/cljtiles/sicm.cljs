@@ -23,8 +23,11 @@
 
 (def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean"])
 
+(defn classify [e]
+  (first (filter #(s/valid? (first %) e) (partition 2 sps))))
+
 (defn kind-s? [e]
-  (let [[spc text] (first (filter #(s/valid? (first %) e) (partition 2 sps)))
+  (let [[spc text] (classify e)
         differential (fn [^dr/Differential e1] (let [t (.-terms  e1)] [(second (first t)) (last (last t))]))]
     (cond
       (= spc ::up)

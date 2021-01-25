@@ -1,5 +1,6 @@
 (ns cljtiles.tutorials-sicm2
-  (:require [cljtiles.code-analysis :as ca]))
+  (:require [cljtiles.code-analysis :as ca]
+            [cljtiles.sicm :as sc]))
 
 (def bold {:style {:font-weight "bold"}})
 
@@ -59,46 +60,67 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     (fn [ifo result]
       (println "msg " ifo)
       (def i ifo)
-      (def r result)
+      (def r result) 
       (let [frm (last ifo)
             last-ifo (cond
                        (and (coll? frm) (= (first frm) 'Path-of-a-Free-Particle))
-                       (if (js/isNaN (js/parseInt (last frm)))
-                         'Path-of-a-Free-Particle-sym
-                         'Path-of-a-Free-Particle-num)
+                       ({[true true] 'Path-of-a-Free-Particle-sym-vec
+                         [true false] 'Path-of-a-Free-Particle-sym
+                         [false true] 'Path-of-a-Free-Particle-num-vec
+                         [false false] 'Path-of-a-Free-Particle-num}
+                        [(js/isNaN (js/parseInt (last frm)))
+                         (= ::sc/up (first (sc/classify (first r))))])
                        (= (str frm) "'t")
                        't-symbol
+                       (and (coll? frm)
+                            (= '(defn Path-of-a-Free-Particle [time])
+                               (take 3 frm))
+                            (= 'up (first (nth frm 3 nil))))
+                       'Path-of-a-Free-Particle-fn
                        :else frm)]
-        (get
-          {(symbol :5) "And the number 4..."
-           (symbol :4) "We multiply them to give ..."
-           (list '* (symbol :5) (symbol :4))
-           "and add 2 resulting in ..."
-           (list '+ (symbol :2) (list '* (symbol :5) (symbol :4)))
-           "Now we have here a block called up. Inspecting it..."
-           '(up)
-           "gives an unknown type. The block does not mean anything by itself. But if we connect the formula we just created...
+        (println last-ifo)
+        (or
+          (get
+            {(symbol :5) "And the number 4..."
+             (symbol :4) "We multiply them to give ..."
+             (list '* (symbol :5) (symbol :4))
+             "and add 2 resulting in ..."
+             (list '+ (symbol :2) (list '* (symbol :5) (symbol :4)))
+             "Now we have here a block called up. Inspecting it..."
+             '(up)
+             "gives an unknown type. The block does not mean anything by itself. But if we connect the formula we just created...
 "
-           (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))))
-           "we get a column vector. If we connect the number 3, ..."
-           (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))) (symbol :3))
-           "we get a proper column vector in two dimensions. Now we want to make the vector time dependent. But if we inspect the variable \"time\", ..."
-           'time-error
-           "we get an error. This is another block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle, it has one argument, which is the time and returns the (4 * time). Inspecting the function..."
-           (list 'defn 'Path-of-a-Free-Particle ['time]
-                 (list '* (symbol :4) 'time))
-           "gives some cryptic output of unknown type. We need to add a block which calls the function. You open the parser, and create the call statement"
-           'Path-of-a-Free-Particle-num
-           "We get a number. By inspecting the parameter \"time\" of the function itself, ..."
-           'time
-           "we see that time is also a number, as we would expect from looking at the block just created. But here comes a crucial step: Not only can we call a function with a number, but we can call it with a symbol. For this, we create a new calling block with a symbol 't as the argument. You open the parser again..."
-           't-symbol
-           "It is indeed a symbol"
-           'Path-of-a-Free-Particle-sym
-           "This is yet another new type: an Expression. It is four times t. Now you start to finish the construction of the function describing the motion of a free particle.
-"
-           }
-          last-ifo)))
+             (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))))
+             "we get a column vector. If we connect the number 3, ..."
+             (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))) (symbol :3))
+             "we get a proper column vector in two dimensions. Now we want to make the vector time dependent. But if we inspect the variable \"time\", ..."
+             'time-error
+             "we get an error. This is a block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle, it has one argument, which is the time and returns (4 * time). Inspecting the function..."
+             (list 'defn 'Path-of-a-Free-Particle ['time]
+                   (list '* (symbol :4) 'time))
+             "gives some cryptic output of unknown type. We need to add a block which calls the function. You open the parser, and create the call statement"
+             'Path-of-a-Free-Particle-num
+             "We get a number. By inspecting the parameter \"time\" of the function itself, ..."
+             't-symbol
+             "It is indeed a symbol"
+             'Path-of-a-Free-Particle-sym
+             "This is yet another new type: an Expression. It is four times t. Now you start to finish the construction of the function describing the motion of a free particle."
+             'Path-of-a-Free-Particle-fn
+             "You see some cyptic output. You'd better call the function."
+             'Path-of-a-Free-Particle-num-vec
+             "A vector of numbers. Calling the function with a symbol is certainly more interesting."
+             'Path-of-a-Free-Particle-sym-vec
+             "leads to the time dependent vector we more traditionally associate with the motion of a particle with constant velocity. The most important fact comes up, when we inspect the parameter time of the function:"
+             }
+            last-ifo)
+          (when (= frm 'time)
+            (let [c (map sc/classify result)]
+              (if (> (count (into #{} c)) 1)
+                (str "The block changes its type during the course of the program. It is first a " (last (first c)) ", than a " (last (last c))". This result, that blocks change their type, is very general. If we move to the last step of this pendulum example")
+                (if (= :cljtiles.sicm/nu (first (first c)))
+                  "we see that time is also a number, as we would expect from looking at the block just created. But here comes a crucial step: Not only can we call a function with a number, but we can call it with a symbol. For this, we create a new calling block with a symbol 't as the argument. You open the parser again..."
+                  (str "The block \"time\" is a " (last (first c)) ". But a block can have more than one type during the course of a program.")))))
+          )))
 
     :scroll [0 0]
     :blockpos [[0 0] [100 0] [250 0]
