@@ -1,6 +1,5 @@
 (ns cljtiles.tutorials-sicm2
-  (:require [cljtiles.code-analysis :as ca]
-            [cljtiles.sicm :as sc]))
+  (:require [cljtiles.sicm :as sc]))
 
 (def bold {:style {:font-weight "bold"}})
 
@@ -48,9 +47,6 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :error-message-fn
     (fn [ifo error msg-fn]
-      (println "err-msg " ifo)
-      (def io ifo)
-      (def err error)
       (let [frm (last ifo)]
         (cond
           (= frm 'time) (msg-fn '(nil time-error) nil)
@@ -58,9 +54,6 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
           (str "An error occured. Maybe you can rearrange things so that " frm " is called before the error occurs."))))
     :message-fn
     (fn [ifo result]
-      (println "msg " ifo)
-      (def i ifo)
-      (def r result) 
       (let [frm (last ifo)
             last-ifo (cond
                        (and (coll? frm) (= (first frm) 'Path-of-a-Free-Particle))
@@ -69,7 +62,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                          [false true] 'Path-of-a-Free-Particle-num-vec
                          [false false] 'Path-of-a-Free-Particle-num}
                         [(js/isNaN (js/parseInt (last frm)))
-                         (= ::sc/up (first (sc/classify (first r))))])
+                         (= ::sc/up (first (sc/classify (first result))))])
                        (= (str frm) "'t")
                        't-symbol
                        (and (coll? frm)
@@ -78,7 +71,6 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                             (= 'up (first (nth frm 3 nil))))
                        'Path-of-a-Free-Particle-fn
                        :else frm)]
-        (println last-ifo)
         (or
           (get
             {(symbol :5) "And the number 4..."
@@ -144,15 +136,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(* :tiles/slot :tiles/slot)
            'time
            '(+ :tiles/slot :tiles/slot)
-           'time]}
-   {:description
-    "You run the program, but the output does not convey much yet."
-    :scroll [0 0]
-    :blockpos [[0 0]]
-    :code
-    '(defn Path-of-a-Free-Particle
-       time
-       (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))}])
+           'time]}])
 
-(def chapnames ["SICM2"])
+(def chapnames ["Pendulum begin"])
 (def chaps [(count e-vect)])

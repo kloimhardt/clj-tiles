@@ -10,6 +10,7 @@
    [cljtiles.genblocks :as gb]
    [cljtiles.tutorials-sicm :as t-s]
    [cljtiles.tutorials-sicm2 :as t-s2]
+   [cljtiles.tutorials-sicm3 :as t-s3]
    [cljs.reader :as edn]
    [clojure.walk :as w]
    [tubax.core :as sax]
@@ -23,10 +24,6 @@
 
 (when workspace!/dev
   (print (tst/test-pure)))
-
-(def chaps (concat t-0/chaps t-s/chaps t-s2/chaps))
-
-(def chapnames (concat t-0/chapnames t-s/chapnames t-s2/chapnames))
 
 (def tutorials_clj (map (fn [xml-code]
                        {:xml-code xml-code})
@@ -43,9 +40,20 @@
 (defn generate-xml [pages]
   (map #(assoc % :xml-code (apply gb/rpg (:blockpos %) (:code %))) pages))
 
+(def chaps (concat t-0/chaps
+                   t-s2/chaps
+                   t-s/chaps
+                   t-s3/chaps))
+
+(def chapnames (concat t-0/chapnames
+                       t-s2/chapnames
+                       t-s/chapnames
+                       t-s3/chapnames))
+
 (def tutorials (concat tutorials_clj
+                       (generate-xml t-s2/e-vect)
                        tutorials_scm
-                       (generate-xml t-s2/e-vect)))
+                       (generate-xml t-s3/e-vect)))
 
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
