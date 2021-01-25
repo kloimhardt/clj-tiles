@@ -6,11 +6,14 @@
 (def e-vect
   [{:description
     [:div
+     [:div bold "Introduction"]
+     [:p "This workspace is about modelling the motion of a free particle. You see lots of building blocks. Number 5 on the upper left catches your attention. Full of curiosity, you right click and inspect it (before even reading on)."]
      [:div bold "Description"]
      [:p "We start by creating a function Path-of-a-Free-Particle. Newtons first law states that in some inertial frame of reference, an object continues to move in space at a constant velocity. This movement takes time, so our function depends on time. It returns a vector of two elements because we choose our path to live in two dimensions."]
 
      [:div bold "Explanation"]
      [:p "
+Modelling the path of a free particle is the first step for creating the equatios of motion for the driven pendulum in a gravitational field.
 In familiar notation, the path is denoted by:
    \\[\\vec{x}(t) =
       \\begin{pmatrix}
@@ -42,7 +45,8 @@ In familiar notation, the path is denoted by:
 \\end{smallmatrix}\\big)\\)
 and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \\frac{m}{s}\\) in \\(y\\) direction. Imagine the body as a "
       [:a {:href "https://www.youtube.com/watch?v=z74OwRy8o9I"} "Pizza in space"]
-      " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]]
+      " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]
+     ]
     :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :error-message-fn
@@ -73,21 +77,23 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                        :else frm)]
         (or
           (get
-            {(symbol :5) "And the number 4..."
-             (symbol :4) "We multiply them to give ..."
+            {(symbol :5) "You look at number 4."
+             (symbol :4) "You definitely want to multiply 5 and 4. "
              (list '* (symbol :5) (symbol :4))
-             "and add 2 resulting in ..."
+             "You wonder if \\((2 + 5 \\times 4)\\) works."
              (list '+ (symbol :2) (list '* (symbol :5) (symbol :4)))
-             "Now we have here a block called up. Inspecting it..."
+             "This was as expected. Now, the block called \"up\" is next."
              '(up)
-             "gives an unknown type. The block does not mean anything by itself. But if we connect the formula we just created...
+             "Inspecting \"up\" gives an unknown type. This block by itself does not seem to mean very much. But noticing its two connections, you attach the formula just created.
 "
              (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))))
-             "we get a column vector. If we connect the number 3, ..."
+             "You read the type of the result: \"Column Vector\". But there are no columns. You connect the number 3."
              (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))) (symbol :3))
-             "we get a proper column vector in two dimensions. Now we want to make the vector time dependent. But if we inspect the variable \"time\", ..."
+             [:<>
+              [:p "At last a proper column vector in two dimensions."]
+              [:p "A block called \"time\" is nearby. Certainly, a time dependent vector would be nice. You inspect \"time\"."]]
              'time-error
-             "we get an error. This is a block which has no meaning by itself. It is meant to be a parameter of a function. So we define one and give it the name Path-of-a-free-particle, it has one argument, which is the time and returns (4 * time). Inspecting the function..."
+             "An error. It reads \"Cound not resolve symbol\". Obviously, the \"time\" block must not be by itself. You connect it to the \"defn\" block and inspect again."
              (list 'defn 'Path-of-a-Free-Particle ['time]
                    (list '* (symbol :4) 'time))
              "gives some cryptic output of unknown type. We need to add a block which calls the function. You open the parser, and create the call statement"
@@ -120,7 +126,8 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                [0 50]
                [300 100]
                [350 110]
-               [0 150] [150 150]
+               [70 140]
+               [0 150]
                [0 250] [150 250]
                [0 300] [150 300]]
     :code [5
@@ -131,8 +138,8 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(:tiles/vert (up :tiles/slot :tiles/slot))
            3
            'time
-           '(defn :tiles/slot :tiles/slot :tiles/slot)
            'Path-of-a-Free-Particle
+           '(defn :tiles/slot :tiles/slot :tiles/slot)
            '(* :tiles/slot :tiles/slot)
            'time
            '(+ :tiles/slot :tiles/slot)

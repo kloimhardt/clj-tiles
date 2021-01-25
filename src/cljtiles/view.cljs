@@ -341,7 +341,7 @@
                                       [:hr]])
                        (:inspect @state))
           (when-let [msg-fn (:message-fn tut)]
-            [:p (msg-fn ifo (:inspect @state))])]
+            [tex-comp (msg-fn ifo (:inspect @state))])]
          [:<>
           (if-let [error-msg-fn (:error-message-fn tut)]
             [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut))]
