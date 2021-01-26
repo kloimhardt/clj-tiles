@@ -51,11 +51,22 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :error-message-fn
     (fn [ifo error msg-fn]
+      (println "klmi " ifo)
+      (println "klme " error)
+      (def er error)
       (let [frm (last ifo)]
         (cond
-          (= frm 'time) (msg-fn '(nil time-error) nil)
+          (and (= frm 'time)
+               (= (subs error 0 30) "Could not resolve symbol: time"))
+          (msg-fn '(nil time-error) nil)
+          (and (coll? frm)
+               (= (first frm) 'Path-of-a-Free-Particle)
+               (= (subs error 0 30) "Could not resolve symbol: time"))
+          "The error is because a \"time\" block is still unconnected. For now, move the block upwards so that it is called before the error occurs."
+          (= (subs error 0 35) "Could not resolve symbol: Path-of-a")
+          (msg-fn '(nil particle-error) nil)
           :else
-          (str "An error occured. Maybe you can rearrange things so that " frm " is called before the error occurs."))))
+          (str "You did something unexpected. Hopefully the error message helps. Maybe chances are that you can rearrange things so that " frm " is called before the error occurs."))))
     :message-fn
     (fn [ifo result]
       (let [frm (last ifo)
@@ -80,7 +91,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
             {(symbol :5) "You look at number 4."
              (symbol :4) "You definitely want to multiply 5 and 4. "
              (list '* (symbol :5) (symbol :4))
-             "You wonder if \\((2 + 5 \\times 4)\\) works."
+             "You wonder if \\((2 + 5 * 4)\\) works."
              (list '+ (symbol :2) (list '* (symbol :5) (symbol :4)))
              "This was as expected. Now, the block called \"up\" is next."
              '(up)
@@ -94,11 +105,15 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
               [:p "A block called \"time\" is nearby. Certainly, a time dependent vector would be nice. You inspect \"time\"."]]
              'time-error
              "An error. It reads \"Cound not resolve symbol\". Obviously, the \"time\" block must not be by itself. You connect it to the \"defn\" block and inspect again."
+             'particle-error
+             "An error. It reads \"Cound not resolve symbol\". Now you notice the \"Path-of-a-Free-Particle\" block. You connect it and inspect the whole \"defn\" block."
+             (list 'defn 'Path-of-a-Free-Particle ['time])
+             "A cryptic output without any type at all. But you realize that you just crated a stub for a function definition. The name of the function is \"Path-of-a-Free-Particle\" and its parameter is \"time\". You add a block \\( (4 * time )\\) to the last connection of the \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time]
                    (list '* (symbol :4) 'time))
-             "gives some cryptic output of unknown type. We need to add a block which calls the function. You open the parser, and create the call statement"
+             "A cryptic output without any type at all. This is expected, as you know that functions need to be called. You open the parser and create the call statement."
              'Path-of-a-Free-Particle-num
-             "We get a number. By inspecting the parameter \"time\" of the function itself, ..."
+             "You are pleased to finally get some number. Now, inspecting the \"time\" parameter of the function seems intersting."
              't-symbol
              "It is indeed a symbol"
              'Path-of-a-Free-Particle-sym
