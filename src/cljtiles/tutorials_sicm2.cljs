@@ -54,19 +54,21 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
       (println "klmi " ifo)
       (println "klme " error)
       (def er error)
+      (def fo (last ifo))
       (let [frm (last ifo)]
         (cond
           (and (= frm 'time)
                (= (subs error 0 30) "Could not resolve symbol: time"))
           (msg-fn '(nil time-error) nil)
-          (and (coll? frm)
-               (= (first frm) 'Path-of-a-Free-Particle)
-               (= (subs error 0 30) "Could not resolve symbol: time"))
-          "The error is because a \"time\" block is still unconnected. For now, move the block upwards so that it is called before the error occurs."
+          (and (= (subs error 0 30) "Could not resolve symbol: time")
+               (or (= (str frm) "'t")
+                   (and (coll? frm)
+                        (= (first frm) 'Path-of-a-Free-Particle))))
+          (str "The error is because a \"time\" block is still unconnected. For now, move the block " frm " upwards so that it is called before the error occurs.")
           (= (subs error 0 35) "Could not resolve symbol: Path-of-a")
           (msg-fn '(nil particle-error) nil)
           :else
-          (str "You did something unexpected. Hopefully the error message helps. Maybe chances are that you can rearrange things so that " frm " is called before the error occurs."))))
+          (str "You did something unexpected. Hopefully the error message below helps. Maybe chances are that you can rearrange things so that " frm " is called before the error occurs."))))
     :message-fn
     (fn [ifo result]
       (let [frm (last ifo)
@@ -115,23 +117,33 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              'Path-of-a-Free-Particle-num
              "You are pleased to finally get some number. Now, inspecting the \"time\" parameter of the function seems intersting."
              't-symbol
-             "It is indeed a symbol"
+             "A new type: a symbol. You notice the single quote, allowing t to stand by itself, more akin to a number."
              'Path-of-a-Free-Particle-sym
-             "This is yet another new type: an Expression. It is four times t. Now you start to finish the construction of the function describing the motion of a free particle."
+             "This is yet another new type: an Expression. It is four times t. Now you start to finish the construction of the function describing the motion of a free particle:
+\\(
+      \\begin{pmatrix}
+      2 + 5t \\\\
+      3 + 4t
+      \\end{pmatrix}
+\\)"
              'Path-of-a-Free-Particle-fn
              "You see some cyptic output. You'd better call the function."
              'Path-of-a-Free-Particle-num-vec
              "A vector of numbers. Calling the function with a symbol is certainly more interesting."
              'Path-of-a-Free-Particle-sym-vec
-             "leads to the time dependent vector we more traditionally associate with the motion of a particle with constant velocity. The most important fact comes up, when we inspect the parameter time of the function:"
+             "Finally, the time dependent vector! "
              }
             last-ifo)
           (when (= frm 'time)
             (let [c (map sc/classify result)]
               (if (> (count (into #{} c)) 1)
-                (str "The block changes its type during the course of the program. It is first a " (last (first c)) ", than a " (last (last c))". This result, that blocks change their type, is very general. If we move to the last step of this pendulum example")
+                (str "The block changes its type during the course of the program. It is first a " (last (first c)) ", than a " (last (last c))". This result, that blocks change their type, is very general.")
                 (if (= :cljtiles.sicm/nu (first (first c)))
-                  "we see that time is also a number, as we would expect from looking at the block just created. But here comes a crucial step: Not only can we call a function with a number, but we can call it with a symbol. For this, we create a new calling block with a symbol 't as the argument. You open the parser again..."
+                  [:<>
+                   ;;after 'Path-of-a-Free-Particle-num
+                   [:p "You see that time is also a number, as expected. Can it be something else as well?"]
+                   [:p "Remembering the hint button, you open the parser to press it twice."]]
+
                   (str "The block \"time\" is a " (last (first c)) ". But a block can have more than one type during the course of a program.")))))
           )))
 
