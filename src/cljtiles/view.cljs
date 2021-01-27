@@ -335,17 +335,16 @@
        (if (seq (:inspect @state))
          [:<>
           (map-indexed (fn [idx v]
-                         (println v)
                          ^{:key idx} [:<>
                                       [mixed-comp (sicm/kind? v)]
                                       [:hr]])
                        (:inspect @state))
           (when-let [msg-fn (:message-fn tut)]
-            [tex-comp (msg-fn ifo (:inspect @state))])]
+            [tex-comp (msg-fn ifo (:inspect @state) (:edn-code @state) goto-page!)])]
          (when (:sci-error @state)
            [:<>
             (if-let [error-msg-fn (:error-message-fn tut)]
-              [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut))]
+              [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut) (:edn-code @state))]
               [mixed-comp (str "Evaluation error for: " (last ifo))])
             [error-comp]]))])
     [:<>

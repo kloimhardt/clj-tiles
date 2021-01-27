@@ -3,7 +3,9 @@
 
 (def e-vect
   [{:description
-    "Running the workspace yields the equation for the driven pendulum."
+    [:<>
+     [:p "You came a long way to this final result. Maybe you skipped a view steps. Running this workspace yields the equation of motion for the driven pendulum."]
+     [:p "Inspecting the block \"(Hight-of-Pivot time)\" demonstrates another very general result: blocks change their type during the course of the program."]]
     :error-message-fn
     (fn [ifo error msg-fn]
       (str "An error occured. Maybe you can rearrange things so that " (last ifo) " is called before the error occurs."))
@@ -11,7 +13,7 @@
     (fn [ifo result]
       (get
         {'(Hight-of-Pivot time)
-         "We see that the hight of the pivot can be of type Differential as well as of type Expression. I think the most important type is still the number as it connects the theory to experiment. But this type seems to be the most elusive one, as we have all kinds of types in this final result, but no numbers."}
+         "Hight-of-Pivot can be of type Differential as well as of type Expression. You wander what Differential means in this context. And: you search for numbers, as those provide the all important connection to experiment. But they seem to be very elusive, as you find all kinds of types here, but no numbers. You hope to recover them in future examples."}
         (last ifo)))
     :scroll [0 -400]
     :blockpos [[0 0]

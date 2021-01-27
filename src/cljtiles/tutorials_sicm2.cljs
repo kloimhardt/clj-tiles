@@ -6,7 +6,6 @@
 (def e-vect
   [{:description
     [:div
-     [:div bold "Introduction"]
      [:p "This workspace is about modelling the motion of a free particle. You see lots of building blocks. Number 5 on the upper left catches your attention. Full of curiosity, you right click and inspect it (before even reading on)."]
      [:div bold "Description"]
      [:p "We start by creating a function Path-of-a-Free-Particle. Newtons first law states that in some inertial frame of reference, an object continues to move in space at a constant velocity. This movement takes time, so our function depends on time. It returns a vector of two elements because we choose our path to live in two dimensions."]
@@ -50,27 +49,27 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :error-message-fn
-    (fn [ifo error msg-fn]
-      (println "klmi " ifo)
-      (println "klme " error)
-      (def er error)
-      (def fo (last ifo))
+    (fn [ifo error msg-fn edn-code]
       (let [frm (last ifo)]
         (cond
+          (= "Var name should be simple symbol." (subs error 0 33))
+          "You cannot inspect this block."
           (and (= frm 'time)
-               (= (subs error 0 30) "Could not resolve symbol: time"))
+               (= (subs error 0 30) "Could not resolve symbol: time")
+               (empty? (filter #(= (and (coll? %) (nth % 2 nil)) ['time])
+                            edn-code))
+               )
           (msg-fn '(nil time-error) nil)
           (and (= (subs error 0 30) "Could not resolve symbol: time")
-               (or (= (str frm) "'t")
+               (or (#{"10" "'t"} (str frm))
                    (and (coll? frm)
                         (= (first frm) 'Path-of-a-Free-Particle))))
           (str "The error is because a \"time\" block is still unconnected. For now, move the block " frm " upwards so that it is called before the error occurs.")
           (= (subs error 0 35) "Could not resolve symbol: Path-of-a")
           (msg-fn '(nil particle-error) nil)
-          :else
-          (str "You did something unexpected. Hopefully the error message below helps. Maybe chances are that you can rearrange things so that " frm " is called before the error occurs."))))
+          )))
     :message-fn
-    (fn [ifo result]
+    (fn [ifo result edn-code goto-page!]
       (let [frm (last ifo)
             last-ifo (cond
                        (and (coll? frm) (= (first frm) 'Path-of-a-Free-Particle))
@@ -85,19 +84,19 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                        (and (coll? frm)
                             (= '(defn Path-of-a-Free-Particle [time])
                                (take 3 frm))
-                            (= 'up (first (nth frm 3 nil))))
+                            (= 'up (#(and (coll? %) (first %)) (nth frm 3 nil))))
                        'Path-of-a-Free-Particle-fn
                        :else frm)]
         (or
           (get
-            {(symbol :5) "You look at number 4."
-             (symbol :4) "You definitely want to multiply 5 and 4. "
+            {(symbol :5) "Number 5. Next you look at number 4."
+             (symbol :4) "You multiply 5 and 4. "
              (list '* (symbol :5) (symbol :4))
              "You wonder if \\((2 + 5 * 4)\\) works."
              (list '+ (symbol :2) (list '* (symbol :5) (symbol :4)))
-             "This was as expected. Now, the block called \"up\" is next."
+             "This was as expected. Next, the block called \"up\" seems interesting."
              '(up)
-             "Inspecting \"up\" gives an unknown type. This block by itself does not seem to mean very much. But noticing its two connections, you attach the formula just created.
+             "An unknown type. This block does not seem to mean very much. But noticing its two connections, you attach the formula just created.
 "
              (list 'up (list '+ (symbol :2) (list '* (symbol :5) (symbol :4))))
              "You read the type of the result: \"Column Vector\". But there are no columns. You connect the number 3."
@@ -110,43 +109,50 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              'particle-error
              "An error. It reads \"Cound not resolve symbol\". Now you notice the \"Path-of-a-Free-Particle\" block. You connect it and inspect the whole \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time])
-             "A cryptic output without any type at all. But you realize that you just crated a stub for a function definition. The name of the function is \"Path-of-a-Free-Particle\" and its parameter is \"time\". You add a block \\( (4 * time )\\) to the last connection of the \"defn\" block."
+             "A cryptic output without any type at all. But you realize that you just created a stub for a function definition. The name of the function is \"Path-of-a-Free-Particle\" and its argument is \"time\". You add a block \\( (4 * time )\\) to the last connection of the \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time]
                    (list '* (symbol :4) 'time))
              "A cryptic output without any type at all. This is expected, as you know that functions need to be called. You open the parser and create the call statement."
              'Path-of-a-Free-Particle-num
-             "You are pleased to finally get some number. Now, inspecting the \"time\" parameter of the function seems intersting."
+             "You are pleased to finally get some number. Inspecting \"time\", the argument of the function just called, seems intersting."
              't-symbol
              "A new type: a symbol. You notice the single quote, allowing t to stand by itself, more akin to a number."
-             'Path-of-a-Free-Particle-sym
-             "This is yet another new type: an Expression. It is four times t. Now you start to finish the construction of the function describing the motion of a free particle:
-\\(
-      \\begin{pmatrix}
-      2 + 5t \\\\
-      3 + 4t
-      \\end{pmatrix}
-\\)"
              'Path-of-a-Free-Particle-fn
              "You see some cyptic output. You'd better call the function."
              'Path-of-a-Free-Particle-num-vec
              "A vector of numbers. Calling the function with a symbol is certainly more interesting."
              'Path-of-a-Free-Particle-sym-vec
-             "Finally, the time dependent vector! "
+             "Finally, the time dependent vector! You inspect the argument \"time\" of the function again."
              }
             last-ifo)
           (when (= frm 'time)
             (let [c (map sc/classify result)]
               (if (> (count (into #{} c)) 1)
-                (str "The block changes its type during the course of the program. It is first a " (last (first c)) ", than a " (last (last c))". This result, that blocks change their type, is very general.")
+                [:<>
+                 [:p (str "The block changes type during the course of the program. It is first a " (last (first c)) ", than a " (last (last c))". You notice a button below.")]
+                 [:div [:button {:on-click (fn [] (goto-page! (dec 68)))} "Make a huge leap"]]]
                 (if (= :cljtiles.sicm/nu (first (first c)))
                   [:<>
                    ;;after 'Path-of-a-Free-Particle-num
-                   [:p "You see that time is also a number, as expected. Can it be something else as well?"]
-                   [:p "Remembering the hint button, you open the parser to press it twice."]]
+                   [:p "Time is also a number. But you suspect that it could be something else as well."]
+                   [:p "Remembering the hint button, you press it twice after opening the parser."]]
 
                   (str "The block \"time\" is a " (last (first c)) ". But a block can have more than one type during the course of a program.")))))
-          )))
-
+          (when (= last-ifo 'Path-of-a-Free-Particle-sym)
+            (if (= :cljtiles.sicm/literal-expression (first (sc/classify (first result))))
+              "This is yet another new type: an Expression. Now you start to finish the free particle motion:
+\\[ \\begin{pmatrix}
+      x(t) \\\\
+      y(t)
+    \\end{pmatrix}
+=
+    \\begin{pmatrix}
+      2 + 5t \\\\
+      3 + 4t
+    \\end{pmatrix}
+\\]"
+              "An expected result. Certainly the function called is not very complicated.")
+             ))))
     :scroll [0 0]
     :blockpos [[0 0] [100 0] [250 0]
                [400 0] [500 0]
