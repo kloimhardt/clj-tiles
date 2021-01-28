@@ -37,8 +37,8 @@
                         t-s/scroll
                         t-s/vect))
 
-(defn generate-xml [pages]
-  (map #(assoc % :xml-code (apply gb/rpg (:blockpos %) (:code %))) pages))
+(defn generate-xml [page]
+  (assoc page :xml-code (apply gb/rpg (:blockpos page) (:code page))))
 
 (def chaps (concat t-0/chaps
                    t-s2/chaps
@@ -51,9 +51,9 @@
                        t-s3/chapnames))
 
 (def tutorials (concat tutorials_clj
-                       (generate-xml t-s2/e-vect)
+                       (map generate-xml t-s2/e-vect)
                        tutorials_scm
-                       (generate-xml t-s3/e-vect)))
+                       (map generate-xml t-s3/e-vect)))
 
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
@@ -225,6 +225,24 @@
 
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
+
+
+
+
+(comment
+
+  (keys (nth tutorials 67))
+  ;; => (:description :error-message-fn :message-fn :scroll :blockpos :code :xml-code)
+  (:code  (nth tutorials 67))
+
+  (defn gen-xml [e]
+    (let [a (edn/read-string (str "[" e "]"))
+          b (first a)]
+      (if (and (map? b) (:code b))
+        (:xml-code (generate-xml b))
+        ))
+    )
+  )
 
 (defn modal-comp [_]
   (let [textarea-element (atom nil)

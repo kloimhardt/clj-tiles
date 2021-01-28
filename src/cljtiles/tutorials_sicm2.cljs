@@ -95,7 +95,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              (list '* (symbol :5) (symbol :4))
              "You wonder if \\((2 + 5 * 4)\\) works."
              (list '+ (symbol :2) (list '* (symbol :5) (symbol :4)))
-             "Indeed it does. Next, the block called \"up\" seems interesting."
+             "Indeed 22. Next, the block called \"up\" looks interesting."
              '(up)
              "An unknown type. This block does not seem to mean very much. But noticing its two connections, you attach the formula just created.
 "
