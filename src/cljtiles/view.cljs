@@ -226,32 +226,21 @@
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
 
-
-
-
-(comment
-
-  (keys (nth tutorials 67))
-  ;; => (:description :error-message-fn :message-fn :scroll :blockpos :code :xml-code)
-  (:code  (nth tutorials 67))
-
-  (defn gen-xml [e]
-    (let [a (edn/read-string (str "[" e "]"))
-          b (first a)]
-      (if (and (map? b) (:code b))
-        (:xml-code (generate-xml b))
-        ))
-    )
-  )
-
 (defn modal-comp [_]
   (let [textarea-element (atom nil)
+        parse
+        (fn [e]
+          (let [a (edn/read-string (str "[" e "]"))
+                b (first a)]
+            (if (and (map? b) (:code b))
+              (:xml-code (generate-xml b))
+              (map #(gb/rpg [] %) a))))
         run-parser
-        (fn  []
-          (let [a (edn/read-string (str "[" (.-value @textarea-element) "]"))]
-            (if (list? (first a))
-              (run! (fn [c] (append-to-workspace (gb/rpg [] c))) a)
-              (load-workspace (apply gb/rpg a)))))
+        (fn []
+          (let [xml (parse (.-value @textarea-element))]
+            (if (seq? xml)
+              (run! (fn [c] (append-to-workspace c)) xml)
+              (load-workspace xml))))
         close-modal
         (fn []
           (set! (.-value @textarea-element) "")
