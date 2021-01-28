@@ -75,8 +75,12 @@
 
 (defn reset-state [tutorial-no]
   (reset! state
-          {:desc (:description (nth tutorials tutorial-no)) :stdout [] :inspect [] :sci-error nil :result nil
-           :code nil :edn-code nil
+          {:desc (:description (nth tutorials tutorial-no)) :stdout [] :inspect [] :sci-error nil
+           :result nil
+           :result-brk nil
+           :code nil
+           :edn-code nil
+           :edn-code-orig nil
            :tutorial-no tutorial-no :reagent-error nil
            :modal-style-display "none"
            :run-button true}))
@@ -180,13 +184,16 @@
         cbr (code->break-str str-width aug-edn-code)
         _ (reset-state (:tutorial-no @state))
         erg (try (sci/eval-string cbr {:bindings bindings2})
-                 (catch js/Error e (swap! state assoc :sci-error (my-str-brk (.-message e) str-width)) nil))]
+                 (catch js/Error e (swap! state assoc :sci-error (my-str-brk (.-message e) str-width)) nil))
+        result (cond (some? erg) (my-str erg)
+                     (= "nil" (str (last edn-code))) "nil"
+                     :else "")]
     (swap! state assoc
-           :result (cond (some? erg) (my-str erg)
-                         (= "nil" (str (last edn-code))) "nil"
-                         :else "")
+           :result result
+           :result-brk (my-str-brk result str-width)
            :code (if error "Cannot even parse the blocks" cbr)
-           :edn-code aug-edn-code)))
+           :edn-code aug-edn-code
+           :edn-code-orig edn-code)))
 
 (defn insert-inspect [edn-code inspect-form]
     (if inspect-form
@@ -216,7 +223,7 @@
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
 
-(defn modal-comp []
+(defn modal-comp [_]
   (let [textarea-element (atom nil)
         run-parser
         (fn  []
@@ -228,9 +235,9 @@
         (fn []
           (set! (.-value @textarea-element) "")
           (swap! state assoc :modal-style-display "none"))]
-    (fn []
+    (fn [{:keys [tutorial-no modal-style-display]}]
       [:div {:id "myModal", :class "modal"
-             :style {:display (:modal-style-display @state)}}
+             :style {:display modal-style-display}}
        [:div {:class "modal-content"}
         [:div
          [:textarea {:cols 80 :rows 10
@@ -238,7 +245,7 @@
         [:button {:on-click #(do (run-parser) (close-modal))}
          "Insert"]
         " "
-        (when-let [h (:hint (nth tutorials (:tutorial-no @state)))]
+        (when-let [h (:hint (nth tutorials tutorial-no @state))]
           (let [i (atom 0)]
             [:button {:on-click (fn []
                                   (set! (.-value @textarea-element)
@@ -306,8 +313,8 @@
     (when (= (symbol ":div") (first last-vec))
       last-vec)))
 
-(defn reagent-comp [last-vec]
-  (transform-vec last-vec (:edn-code @state)))
+(defn reagent-comp [last-vec edn-code]
+  (transform-vec last-vec edn-code))
 
 (defn tex-comp [txt]
   [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
@@ -320,50 +327,51 @@
     [tex-comp txt]
     [:pre txt]))
 
-(defn error-comp []
+(defn error-comp [{:keys [sci-error code]}]
   (let [flex50 {:style {:flex "50%"}}]
     [:div {:style {:display "flex"}}
      [:div flex50
       [:h3 "Error"]
-      [:pre (:sci-error @state)]]
+      [:pre sci-error]]
      [:div flex50
       [:h3 "Code"]
-      [:pre (:code @state)]]]))
+      [:pre code]]]))
 
-(defn result-comp []
-  (if-let [ifo (ca/inspect-form (:edn-code @state) workspace!/inspect-fn-sym)]
-    (let [tut (nth tutorials (:tutorial-no @state))]
+(defn result-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
+                           result desc] :as the-state}]
+  (if-let [ifo (ca/inspect-form edn-code workspace!/inspect-fn-sym)]
+    (let [tut (nth tutorials tutorial-no)]
       [:<>
        (cond
-         (seq (:inspect @state))
+         (seq inspect)
          [:<>
           (map-indexed (fn [idx v]
                          ^{:key idx} [:<>
                                       [mixed-comp (sicm/kind? v)]
                                       [:hr]])
-                       (:inspect @state))
+                       inspect)
           (when-let [msg-fn (:message-fn tut)]
-            [tex-comp (msg-fn ifo (:inspect @state) (:edn-code @state) goto-page!)])]
-         (:sci-error @state)
+            [tex-comp (msg-fn ifo inspect edn-code goto-page!)])]
+         sci-error
          [:<>
           (if-let [error-msg-fn (:error-message-fn tut)]
-            [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut) (:edn-code @state))]
+            [:p (error-msg-fn ifo sci-error (:message-fn tut) edn-code)]
             [mixed-comp (str "Evaluation error for: " (last ifo))])
-          [error-comp]]
+          [error-comp the-state]]
          (= (last ifo) :start-interactive)
-         [tex-comp ((:message-fn tut) ifo (:inspect @state) (:edn-code @state) goto-page!)]
+         [tex-comp ((:message-fn tut) ifo inspect edn-code goto-page!)]
          )])
     [:<>
      (map-indexed (fn [idx v]
                     ^{:key idx} [mixed-comp v])
-                  (:stdout @state))
-     (when (:sci-error @state)
-       [error-comp])
+                  stdout)
+     (when sci-error
+       [error-comp the-state])
      (if-let [last-vec (is-last-div)]
-       [reagent-comp last-vec]
-       [:pre (:result @state)])
+       [reagent-comp last-vec edn-code]
+       [:pre result])
      [:div {:style {:column-count 2}}
-      [tex-comp (:desc @state)]]]))
+      [tex-comp desc]]]))
 
 (defn error-boundary [comp]
   (rc/create-class
@@ -378,10 +386,10 @@
 
 (defn theview []
   [:div
-   [modal-comp]
+   [modal-comp @state]
    [tutorials-comp]
    [error-boundary
-    [result-comp]]])
+    [result-comp @state]]])
 
 (defn ^{:dev/after-load true} render []
   ;;((tutorial-fu identity))
