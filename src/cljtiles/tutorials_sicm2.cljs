@@ -6,7 +6,6 @@
 (def e-vect
   [{:description
     [:div
-     [:p "This workspace is about modelling the motion of a free particle. You see lots of building blocks. Number 5 on the upper left catches your attention. Full of curiosity, you right click and inspect it (before even reading on)."]
      [:div bold "Description"]
      [:p "We start by creating a function Path-of-a-Free-Particle. Newtons first law states that in some inertial frame of reference, an object continues to move in space at a constant velocity. This movement takes time, so our function depends on time. It returns a vector of two elements because we choose our path to live in two dimensions."]
 
@@ -89,12 +88,14 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                        :else frm)]
         (or
           (get
-            {(symbol :5) "Number 5. Next you look at number 4."
+            {:start-interactive
+             [:p "This workspace is about modelling the motion of a free particle. You see lots of building blocks. Number 5 on the upper left catches your attention. Full of curiosity, you right click and inspect it."]
+             (symbol :5) "Number 5. Next you look at number 4."
              (symbol :4) "You multiply 5 and 4. "
              (list '* (symbol :5) (symbol :4))
              "You wonder if \\((2 + 5 * 4)\\) works."
              (list '+ (symbol :2) (list '* (symbol :5) (symbol :4)))
-             "This was as expected. Next, the block called \"up\" seems interesting."
+             "Indeed it does. Next, the block called \"up\" seems interesting."
              '(up)
              "An unknown type. This block does not seem to mean very much. But noticing its two connections, you attach the formula just created.
 "
@@ -116,7 +117,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              'Path-of-a-Free-Particle-num
              "You are pleased to finally get some number. Inspecting \"time\", the argument of the function just called, seems intersting."
              't-symbol
-             "A new type: a symbol. You notice the single quote, allowing t to stand by itself, more akin to a number."
+             "A new type: a Symbol. You notice the single quote, allowing t to stand by itself, more akin to a number."
              'Path-of-a-Free-Particle-fn
              "You see some cyptic output. You'd better call the function."
              'Path-of-a-Free-Particle-num-vec

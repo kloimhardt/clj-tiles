@@ -332,7 +332,8 @@
   (if-let [ifo (ca/inspect-form (:edn-code @state) workspace!/inspect-fn-sym)]
     (let [tut (nth tutorials (:tutorial-no @state))]
       [:<>
-       (if (seq (:inspect @state))
+       (cond
+         (seq (:inspect @state))
          [:<>
           (map-indexed (fn [idx v]
                          ^{:key idx} [:<>
@@ -341,12 +342,15 @@
                        (:inspect @state))
           (when-let [msg-fn (:message-fn tut)]
             [tex-comp (msg-fn ifo (:inspect @state) (:edn-code @state) goto-page!)])]
-         (when (:sci-error @state)
-           [:<>
-            (if-let [error-msg-fn (:error-message-fn tut)]
-              [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut) (:edn-code @state))]
-              [mixed-comp (str "Evaluation error for: " (last ifo))])
-            [error-comp]]))])
+         (:sci-error @state)
+         [:<>
+          (if-let [error-msg-fn (:error-message-fn tut)]
+            [:p (error-msg-fn ifo (:sci-error @state) (:message-fn tut) (:edn-code @state))]
+            [mixed-comp (str "Evaluation error for: " (last ifo))])
+          [error-comp]]
+         (= (last ifo) :start-interactive)
+         [tex-comp ((:message-fn tut) ifo (:inspect @state) (:edn-code @state) goto-page!)]
+         )])
     [:<>
      (map-indexed (fn [idx v]
                     ^{:key idx} [mixed-comp v])
@@ -383,11 +387,16 @@
 
 (defn ^{:export true} output []
   (workspace!/init startsci open-modal)
-  (some-> (not-empty (.. js/window -location -search))
-          js/URLSearchParams.
-          (.get "page")
+  ((tutorial-fu identity))
+  (when-let [p (some-> (not-empty (.. js/window -location -search))
+                       js/URLSearchParams.
+                       (.get "page"))]
+    (if (= p "freeparticle")
+      (do
+        (goto-page! (dec 51))
+        (swap! state assoc :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
+      (-> p
           js/parseInt
           dec
-          goto-page!)
-  ((tutorial-fu identity))
+          goto-page!)))
   (render))
