@@ -78,7 +78,8 @@
           {:desc (:description (nth tutorials tutorial-no)) :stdout [] :inspect [] :sci-error nil :result nil
            :code nil :edn-code nil
            :tutorial-no tutorial-no :reagent-error nil
-           :modal-style-display "none"}))
+           :modal-style-display "none"
+           :run-button true}))
 
 (defonce app-state (rc/atom nil))
 
@@ -265,7 +266,8 @@
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
-    [:button {:on-click #(startsci nil)} "Run"]]])
+    (when (:run-button @state)
+      [:button {:on-click #(startsci nil)} "Run"])]])
 
 (defn filter-defns [edn-code fu]
   (conj
@@ -394,6 +396,7 @@
     (if (= p "freeparticle")
       (do
         (goto-page! (dec 51))
+        (swap! state assoc :run-button false)
         (swap! state assoc :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
       (-> p
           js/parseInt
