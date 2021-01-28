@@ -74,16 +74,19 @@
 (defonce state (rc/atom nil))
 
 (defn reset-state [tutorial-no]
-  (reset! state
-          {:desc (:description (nth tutorials tutorial-no)) :stdout [] :inspect [] :sci-error nil
+  (swap! state merge
+          {:stdout [] :inspect [] :sci-error nil
            :result nil
            :result-brk nil
            :code nil
            :edn-code nil
            :edn-code-orig nil
-           :tutorial-no tutorial-no :reagent-error nil
+           :reagent-error nil
            :modal-style-display "none"
-           :run-button true}))
+           :run-button true})
+  (when tutorial-no
+    (swap! state assoc :tutorial-no tutorial-no)
+    (swap! state assoc :desc (:description (nth tutorials tutorial-no)))))
 
 (defonce app-state (rc/atom nil))
 
@@ -182,7 +185,7 @@
         tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
         bindings2 (bindings new-println tex-print tex-inspect)
         cbr (code->break-str str-width aug-edn-code)
-        _ (reset-state (:tutorial-no @state))
+        _ (reset-state nil)
         erg (try (sci/eval-string cbr {:bindings bindings2})
                  (catch js/Error e (swap! state assoc :sci-error (my-str-brk (.-message e) str-width)) nil))
         result (cond (some? erg) (my-str erg)
@@ -255,10 +258,10 @@
         [:button {:style {:float "right"} :on-click close-modal}
          "Cancel"]]])))
 
-(defn tutorials-comp []
+(defn tutorials-comp [{:keys [run-button tutorial-no]}]
   [:div
    [:span
-    [:select {:value (page->chapter (:tutorial-no @state))
+    [:select {:value (page->chapter tutorial-no)
               :on-change (fn [el]
                            (let [chap (gstring/toNumber
                                        (.. el -target -value))
@@ -269,11 +272,11 @@
     [:button {:on-click (tutorial-fu dec)} "<"]
     " "
     [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
-             :value (str (inc (:tutorial-no @state)) "/" (count tutorials))}]
+             :value (str (inc tutorial-no) "/" (count tutorials))}]
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
-    (when (:run-button @state)
+    (when run-button
       [:button {:on-click #(startsci nil)} "Run"])]])
 
 (defn filter-defns [edn-code fu]
@@ -307,9 +310,9 @@
   (w/postwalk #(to-kw edn-code %)
               vect))
 
-(defn is-last-div []
+(defn is-last-div [edn-code]
   (let [v? #(when (vector? %) %)
-        last-vec (v? (last (:edn-code @state)))]
+        last-vec (v? (last edn-code))]
     (when (= (symbol ":div") (first last-vec))
       last-vec)))
 
@@ -367,7 +370,7 @@
                   stdout)
      (when sci-error
        [error-comp the-state])
-     (if-let [last-vec (is-last-div)]
+     (if-let [last-vec (is-last-div edn-code)]
        [reagent-comp last-vec edn-code]
        [:pre result])
      [:div {:style {:column-count 2}}
@@ -379,25 +382,26 @@
      :get-derived-state-from-error (fn [e]
                                      (swap! state assoc :reagent-error e)
                                      #js {})
-     :reagent-render (fn [comp]
-                       (if (:reagent-error @state)
+     :reagent-render (fn [comp reagent-error]
+                       (if reagent-error
                          [:pre "Something went wrong."]
                          comp))}))
 
 (defn theview []
   [:div
    [modal-comp @state]
-   [tutorials-comp]
+   [tutorials-comp @state]
    [error-boundary
-    [result-comp @state]]])
+    [result-comp @state]
+    (:reagent-error @state)]])
 
 (defn ^{:dev/after-load true} render []
-  ;;((tutorial-fu identity))
+  ;;((tutorial-fu identity)) ;;load currenet workspace new
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
   (workspace!/init startsci open-modal)
-  ((tutorial-fu identity))
+  (goto-page! (dec 1))
   (when-let [p (some-> (not-empty (.. js/window -location -search))
                        js/URLSearchParams.
                        (.get "page"))]
