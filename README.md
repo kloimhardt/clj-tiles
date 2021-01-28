@@ -1,6 +1,6 @@
 # Clj-Tiles
 
-Follow up to the [Werkbank](https://github.com/kloimhardt/werkbank) repository. Works fully [on-line](https://github.com/kloimhardt/clj-tiles) (only old version is live). Also has two way parsing Clojure->XML->Clojure. The typical fly-out toolbar of Blockly is removed, the Blocks are programmed directly in Clojure.
+Follow up to the [Werkbank](https://github.com/kloimhardt/werkbank) repository. Works fully [on-line](https://kloimhardt.github.io/cljtiles.html?page=freeparticle). Also has two way parsing Clojure->XML->Clojure. The typical fly-out toolbar of Blockly is removed, the Blocks are programmed directly in Clojure.
 
 For development install Clojure/Java and do:
  ```
@@ -16,7 +16,7 @@ For development install Clojure/Java and do:
  shadow-cljs watch cljtiles
  ```
 
-Go to http://localhost:8080/cljtiles.html in your browser.
+Go to https://kloimhardt.github.io/cljtiles.html?page=freeparticle in your browser (Safari does not work).
 
 Try out some tutorials. You can inspect the blocks by right clicking on them. You will see the type of the according data in the running program.
 

@@ -10,6 +10,7 @@
  {:cljtiles {:target :browser
              :output-dir "public/target"
              :asset-path "/target"
+             :compiler-options {:optimizations :simple}
              :modules {:main {:entries [cljtiles.view]}}}}}
 
 ;; npm init -y
