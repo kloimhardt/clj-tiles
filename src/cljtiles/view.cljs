@@ -245,7 +245,7 @@
         [:button {:on-click #(do (run-parser) (close-modal))}
          "Insert"]
         " "
-        (when-let [h (:hint (nth tutorials tutorial-no @state))]
+        (when-let [h (:hint (nth tutorials tutorial-no))]
           (let [i (atom 0)]
             [:button {:on-click (fn []
                                   (set! (.-value @textarea-element)
