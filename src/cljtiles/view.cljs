@@ -340,8 +340,20 @@
       [:h3 "Code"]
       [:pre code]]]))
 
-(defn result-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
-                           result desc] :as the-state}]
+(defn result-comp [{:keys [result result-brk edn-code edn-code-orig code]}]
+  (if (= edn-code edn-code-orig)
+    [:pre result]
+    (let [flex50 {:style {:flex "50%"}}]
+      [:div {:style {:display "flex"}}
+       [:div flex50
+        [:h3 "Result"]
+        [:pre result-brk]]
+       [:div flex50
+        [:h3 "Code"]
+        [:pre code]]])))
+
+(defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
+                           desc] :as the-state}]
   (if-let [ifo (ca/inspect-form edn-code workspace!/inspect-fn-sym)]
     (let [tut (nth tutorials tutorial-no)]
       [:<>
@@ -372,7 +384,7 @@
        [error-comp the-state])
      (if-let [last-vec (is-last-div edn-code)]
        [reagent-comp last-vec edn-code]
-       [:pre result])
+       [result-comp the-state])
      [:div {:style {:column-count 2}}
       [tex-comp desc]]]))
 
@@ -392,7 +404,7 @@
    [modal-comp @state]
    [tutorials-comp @state]
    [error-boundary
-    [result-comp @state]
+    [output-comp @state]
     (:reagent-error @state)]])
 
 (defn ^{:dev/after-load true} render []
