@@ -2,15 +2,13 @@
   (:require [cljtiles.sicm :as sc]))
 
 (def e-vect
-  [{:description
+  [{:lable :pendulum-final
+    :description
     [:<>
      [:p "You came a long way to this final result. Maybe you skipped a view steps. Running this workspace yields the equation of motion for the driven pendulum."]
      [:p "Inspecting the block \"(Hight-of-Pivot time)\" demonstrates another very general result: blocks change their type during the course of the program."]]
-    :error-message-fn
-    (fn [ifo error msg-fn]
-      (str "An error occured. Maybe you can rearrange things so that " (last ifo) " is called before the error occurs."))
     :message-fn
-    (fn [ifo result]
+    (fn [_ ifo _]
       (get
         {'(Hight-of-Pivot time)
          "Hight-of-Pivot can be of type Differential as well as of type Expression. You wander what Differential means in this context. And: you search for numbers, as those connect the thory to experiment. But they seem to be quite elusive here. Nevertheless, you hope to recover more numbers in future quests."}

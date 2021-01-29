@@ -332,7 +332,8 @@
              {:xml-code xml-code})
            vect)
       vec
-      (assoc-in  [13 :error-message-fn]
+      (assoc-in [13 :lable] :defn)
+      (assoc-in [13 :error-message-fn]
                  (fn [{:keys [sci-error]} ifo msg-fn]
                    (let [frm (last ifo)]
                      (cond
@@ -341,7 +342,7 @@
                        (= (subs sci-error 0 30) "Could not resolve symbol: what")
                        "You need to connect the \"what\" block."
                        ))))
-      (assoc-in  [13 :message-fn]
+      (assoc-in [13 :message-fn]
                  (fn [{:keys [result inspect stdout]} ifo goto-page!]
                    (do
                      (def result result)
@@ -351,7 +352,7 @@
                          frmcoll (when (coll? frm) frm)]
                      (cond
                        (= 'defn (first frmcoll))
-                       "This is a \"defn\" block, it defines a function. Its return value is the name of the function in a somewhat crypric from. You suspect that a function needs to be called to reveal its purpose."
+                       "This is a \"defn\" block, it defines a function. The return value of this block is the name of the function in a somewhat crypric from. You suspect that a function needs to be called to reveal its purpose."
                        (and (> (count inspect) 0)
                             (nil? (first inspect))
                             (first stdout))

@@ -73,9 +73,8 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
           (msg-fn the-state '(nil particle-error) nil)
           )))
     :message-fn
-    (fn [{:keys [result]} ifo goto-page!]
+    (fn [{:keys [inspect]} ifo goto-labled-page!]
       (do
-        (def result result)
         (def ifo1 ifo))
       (let [frm (last ifo)
             last-ifo (cond
@@ -85,7 +84,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                          [false true] 'Path-of-a-Free-Particle-num-vec
                          [false false] 'Path-of-a-Free-Particle-num}
                         [(js/isNaN (js/parseInt (last frm)))
-                         (= ::sc/up (first (sc/classify (first result))))])
+                         (= ::sc/up (first (sc/classify (first inspect))))])
                        (= (str frm) "'t")
                        't-symbol
                        (and (coll? frm)
@@ -135,11 +134,11 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              }
             last-ifo)
           (when (= frm 'time)
-            (let [c (map sc/classify result)]
+            (let [c (map sc/classify inspect)]
               (if (> (count (into #{} c)) 1)
                 [:<>
                  [:p (str "The block changes type during the course of the program. It is first a " (last (first c)) ", than a " (last (last c))". You notice a button below.")]
-                 [:div [:button {:on-click (fn [] (goto-page! (dec 68)))} "Make a huge leap"]]]
+                 [:div [:button {:on-click (fn [] (goto-labled-page! :pendulum-final))} "Make a huge leap"]]]
                 (if (= :cljtiles.sicm/nu (first (first c)))
                   [:<>
                    ;;after 'Path-of-a-Free-Particle-num
@@ -148,7 +147,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
 
                   (str "The block \"time\" is a " (last (first c)) ". But a block can have more than one type during the course of a program.")))))
           (when (= last-ifo 'Path-of-a-Free-Particle-sym)
-            (if (= :cljtiles.sicm/literal-expression (first (sc/classify (first result))))
+            (if (= :cljtiles.sicm/literal-expression (first (sc/classify (first inspect))))
               "This is yet another new type: an Expression. Now you start to finish the free particle motion:
 \\[ \\begin{pmatrix}
       x(t) \\\\

@@ -87,7 +87,12 @@
   (apply set-scrollbar (:scroll (nth tutorials page-no)))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset-state page-no)
-  (reset! app-state 0))
+  (reset! app-state 0)
+  page-no)
+
+(defn goto-lable-page! [lable]
+  (let [cnt (count (take-while false? (map #(= lable (:lable %)) tutorials)))]
+    (when (< cnt (count tutorials)) (goto-page! cnt))))
 
 (defn tutorial-fu [inc-or-dec]
   (fn []
@@ -361,14 +366,14 @@
                                       [:hr]])
                        inspect)
           (when-let [msg-fn (:message-fn tut)]
-            [tex-comp (msg-fn the-state ifo goto-page!)])]
+            [tex-comp (msg-fn the-state ifo goto-lable-page!)])]
          sci-error
          [:<>
           (when-let [error-msg-fn (:error-message-fn tut)]
             [:p (error-msg-fn the-state ifo (:message-fn tut))])
           [error-comp the-state]]
          (= (last ifo) :start-interactive)
-         [tex-comp ((:message-fn tut) ifo inspect edn-code goto-page!)]
+         [tex-comp ((:message-fn tut) the-state ifo goto-lable-page!)]
          )])
     [:<>
      (map-indexed (fn [idx v]
