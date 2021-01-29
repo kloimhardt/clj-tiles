@@ -360,7 +360,7 @@
                         [:p "The result is of type Nothing, which obviously means that there is no result. But by pressing the \"run\" button, you see that there is an output to the console: "]
                         (map-indexed (fn [idx val] ^{:key idx}[:pre val])
                                      stdout)
-                        [:p "You remember from previous investigations that this is typical for the println function: it does not return a result but writes to the console. You use the arrow-button > to investigate the next two workspaces in order to refresh your knowledge about defining and calling functions."]]
+                        [:p "You remember from previous experience that this is typical for the println function: it does not return a result but writes to the console. You use the arrow-button > to work through the next two workspaces in order to refresh your knowledge about defining and calling functions."]]
                        ))))
       )
   )

@@ -54,7 +54,8 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
         (def ifo0 ifo)
         (def frm (last ifo))
         (def edn-code edn-code))
-      (let [frm (last ifo)]
+      (let [frm (last ifo)
+            frmcoll (when (coll? frm) frm)]
         (cond
           (= "Var name should be simple symbol." (subs sci-error 0 33))
           "You cannot inspect this block."
@@ -71,12 +72,15 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
           (str "The error is because a \"time\" block is still unconnected. For now, move the block " frm " upwards so that it is called before the error occurs.")
           (= (subs sci-error 0 35) "Could not resolve symbol: Path-of-a")
           (msg-fn the-state '(nil particle-error) nil)
+          (and (= 'defn (first frmcoll)) (= "Parameter declaration missing" (subs sci-error 0 29)))
+          "The \"defn\" block has three connections, but only one is actually connected. You notice the \"Path-of-a-Free-Particle\" block. You connect it and inspect the whole \"defn\" block."
           )))
     :message-fn
-    (fn [{:keys [inspect]} ifo goto-labled-page!]
+    (fn [{:keys [inspect]} ifo goto-lable-page!]
       (do
         (def ifo1 ifo))
       (let [frm (last ifo)
+            frmcoll (when (coll? frm) frm)
             last-ifo (cond
                        (and (coll? frm) (= (first frm) 'Path-of-a-Free-Particle))
                        ({[true true] 'Path-of-a-Free-Particle-sym-vec
@@ -117,7 +121,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              'particle-error
              "An error. It reads \"Cound not resolve symbol\". Now you notice the \"Path-of-a-Free-Particle\" block. You connect it and inspect the whole \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time])
-             "A cryptic output without any type at all. But you realize that you just created a stub for a function definition. The name of the function is \"Path-of-a-Free-Particle\" and its argument is \"time\". You add a block \\( (4 * time )\\) to the last connection of the \"defn\" block."
+             "A cryptic output without any type at all. But you realize from prior experience that you just created a stub for a function definition. The name of the function is \"Path-of-a-Free-Particle\" and its argument is \"time\". You add a block \\( (4 * time )\\) to the last connection of the \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time]
                    (list '* (symbol :4) 'time))
              "A cryptic output without any type at all. This is expected, as you know that functions need to be called. You open the parser and create the call statement."
@@ -138,7 +142,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
               (if (> (count (into #{} c)) 1)
                 [:<>
                  [:p (str "The block changes type during the course of the program. It is first a " (last (first c)) ", than a " (last (last c))". You notice a button below.")]
-                 [:div [:button {:on-click (fn [] (goto-labled-page! :pendulum-final))} "Make a huge leap"]]]
+                 [:div [:button {:on-click (fn [] (goto-lable-page! :pendulum-final))} "Make a huge leap"]]]
                 (if (= :cljtiles.sicm/nu (first (first c)))
                   [:<>
                    ;;after 'Path-of-a-Free-Particle-num
@@ -159,8 +163,17 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
       3 + 4t
     \\end{pmatrix}
 \\]"
-              "An expected result. Certainly the function called is not very complicated.")
-             ))))
+              "An expected result. Certainly the function called is not very complicated."))
+          (when (= (take 3 frmcoll) '(defn time [Path-of-a-Free-Particle]))
+            [:<>
+             [:p "This does not thorw an error. However, your gut feeling tells you that something is not right. You think of going back to your former exercises about defining functions, albeit you know that you are going to lose your work. Or maybe just permute things?"]
+             [:button {:on-click #(goto-lable-page! :defn)} "defining functions"]]
+
+            )
+
+
+
+          )))
     :scroll [0 0]
     :blockpos [[0 0] [100 0] [250 0]
                [400 0] [500 0]
