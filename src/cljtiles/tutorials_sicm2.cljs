@@ -51,7 +51,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     (fn [{:keys [sci-error edn-code] :as the-state} ifo msg-fn]
       (do
         (def sci-error sci-error)
-        (def ifo ifo)
+        (def ifo0 ifo)
         (def frm (last ifo))
         (def edn-code edn-code))
       (let [frm (last ifo)]
@@ -74,6 +74,9 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
           )))
     :message-fn
     (fn [{:keys [result]} ifo goto-page!]
+      (do
+        (def result result)
+        (def ifo1 ifo))
       (let [frm (last ifo)
             last-ifo (cond
                        (and (coll? frm) (= (first frm) 'Path-of-a-Free-Particle))

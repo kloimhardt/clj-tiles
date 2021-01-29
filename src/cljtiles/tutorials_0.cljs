@@ -333,15 +333,33 @@
            vect)
       vec
       (assoc-in  [13 :error-message-fn]
-                 (fn [ifo error msg-fn edn-code]
+                 (fn [{:keys [sci-error]} ifo msg-fn]
                    (let [frm (last ifo)]
                      (cond
-                       (= "Var name should be simple symbol." (subs error 0 33))
+                       (= "Var name should be simple symbol." (subs sci-error 0 33))
                        "You cannot inspect this block."
-                       (= (subs error 0 30) "Could not resolve symbol: what")
+                       (= (subs sci-error 0 30) "Could not resolve symbol: what")
                        "You need to connect the \"what\" block."
                        ))))
       (assoc-in  [13 :message-fn]
-                 (fn [] "hii"))
+                 (fn [{:keys [result inspect stdout]} ifo goto-page!]
+                   (do
+                     (def result result)
+                     (def ifo1 ifo)
+                     (def inspect inspect))
+                   (let [frm (last ifo)
+                         frmcoll (when (coll? frm) frm)]
+                     (cond
+                       (= 'defn (first frmcoll))
+                       "This is a \"defn\" block, it defines a function. Its return value is the name of the function in a somewhat crypric from. You suspect that a function needs to be called to reveal its purpose."
+                       (and (> (count inspect) 0)
+                            (nil? (first inspect))
+                            (first stdout))
+                       [:<>
+                        [:p "The result is of type Nothing, which obviously means that there is no result. But by pressing the \"run\" button, you see that there is an output to the console: "]
+                        (map-indexed (fn [idx val] ^{:key idx}[:pre val])
+                                     stdout)
+                        [:p "You remember from previous investigations that this is typical for the println function: it does not return a result but writes to the console. You use the arrow-button > to investigate the next two workspaces in order to refresh your knowledge about defining and calling functions."]]
+                       ))))
       )
   )

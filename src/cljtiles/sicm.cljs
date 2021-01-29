@@ -4,6 +4,7 @@
             [sicmutils.value :as vl]
             [sicmutils.numsymb :as ny]
             [sicmutils.generic :as gn]
+            [sicmutils.ratio :as rt]
             [sicmutils.structure :as st]
             [sicmutils.simplify :as sp] ;;necessary to load simplify multifunction
             [sicmutils.function :as fu] ;;necessary for ((gn/* 5 (fn[x] x)) 4)
@@ -21,7 +22,7 @@
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
 
-(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean"])
+(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio"])
 
 (defn classify [e]
   (first (filter #(s/valid? (first %) e) (partition 2 sps))))
@@ -81,6 +82,7 @@
                'kind? kind?
                'tex tex})
 
+(s/def ::ratio rt/ratio?)
 (s/def ::clojure-vector vector?)
 (s/def ::boolean boolean?)
 (s/def ::sci-var #(instance? sci.impl.vars/SciVar %))
