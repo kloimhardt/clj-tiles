@@ -48,27 +48,32 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :error-message-fn
-    (fn [ifo error msg-fn edn-code]
+    (fn [{:keys [sci-error edn-code] :as the-state} ifo msg-fn]
+      (do
+        (def sci-error sci-error)
+        (def ifo ifo)
+        (def frm (last ifo))
+        (def edn-code edn-code))
       (let [frm (last ifo)]
         (cond
-          (= "Var name should be simple symbol." (subs error 0 33))
+          (= "Var name should be simple symbol." (subs sci-error 0 33))
           "You cannot inspect this block."
           (and (= frm 'time)
-               (= (subs error 0 30) "Could not resolve symbol: time")
+               (= (subs sci-error 0 30) "Could not resolve symbol: time")
                (empty? (filter #(= (and (coll? %) (nth % 2 nil)) ['time])
                             edn-code))
                )
-          (msg-fn '(nil time-error) nil)
-          (and (= (subs error 0 30) "Could not resolve symbol: time")
+          (msg-fn the-state '(nil time-error) nil)
+          (and (= (subs sci-error 0 30) "Could not resolve symbol: time")
                (or (#{"10" "'t"} (str frm))
                    (and (coll? frm)
                         (= (first frm) 'Path-of-a-Free-Particle))))
           (str "The error is because a \"time\" block is still unconnected. For now, move the block " frm " upwards so that it is called before the error occurs.")
-          (= (subs error 0 35) "Could not resolve symbol: Path-of-a")
-          (msg-fn '(nil particle-error) nil)
+          (= (subs sci-error 0 35) "Could not resolve symbol: Path-of-a")
+          (msg-fn the-state '(nil particle-error) nil)
           )))
     :message-fn
-    (fn [ifo result edn-code goto-page!]
+    (fn [{:keys [result]} ifo goto-page!]
       (let [frm (last ifo)
             last-ifo (cond
                        (and (coll? frm) (= (first frm) 'Path-of-a-Free-Particle))

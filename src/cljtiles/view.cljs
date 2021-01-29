@@ -361,11 +361,11 @@
                                       [:hr]])
                        inspect)
           (when-let [msg-fn (:message-fn tut)]
-            [tex-comp (msg-fn ifo inspect edn-code goto-page!)])]
+            [tex-comp (msg-fn the-state ifo goto-page!)])]
          sci-error
          [:<>
           (when-let [error-msg-fn (:error-message-fn tut)]
-            [:p (error-msg-fn ifo sci-error (:message-fn tut) edn-code)])
+            [:p (error-msg-fn the-state ifo (:message-fn tut))])
           [error-comp the-state]]
          (= (last ifo) :start-interactive)
          [tex-comp ((:message-fn tut) ifo inspect edn-code goto-page!)]

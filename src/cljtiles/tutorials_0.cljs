@@ -327,6 +327,21 @@
                   :x 50,
                   :y (- 160 @app-state)}]])]))))
 
-(def e-vect (map (fn [xml-code]
-                   {:xml-code xml-code})
-                 vect))
+(def e-vect
+  (-> (map (fn [xml-code]
+             {:xml-code xml-code})
+           vect)
+      vec
+      (assoc-in  [13 :error-message-fn]
+                 (fn [ifo error msg-fn edn-code]
+                   (let [frm (last ifo)]
+                     (cond
+                       (= "Var name should be simple symbol." (subs error 0 33))
+                       "You cannot inspect this block."
+                       (= (subs error 0 30) "Could not resolve symbol: what")
+                       "You need to connect the \"what\" block."
+                       ))))
+      (assoc-in  [13 :message-fn]
+                 (fn [] "hii"))
+      )
+  )
