@@ -25,20 +25,10 @@
 (when workspace!/dev
   (print (tst/test-pure)))
 
-(def tutorials_clj (map (fn [xml-code]
-                       {:xml-code xml-code})
-                     t-0/vect))
-
-(def tutorials_scm (map (fn [description scroll xml-code]
-                          {:description description
-                           :scroll scroll
-                           :xml-code xml-code})
-                        t-s/desc
-                        t-s/scroll
-                        t-s/vect))
-
 (defn generate-xml [page]
-  (assoc page :xml-code (apply gb/rpg (:blockpos page) (:code page))))
+  (if (:xml-code page)
+    page
+    (assoc page :xml-code (apply gb/rpg (:blockpos page) (:code page)))))
 
 (def chaps (concat t-0/chaps
                    t-s2/chaps
@@ -50,10 +40,8 @@
                        t-s/chapnames
                        t-s3/chapnames))
 
-(def tutorials (concat tutorials_clj
-                       (map generate-xml t-s2/e-vect)
-                       tutorials_scm
-                       (map generate-xml t-s3/e-vect)))
+(def tutorials (mapcat #(map generate-xml %)
+                 [t-0/e-vect t-s2/e-vect t-s/e-vect t-s3/e-vect]))
 
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
@@ -376,9 +364,8 @@
             [tex-comp (msg-fn ifo inspect edn-code goto-page!)])]
          sci-error
          [:<>
-          (if-let [error-msg-fn (:error-message-fn tut)]
-            [:p (error-msg-fn ifo sci-error (:message-fn tut) edn-code)]
-            [mixed-comp (str "Evaluation error for: " (last ifo))])
+          (when-let [error-msg-fn (:error-message-fn tut)]
+            [:p (error-msg-fn ifo sci-error (:message-fn tut) edn-code)])
           [error-comp the-state]]
          (= (last ifo) :start-interactive)
          [tex-comp ((:message-fn tut) ifo inspect edn-code goto-page!)]

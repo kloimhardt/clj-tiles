@@ -326,3 +326,7 @@
                  {:href "rocket.png",
                   :x 50,
                   :y (- 160 @app-state)}]])]))))
+
+(def e-vect (map (fn [xml-code]
+                   {:xml-code xml-code})
+                 vect))

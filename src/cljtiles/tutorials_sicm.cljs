@@ -7,7 +7,7 @@
     [(* x 300) (* y 150)]))
 
 (def bold {:style {:font-weight "bold"}})
-(def e-vect
+(def ee-vect
   ["You run the program, but the output does not convey much yet."
    [0 0]
    (gb/rpg [[0 0]]
@@ -429,9 +429,17 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                   't)))
    ])
 
-(def desc (take-nth 3 e-vect))
-(def scroll (take-nth 3 (rest e-vect)))
-(def vect (take-nth 3 (rest (rest e-vect))))
+(def desc (take-nth 3 ee-vect))
+(def scroll (take-nth 3 (rest ee-vect)))
+(def vect (take-nth 3 (rest (rest ee-vect))))
 
 (def chapnames ["Pendulum inter"])
 (def chaps [(count vect)])
+
+(def e-vect (map (fn [description scroll xml-code]
+                          {:description description
+                           :scroll scroll
+                           :xml-code xml-code})
+                        desc
+                        scroll
+                        vect))
