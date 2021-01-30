@@ -65,7 +65,6 @@
   (swap! state merge
           {:stdout [] :inspect [] :sci-error nil
            :result nil
-           :result-brk nil
            :code nil
            :edn-code nil
            :edn-code-orig nil
@@ -181,13 +180,12 @@
         cbr (code->break-str aug-edn-code)
         _ (reset-state nil)
         erg (try (sci/eval-string cbr {:bindings bindings2})
-                 (catch js/Error e (swap! state assoc :sci-error (my-str-brk (.-message e))) nil))
+                 (catch js/Error e (swap! state assoc :sci-error (.-message e)) nil))
         result (cond (some? erg) (my-str erg)
                      (= "nil" (str (last edn-code))) "nil"
                      :else "")]
     (swap! state assoc
            :result result
-           :result-brk (my-str-brk result)
            :code (if error "Cannot even parse the blocks" cbr)
            :edn-code aug-edn-code
            :edn-code-orig edn-code)))
@@ -332,23 +330,27 @@
     [:pre txt]))
 
 (defn error-comp [{:keys [sci-error code]}]
-  (let [flex50 {:style {:flex "50%"}}]
+  (let [flex50 {:style {:flex "50%"}}
+        mod-error (if (= (subs (:sci-error @state) 0 40)
+                         "Parameter declaration should be a vector")
+                    (str "Wrong Parameter declaration" (subs (:sci-error @state) 40))
+                    sci-error)]
     [:div {:style {:display "flex"}}
      [:div flex50
       [:h3 "Error"]
-      [:pre sci-error]]
+      [:pre (my-str-brk mod-error)]]
      [:div flex50
       [:h3 "Code"]
       [:pre code]]]))
 
-(defn result-comp [{:keys [result result-brk edn-code edn-code-orig code]}]
+(defn result-comp [{:keys [result edn-code edn-code-orig code]}]
   (if (= edn-code edn-code-orig)
     [:pre result]
     (let [flex50 {:style {:flex "50%"}}]
       [:div {:style {:display "flex"}}
        [:div flex50
         [:h3 "Result"]
-        [:pre result-brk]]
+        [:pre (my-str-brk result)]]
        [:div flex50
         [:h3 "Code"]
         [:pre code]]])))
