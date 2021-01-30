@@ -107,8 +107,10 @@
                 :else 0)]
       (goto-page! idx))))
 
-(defn code->break-str [width edn-code]
-  (apply str (interpose "\n" (map #(zp/zprint-str % width) edn-code))))
+(def output-width 41)
+
+(defn code->break-str [edn-code]
+  (apply str (interpose "\n" (map #(zp/zprint-str % output-width) edn-code))))
 
 (defn part-str [width s]
   (apply str
@@ -118,10 +120,10 @@
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
 
-(defn my-str-brk [e width]
+(defn my-str-brk [e]
   (if (seq? e)
-    (part-str width (apply str (interpose " " (map my-str e))))
-    (part-str width (my-str e))))
+    (part-str output-width (apply str (interpose " " (map my-str e))))
+    (part-str output-width (my-str e))))
 
 (defn augment-code-fu [edn-code flat-code fn-code]
   (if (seq (filter #{(second fn-code)} flat-code))
@@ -169,7 +171,6 @@
 
 (defn run-code [edn-code error]
   (let [aug-edn-code (augment-code edn-code)
-        str-width 41
         new-println
         (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
         tex-print
@@ -177,16 +178,16 @@
                                         (sicm/tex (last x)))) nil)
         tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
         bindings2 (bindings new-println tex-print tex-inspect)
-        cbr (code->break-str str-width aug-edn-code)
+        cbr (code->break-str aug-edn-code)
         _ (reset-state nil)
         erg (try (sci/eval-string cbr {:bindings bindings2})
-                 (catch js/Error e (swap! state assoc :sci-error (my-str-brk (.-message e) str-width)) nil))
+                 (catch js/Error e (swap! state assoc :sci-error (my-str-brk (.-message e))) nil))
         result (cond (some? erg) (my-str erg)
                      (= "nil" (str (last edn-code))) "nil"
                      :else "")]
     (swap! state assoc
            :result result
-           :result-brk (my-str-brk result str-width)
+           :result-brk (my-str-brk result)
            :code (if error "Cannot even parse the blocks" cbr)
            :edn-code aug-edn-code
            :edn-code-orig edn-code)))

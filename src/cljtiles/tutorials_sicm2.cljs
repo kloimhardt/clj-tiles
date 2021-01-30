@@ -124,7 +124,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              "A cryptic output without any type at all. But you realize from prior experience that you just created a stub for a function definition. The name of the function is \"Path-of-a-Free-Particle\" and its argument is \"time\". You add a block \\( (4 * time )\\) to the last connection of the \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time]
                    (list '* (symbol :4) 'time))
-             "A cryptic output without any type at all. This is expected, as you know that functions need to be called. You open the parser and create the call statement."
+             "A cryptic output without any type at all. This is expected, as you know that functions need to be called. You right-click on empty space to open the parser and create the call statement."
              'Path-of-a-Free-Particle-num
              "You are pleased to finally get some number. Inspecting \"time\", the argument of the function just called, seems intersting."
              't-symbol
