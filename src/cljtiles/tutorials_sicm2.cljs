@@ -49,13 +49,11 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :error-message-fn
     (fn [{:keys [sci-error edn-code] :as the-state} ifo msg-fn]
-      (do
-        (def sci-error sci-error)
-        (def ifo0 ifo)
-        (def frm (last ifo))
-        (def edn-code edn-code))
       (let [frm (last ifo)
             frmcoll (when (coll? frm) frm)]
+        ;;u
+;; => (sc.api/defsc [44 -50])
+        (def u (list 'sc.api/defsc (sc.api/spy (sc.api/last-ep-id))))
         (cond
           (= "Var name should be simple symbol." (subs sci-error 0 33))
           "You cannot inspect this block."
@@ -77,8 +75,6 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
           )))
     :message-fn
     (fn [{:keys [inspect]} ifo goto-lable-page!]
-      (do
-        (def ifo1 ifo))
       (let [frm (last ifo)
             frmcoll (when (coll? frm) frm)
             last-ifo (cond
@@ -97,6 +93,9 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                             (= 'up (#(and (coll? %) (first %)) (nth frm 3 nil))))
                        'Path-of-a-Free-Particle-fn
                        :else frm)]
+        ;;v
+;; => (sc.api/defsc [45 -51])
+        (def v (list 'sc.api/defsc (sc.api/spy (sc.api/last-ep-id))))
         (or
           (get
             {:start-interactive

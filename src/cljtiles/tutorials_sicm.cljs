@@ -160,11 +160,12 @@ The result of the program cannot be the zero vector anymore, as the new function
 \\end{smallmatrix}\\big)\\)
 my not be linear in time."
      ]
-     [:p "The actual result is
+     [:p "The actual result in usual mathematical notation is:
 \\[
 \\left[ 2 \\frac{d^2 q_x(t)}{dt^2}\\Bigg|_{t=10}\\ \\ 2 \\frac{d^2 q_y(t)}{dt^2}\\Bigg|_{t=10}\\right]
 \\]
 "]
+    [:p "The result you see upon running the correctly arranged blocks looks different. It is an arguably simpler notation. The rational for this notation is again given in the paper linked before."]
     ]
    [0 -150]
    (gb/rpg [[0 0] [0 170] [0 280] [0 420]

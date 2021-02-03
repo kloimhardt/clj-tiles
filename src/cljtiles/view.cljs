@@ -20,7 +20,8 @@
    [cljtiles.tests :as tst]
    [cljtiles.sicm :as sicm]
    [cljtiles.blockly :as workspace!]
-   [cljtiles.code-analysis :as ca]))
+   [cljtiles.code-analysis :as ca]
+   [sc.api]))
 
 (when workspace!/dev
   (print (tst/test-pure)))
