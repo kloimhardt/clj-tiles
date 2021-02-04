@@ -51,9 +51,12 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     (fn [{:keys [sci-error edn-code] :as the-state} ifo msg-fn]
       (let [frm (last ifo)
             frmcoll (when (coll? frm) frm)]
-        ;;u
-;; => (sc.api/defsc [44 -50])
-        (def u (list 'sc.api/defsc (sc.api/spy (sc.api/last-ep-id))))
+        (do
+          (defonce brk-2 (sc.api/spy {:sc.cs/id -2} (sc.api/last-ep-id)))
+          (sc.api/save-ep 2 (sc.api/ep-info brk-2))
+          #_(sc.api/defsc [2 -2])
+          )
+
         (cond
           (= "Var name should be simple symbol." (subs sci-error 0 33))
           "You cannot inspect this block."
@@ -93,9 +96,11 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                             (= 'up (#(and (coll? %) (first %)) (nth frm 3 nil))))
                        'Path-of-a-Free-Particle-fn
                        :else frm)]
-        ;;v
-;; => (sc.api/defsc [45 -51])
-        (def v (list 'sc.api/defsc (sc.api/spy (sc.api/last-ep-id))))
+        (do
+          (def brk-1 (sc.api/spy {:sc.cs/id -1} (sc.api/last-ep-id)))
+          (sc.api/save-ep 28 (sc.api/ep-info brk-1))
+          #_(sc.api/defsc [28 -1])
+          )
         (or
           (get
             {:start-interactive

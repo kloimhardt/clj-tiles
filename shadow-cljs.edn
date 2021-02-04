@@ -3,8 +3,7 @@
                 [borkdude/sci "0.1.0"]
                 [zprint "1.0.2"]
                 [hiccups "0.3.0"]
-                [sicmutils "0.14.0"]
-                [vvvvalvalval/scope-capture "0.3.2"]]
+                [sicmutils "0.14.0"]]
  :source-paths ["src"]
  :dev-http {8080 ["public" "node_modules"]}
  :builds
