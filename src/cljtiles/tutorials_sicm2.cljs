@@ -51,7 +51,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     (fn [{:keys [sci-error edn-code] :as the-state} ifo msg-fn]
       (let [frm (last ifo)
             frmcoll (when (coll? frm) frm)]
-        (do
+        #_(do
           (def brk-2 (sc.api/spy {:sc/cs-label :brk-2} (sc.api/last-ep-id)))
           #_(sc.api/defsc :brk-2)
           )
@@ -95,9 +95,9 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                             (= 'up (#(and (coll? %) (first %)) (nth frm 3 nil))))
                        'Path-of-a-Free-Particle-fn
                        :else frm)]
-        (do
+        #_(do
           (def brk-1 (sc.api/spy {:sc/cs-label :brk-1} (sc.api/last-ep-id)))
-          (sc.api/defsc :brk-1)
+          ;;(sc.api/defsc :brk-1)
           )
         (or
           (get
