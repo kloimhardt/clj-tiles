@@ -262,7 +262,12 @@
                                   (swap! i inc))}
              "Hint"]))
         [:button {:style {:float "right"} :on-click close-modal}
-         "Cancel"]]])))
+         "Cancel"]
+        [:button {:style {:float "right"}
+                  :on-click (fn []
+                              (set! (.-value @textarea-element)
+                                    "\"For more information go to:\"\n\"https://github.com/kloimhardt/clj-tiles\""))}
+         "About"]]])))
 
 (defn tutorials-comp [{:keys [run-button tutorial-no]}]
   [:div
