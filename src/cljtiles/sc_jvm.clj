@@ -2,8 +2,6 @@
   (:require [sc.impl]
             [sc.impl.db :as db]))
 
-(println "klm in sc-jvmiii")
-
 (defmethod sc.impl/resolve-code-site clojure.lang.Keyword [cs-id]
   (let [csid (->>
                (:code-sites @db/db)
