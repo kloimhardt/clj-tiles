@@ -163,10 +163,10 @@
 
 (defn bindings [new-println tex-print tex-inspect]
   (merge
-    (es/namespaces 'sicmutils.abstract.function)
-    (es/namespaces 'sicmutils.numerical.minimize)
+   (es/namespaces 'sicmutils.numerical.minimize)
    (es/namespaces 'sicmutils.mechanics.lagrange)
    (es/namespaces 'sicmutils.env)
+   (es/namespaces 'sicmutils.abstract.function) ;;needs to be after sicmutils.env
    {'println new-println
     'tex tex-print
     workspace!/inspect-fn-sym tex-inspect
