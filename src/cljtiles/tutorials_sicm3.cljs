@@ -11,7 +11,7 @@
     (fn [_ ifo _]
       (get
         {'(Hight-of-Pivot time)
-         "Hight-of-Pivot can be of type Differential as well as of type Expression. You wander what Differential means in this context. And: you search for numbers, as those connect the thory to experiment. But they seem to be quite elusive here. Nevertheless, you hope to recover more numbers in future quests."}
+         "Hight-of-Pivot can be of type Differential as well as of type Expression. You wonder what Differential means in this context. And: you search for numbers, as those connect the thory to experiment. But they seem to be quite elusive here. Nevertheless, you hope to recover more numbers in future quests. For now, you have reached the end of this one."}
         (last ifo)))
     :scroll [0 -400]
     :blockpos [[0 0]

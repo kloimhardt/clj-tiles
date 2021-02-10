@@ -22,7 +22,7 @@
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
 
-(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio"])
+(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio" ::keyword "Keyword"])
 
 (defn classify [e]
   (first (filter #(s/valid? (first %) e) (partition 2 sps))))
@@ -64,11 +64,8 @@
   (instance? sicmutils.abstract.function/Function (last @u))
   (s/explain ::differential (first (first @u))))
 
-#_(def bindings {'valid? s/valid?
-               'kind? kind?})
-
 ;;necessary for sicmutils version < 0.15.0
-(def bindings {'up st/up
+#_(def bindings {'up st/up
                'down st/down
                '+ gn/+
                '- gn/-
@@ -86,6 +83,7 @@
                'kind? kind?
                'tex tex})
 
+(s/def ::keyword keyword?)
 (s/def ::ratio rt/ratio?)
 (s/def ::clojure-vector vector?)
 (s/def ::boolean boolean?)
