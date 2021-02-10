@@ -1,6 +1,6 @@
 # Clj-Tiles
 
-Follow up to the [Werkbank](https://github.com/kloimhardt/werkbank) repository. Based entirely on ClojureScript. Works fully [on-line](https://kloimhardt.github.io/cljtiles.html?page=freeparticle) (Safari browser does not work). Also has two way parsing Clojure->XML->Clojure. The typical fly-out toolbar of Blockly is removed, the Blocks are programmed directly in Clojure.
+Follow up to the [Werkbank](https://github.com/kloimhardt/werkbank) repository. Based entirely on ClojureScript. Works fully [on-line](https://kloimhardt.github.io/cljtiles.html?page=freeparticle). Also has two way parsing Clojure->XML->Clojure. The typical fly-out toolbar of Blockly is removed, the Blocks are programmed directly in Clojure.
 
 ## Add your own workspaces
 
@@ -33,7 +33,7 @@ Notice that in the simplest last case, the workspace is not cleared before inser
 
 ## A kind note on types
 
-Go to https://kloimhardt.github.io/cljtiles.html?page=freeparticle in your browser (Safari does not work).
+Go to https://kloimhardt.github.io/cljtiles.html?page=freeparticle in your browser.
 
 Try out some workspaces (there are currently 68 grouped into 9 chapters). You can inspect the blocks by right clicking on them. The type of the according data is displayed as the program is running.
 

@@ -9,7 +9,7 @@
             [sicmutils.simplify :as sp] ;;necessary to load simplify multifunction
             [sicmutils.function :as fu] ;;necessary for ((gn/* 5 (fn[x] x)) 4)
             [sicmutils.expression :as ex]
-            [sicmutils.calculus.derivative :as dr]
+            [sicmutils.differential :as dr]
             [sicmutils.numerical.minimize :as mn]
             [sicmutils.mechanics.lagrange :as lg]
             [sicmutils.expression.render :as render]
@@ -64,6 +64,10 @@
   (instance? sicmutils.abstract.function/Function (last @u))
   (s/explain ::differential (first (first @u))))
 
+#_(def bindings {'valid? s/valid?
+               'kind? kind?})
+
+;;necessary for sicmutils version < 0.15.0
 (def bindings {'up st/up
                'down st/down
                '+ gn/+
@@ -141,7 +145,7 @@
 (defn the-terms [^dr/Differential f] (.-terms f))
 
 (s/def ::differential (s/and #(instance?
-                               sicmutils.calculus.derivative.Differential %)
+                               sicmutils.differential.Differential %)
                              #(s/valid? ::nu-sy-eex-eliteral (second (first (the-terms %))))))
 
 (s/def ::nu-sy-eex-dr (s/or :ns ::nu-sy :dr ::differential :eex ::eexpression))

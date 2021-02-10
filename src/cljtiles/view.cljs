@@ -4,6 +4,7 @@
    [goog.string :as gstring]
    [goog.dom.forms :as gforms]
    [sci.core :as sci]
+   ;;[sicmutils.env.sci :as es]
    ["blockly" :as blockly]
    [cljtiles.xmlparse-2 :as edn->code]
    [cljtiles.tutorials-0 :as t-0]
@@ -23,6 +24,12 @@
    [cljtiles.code-analysis :as ca]
    [sc.api]
    [cljtiles.sc]))
+
+(comment
+
+  (:bindings es/context-opts)
+
+  )
 
 (when workspace!/dev
   (print (tst/test-pure)))
@@ -162,6 +169,8 @@
 
 (defn bindings [new-println tex-print tex-inspect]
   (merge
+   ;;(es/namespaces 'sicmutils.env)
+   ;;(es/namespaces 'sicmutils.abstract.function)
    sicm/bindings
    {'println new-println
     'tex tex-print
