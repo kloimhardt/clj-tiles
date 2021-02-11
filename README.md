@@ -1,8 +1,27 @@
 # Clj-Tiles
 
-Follow up to the [Werkbank](https://github.com/kloimhardt/werkbank) repository. Based entirely on ClojureScript. Works fully [on-line](https://kloimhardt.github.io/cljtiles.html?page=freeparticle). Also has two way parsing Clojure->XML->Clojure. The typical fly-out toolbar of Blockly is removed, the Blocks are programmed directly in Clojure.
+* Start to code in ClojureScript by solving graphical puzzles.
+* Works fully [on-line](https://kloimhardt.github.io/cljtiles.html?page=12).
+* Over 50 puzzels built in, leading to sophisticated examples taken from theoretical physics ([this one](https://kloimhardt.github.io/cljtiles.html?page=freeparticle) with a guided solution in the form of an iteractive narrative).
+* Investigate the puzzles with the built in tracer.
+* Make new puzzle tutorials by using the built in parser.
+* Live coding made easy, just prepare a puzzle and solve it in front of the audience.
 
-## Add your own workspaces
+## Solve puzzles
+
+The first and most simple example looks like this:
+
+![hello](screenshots/hello_world.png)
+
+Just press the `Run` button, as this is already a fully functional program.
+
+A more typical puzzle looks like this:
+
+![pendulum](screenshots/pendulum_begin.png)
+
+After completion, it represents a working computer program which can be executed. This one is based on the sophisticated [SICMutils](https://github.com/sicmutils/sicmutils) library. It has descriptions and explanations, and the solution is provided. By right clicking on the tiles and `inspect`, you can trace the program execution and get some type information.
+
+## Create a new puzzle
 
 Open the parser by right clicking on a white space. Paste the following code:
 ```
@@ -33,9 +52,7 @@ Notice that in the simplest last case, the workspace is not cleared before inser
 
 ## A kind note on types
 
-Go to https://kloimhardt.github.io/cljtiles.html?page=freeparticle in your browser.
-
-Try out some workspaces (there are currently 68 grouped into 9 chapters). You can inspect the blocks by right clicking on them. The type of the according data is displayed as the program is running.
+You can inspect the blocks by right clicking on them. The type of the according data is displayed as the program is running.
 
 Like in the pysical world, where things are of some kind or another (like sheep, cow, electron), within programs, many types of things appear as well: vectors, functions, numbers, symbols. There is an infinite number of types, as programmers invent them all the time. E.g. the data holding the address of a person can be attributed the type "collection of strings" or even "address" or both, depending on software design, printing tools and not least the user of the program.
 
@@ -61,3 +78,8 @@ For development install Clojure/Java and do:
  
  shadow-cljs watch cljtiles
  ```
+## Related projects
+* [Werkbank](https://github.com/kloimhardt/werkbank)
+* [Blockly](https://developers.google.com/blockly)
+* [BlockPy](https://think.cs.vt.edu/blockpy/) 
+* [SCI](https://github.com/borkdude/sci)
