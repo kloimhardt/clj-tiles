@@ -8,6 +8,7 @@
                    test-path
                    0
                    10)
+(zero? (- (* 1 2 3) (* (* 1 2) 3)))
 (defn make-η
   "See p. 21"
   [ν t1 t2]
