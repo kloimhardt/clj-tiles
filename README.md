@@ -1,9 +1,8 @@
 # Clj-Tiles
 
-* Start to code in ClojureScript by solving graphical puzzles.
-* Works fully [on-line](https://kloimhardt.github.io/cljtiles.html?page=12).
+* Start to code in Clojure by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html?page=12).
 * Over 50 puzzels built in, leading to sophisticated examples taken from theoretical physics ([this one](https://kloimhardt.github.io/cljtiles.html?page=freeparticle) with a guided solution in the form of an iteractive narrative).
-* Investigate the puzzles with the built in tracer.
+* Investigate puzzles with the built in tracer.
 * Make new puzzle tutorials by using the built in parser.
 * Live coding made easy, just prepare a puzzle and solve it in front of the audience.
 
@@ -50,6 +49,8 @@ Or paste:
 ```
 Notice that in the simplest last case, the workspace is not cleared before insert.
 
+You can paste everything in the [examples](https://github.com/kloimhardt/clj-tiles/tree/master/examples) directory. It contains code from the [sicmutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb).
+
 ## A kind note on types
 
 You can inspect the blocks by right clicking on them. The type of the according data is displayed as the program is running.
@@ -83,3 +84,4 @@ For development install Clojure/Java and do:
 * [Blockly](https://developers.google.com/blockly)
 * [BlockPy](https://think.cs.vt.edu/blockpy/) 
 * [SCI](https://github.com/borkdude/sci)
+* [sicmutils](https://github.com/sicmutils/sicmutils)
