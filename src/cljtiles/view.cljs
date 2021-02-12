@@ -18,15 +18,15 @@
    [reagent.core :as rc]
    [reagent.dom :as rd]
    [zprint.core :as zp]
-   [cljtiles.tests :as tst]
    [cljtiles.sicm :as sicm]
    [cljtiles.blockly :as workspace!]
    [cljtiles.code-analysis :as ca]
+   ;;[cljtiles.tests :as tst]
    ;;[sc.api]
    ;;[cljtiles.sc]
    ))
 
-(when workspace!/dev
+#_(when workspace!/dev
   (print (tst/test-pure)))
 
 (defn generate-xml [page]
