@@ -30,14 +30,15 @@
    0
    10)
   0.01)
-(minimize (varied-free-particle-action
-            3
-            test-path
-            (up sin cos square)
-            0
-            10)
-          -2
-          1)
+(comment
+  (minimize (varied-free-particle-action
+              3
+              test-path
+              (up sin cos square)
+              0
+              10)
+            -2
+            1))
 (defn path-along-x
   [t]
   (up (+ (* 5 t) 1) (* 0 t) (* 0 t)))
