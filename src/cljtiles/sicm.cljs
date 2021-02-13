@@ -1,4 +1,5 @@
 (ns cljtiles.sicm
+  (:refer-clojure :exclude [+ * / -])
   (:require [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as ts]
             [sicmutils.value :as vl]
@@ -15,6 +16,23 @@
             [sicmutils.expression.render :as render]
             [sicmutils.abstract.function :as af :include-macros true]
             [sci.impl.vars]))
+(comment
+
+  (defn test-path
+    "See p. 20"
+    [t]
+    (st/up (gn/+ (gn/* 1 t) 7)
+           (gn/+ (gn/* 3 t) 5)
+           (gn/+ (gn/* 2 t) 1)))
+
+  (defn la []
+    (lg/Lagrangian-action (lg/L-free-particle 3)
+                          test-path
+                          0
+                          10))
+  (la)
+
+)
 
 (defn tex [x]
   (str "\\["  (render/->TeX (gn/simplify x)) "\\]"))
