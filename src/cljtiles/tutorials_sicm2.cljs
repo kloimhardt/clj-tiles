@@ -69,12 +69,13 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                (or (#{"10" "'t"} (str frm))
                    (and (coll? frm)
                         (= (first frm) 'Path-of-a-Free-Particle))))
-          (str "The error is because a \"time\" block is still unconnected. For now, move the block " frm " upwards so that it is called before the error occurs.")
+          (str "The below message is because a \"time\" block is still unconnected. For now, move the block " frm " upwards to help the interpreter reaching it before having to deal with this \"time\" block.")
           (= (subs sci-error 0 35) "Could not resolve symbol: Path-of-a")
           (msg-fn the-state '(nil particle-error) nil)
           (and (= 'defn (first frmcoll)) (= "Parameter declaration missing" (subs sci-error 0 29)))
           "The \"defn\" block has three connections, but only one is actually connected. You notice the \"Path-of-a-Free-Particle\" block. You connect it and inspect the whole \"defn\" block."
-          )))
+          :else
+          "No specific explanation is programmed for the below message. This shows that you are exploring. So don't worry, just try something else you can think of.")))
     :message-fn
     (fn [{:keys [inspect]} ifo goto-lable-page!]
       (let [frm (last ifo)
@@ -119,9 +120,9 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
               [:p "At last a proper column vector in two dimensions."]
               [:p "A block called \"time\" is nearby. Certainly, a time dependent vector would be nice. You inspect \"time\"."]]
              'time-error
-             "An error. It reads \"Cound not resolve symbol\". Obviously, the \"time\" block must not be by itself. You connect it to the \"defn\" block and inspect again."
+             "The code interpreter cannot resolve a symbol. Obviously, the \"time\" block must not be by itself. You connect it to the \"defn\" block and inspect again."
              'particle-error
-             "An error. It reads \"Cound not resolve symbol\". Now you notice the \"Path-of-a-Free-Particle\" block. You connect it and inspect the whole \"defn\" block."
+             "The code interpreter cannot resolve a symbol. Now you notice the \"Path-of-a-Free-Particle\" block. You connect it and inspect the whole \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time])
              "A cryptic output without any type at all. But you realize from prior experience that you just created a stub for a function definition. The name of the function is \"Path-of-a-Free-Particle\" and its argument is \"time\". You add a block \\( (4 * time )\\) to the last connection of the \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time]
@@ -168,12 +169,10 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
               "An expected result. Certainly the function called is not very complicated."))
           (when (= (take 3 frmcoll) '(defn time [Path-of-a-Free-Particle]))
             [:<>
-             [:p "This does not thorw an error. However, your gut feeling tells you that something is not right. You think of going back to your former exercises about defining functions, albeit you know that you are going to lose your work. Or maybe just permute things?"]
+             [:p "This looks ok at first sight. However, your gut feeling tells you that something is not right. You think of going back to your former exercises about defining functions, albeit you know that you are going to lose your work. Or maybe just permute things?"]
              [:button {:on-click #(goto-lable-page! :defn)} "defining functions"]]
 
             )
-
-
 
           )))
     :scroll [0 0]

@@ -353,7 +353,7 @@
                     sci-error)]
     [:div {:style {:display "flex"}}
      [:div flex50
-      [:h3 "Error"]
+      [:h3 "Message from code interpreter"]
       [:pre (my-str-brk mod-error)]]
      [:div flex50
       [:h3 "Code"]
