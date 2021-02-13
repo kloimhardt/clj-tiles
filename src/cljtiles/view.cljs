@@ -192,7 +192,7 @@
         _ (reset-state nil)
         erg (try (sci/eval-string cbr {:bindings bindings2})
                  (catch js/Error e (swap! state assoc :sci-error (.-message e)) nil))
-        result (cond (some? erg) (my-str erg)
+        result (cond #_(some? erg) true (my-str erg)
                      (= "nil" (str (last edn-code))) "nil"
                      :else "")]
     (swap! state assoc
