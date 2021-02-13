@@ -360,7 +360,7 @@
       [:pre code]]]))
 
 (defn result-comp [{:keys [result edn-code edn-code-orig code]}]
-  (if (= edn-code edn-code-orig)
+  (if false #_(= edn-code edn-code-orig)
     [:pre result]
     (let [flex50 {:style {:flex "50%"}}]
       [:div {:style {:display "flex"}}
