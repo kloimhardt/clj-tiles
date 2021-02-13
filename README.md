@@ -6,6 +6,8 @@
 * Make new puzzle tutorials by using the built in parser.
 * Live coding made easy, just prepare a puzzle and solve it in front of the audience.
 
+Watch the [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04)
+
 ## Solve puzzles
 
 The first and most simple example looks like this:
