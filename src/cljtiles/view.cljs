@@ -360,16 +360,17 @@
       [:pre code]]]))
 
 (defn result-comp [{:keys [result edn-code edn-code-orig code]}]
-  (if false #_(= edn-code edn-code-orig)
-    [:pre result]
-    (let [flex50 {:style {:flex "50%"}}]
-      [:div {:style {:display "flex"}}
-       [:div flex50
-        [:h3 "Result"]
-        [:pre (my-str-brk result)]]
-       [:div flex50
-        [:h3 "Code"]
-        [:pre code]]])))
+  (when result
+    (if false #_(= edn-code edn-code-orig)
+        [:pre result]
+        (let [flex50 {:style {:flex "50%"}}]
+          [:div {:style {:display "flex"}}
+           [:div flex50
+            [:h3 "Result"]
+            [:pre (my-str-brk result)]]
+           [:div flex50
+            [:h3 "Code"]
+            [:pre code]]]))))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc] :as the-state}]
