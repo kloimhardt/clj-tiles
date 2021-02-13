@@ -1,5 +1,4 @@
 (defn test-path
-  "See p. 20"
   [t]
   (up (+ (* 4 t) 7)
       (+ (* 3 t) 5)
