@@ -21,6 +21,7 @@
    [cljtiles.sicm :as sicm]
    [cljtiles.blockly :as workspace!]
    [cljtiles.code-analysis :as ca]
+
    ;;[cljtiles.tests :as tst]
    ;;[sc.api]
    ;;[cljtiles.sc]
@@ -141,7 +142,9 @@
                             (let [r (rest x)] (if (seq? r) (vec r) r))))
         (augment-code-fu flat-code
                          '(defn vec-cons "added by Blockly parser" [x coll]
-                            (let [c (cons x coll)] (if (seq? c) (vec c) c)))))))
+                            (let [c (cons x coll)] (if (seq? c) (vec c) c))))
+        (as-> edn-code (w/postwalk #(if (and (list? %) (= 'L-free-particle (first %))) (list 'comp 'sicmutils-double %) %) edn-code))
+        )))
 
 (def timer (atom nil))
 (def counter (atom 0))
@@ -168,6 +171,7 @@
    (es/namespaces 'sicmutils.mechanics.lagrange)
    (es/namespaces 'sicmutils.env)
    (es/namespaces 'sicmutils.abstract.function) ;;needs to be after sicmutils.env
+   sicm/bindings
    {'println new-println
     'tex tex-print
     workspace!/inspect-fn-sym tex-inspect

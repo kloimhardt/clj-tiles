@@ -16,23 +16,6 @@
             [sicmutils.expression.render :as render]
             [sicmutils.abstract.function :as af :include-macros true]
             [sci.impl.vars]))
-(comment
-
-  (defn test-path
-    "See p. 20"
-    [t]
-    (st/up (gn/+ (gn/* 1 t) 7)
-           (gn/+ (gn/* 3 t) 5)
-           (gn/+ (gn/* 2 t) 1)))
-
-  (defn la []
-    (lg/Lagrangian-action (lg/L-free-particle 3)
-                          test-path
-                          0
-                          10))
-  (la)
-
-)
 
 (defn tex [x]
   (str "\\["  (render/->TeX (gn/simplify x)) "\\]"))
@@ -81,6 +64,8 @@
 
   (instance? sicmutils.abstract.function/Function (last @u))
   (s/explain ::differential (first (first @u))))
+
+(def bindings {'sicmutils-double sicmutils.util/double})
 
 ;;necessary for sicmutils version < 0.15.0
 #_(def bindings {'up st/up
