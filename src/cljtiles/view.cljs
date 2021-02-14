@@ -7,7 +7,7 @@
    [sicmutils.env.sci :as es]
    ["blockly" :as blockly]
    [cljtiles.xmlparse-2 :as edn->code]
-   [cljtiles.tutorials-0 :as t-0]
+   [cljtiles.tutorials-clj :as t-0]
    [cljtiles.genblocks :as gb]
    [cljtiles.tutorials-sicm :as t-s]
    [cljtiles.tutorials-sicm2 :as t-s2]
