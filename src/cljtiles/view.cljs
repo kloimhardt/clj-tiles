@@ -353,27 +353,26 @@
                     sci-error)]
     [:div {:style {:display "flex"}}
      [:div flex50
-      [:h3 "Message from code interpreter"]
+      [:h3 "Code interpretation result"]
       [:pre (my-str-brk mod-error)]]
      [:div flex50
       [:h3 "Code"]
       [:pre code]]]))
 
 (defn result-comp [{:keys [result edn-code edn-code-orig code]}]
-  (when result
-    (if false #_(= edn-code edn-code-orig)
-        [:pre result]
-        (let [flex50 {:style {:flex "50%"}}]
-          [:div {:style {:display "flex"}}
-           [:div flex50
-            [:h3 "Result"]
-            [:pre (my-str-brk result)]]
-           [:div flex50
-            [:h3 "Code"]
-            [:pre code]]]))))
+  (if false #_(= edn-code edn-code-orig)
+      [:pre result]
+      (let [flex50 {:style {:flex "50%"}}]
+        [:div {:style {:display "flex"}}
+         [:div flex50
+          [:h3 "Result"]
+          [:pre (my-str-brk result)]]
+         [:div flex50
+          [:h3 "Code"]
+          [:pre code]]])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
-                           desc] :as the-state}]
+                           desc result] :as the-state}]
   (if-let [ifo (ca/inspect-form edn-code workspace!/inspect-fn-sym)]
     (let [tut (nth tutorials tutorial-no)]
       [:<>
@@ -399,11 +398,12 @@
      (map-indexed (fn [idx v]
                     ^{:key idx} [mixed-comp v])
                   stdout)
-     (when sci-error
-       [error-comp the-state])
-     (if-let [last-vec (is-last-div edn-code)]
-       [reagent-comp last-vec edn-code]
-       [result-comp the-state])
+     (if sci-error
+       [error-comp the-state]
+       (when result
+         (if-let [last-vec (is-last-div edn-code)]
+           [reagent-comp last-vec edn-code]
+           [result-comp the-state])))
      [:div {:style {:column-count 2}}
       [tex-comp desc]]]))
 
