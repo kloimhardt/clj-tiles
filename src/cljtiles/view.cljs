@@ -138,12 +138,14 @@
   (let [flat-code (flatten (w/postwalk #(if (map? %) (vec %) %) edn-code))]
     (-> edn-code
         (augment-code-fu flat-code
-                         '(defn vec-rest "added by Blockly parser" [x]
+                         '(defn vec-rest "added by clj-tiles parser" [x]
                             (let [r (rest x)] (if (seq? r) (vec r) r))))
         (augment-code-fu flat-code
-                         '(defn vec-cons "added by Blockly parser" [x coll]
+                         '(defn vec-cons "added by clj-tiles parser" [x coll]
                             (let [c (cons x coll)] (if (seq? c) (vec c) c))))
-        (as-> edn-code (w/postwalk #(if (and (list? %) (= 'L-free-particle (first %))) (list 'comp 'sicmutils-double %) %) edn-code))
+        (augment-code-fu flat-code
+                         '(defn L-free-particle "added by clj-tiles parser" [x]
+                            (comp sicmutils-double (L-free-particle-sicm x))))
         )))
 
 (def timer (atom nil))

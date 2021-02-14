@@ -65,7 +65,8 @@
   (instance? sicmutils.abstract.function/Function (last @u))
   (s/explain ::differential (first (first @u))))
 
-(def bindings {'sicmutils-double sicmutils.util/double})
+(def bindings {'sicmutils-double sicmutils.util/double
+               'L-free-particle-sicm lg/L-free-particle})
 
 ;;necessary for sicmutils version < 0.15.0
 #_(def bindings {'up st/up
