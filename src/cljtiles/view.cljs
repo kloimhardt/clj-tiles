@@ -273,7 +273,13 @@
                                     "\"For more information go to:\"\n\"https://github.com/kloimhardt/clj-tiles\""))}
          "About"]]])))
 
-(defn tutorials-comp [{:keys [run-button tutorial-no]}]
+(defn desc-button []
+  [:button {:on-click #(reset-state nil)} "Clear screen"])
+
+(defn get-inspect-form [edn-code]
+  (ca/inspect-form edn-code workspace!/inspect-fn-sym))
+
+(defn tutorials-comp [{:keys [run-button tutorial-no edn-code]}]
   [:div
    [:span
     [:select {:value (page->chapter tutorial-no)
@@ -292,7 +298,9 @@
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
     (when run-button
-      [:button {:on-click #(startsci nil)} "Run"])]])
+      (if (get-inspect-form edn-code)
+        [desc-button]
+        [:button {:on-click #(startsci nil)} "Run"]))]])
 
 (defn filter-defns [edn-code fu]
   (conj
@@ -373,7 +381,7 @@
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc result] :as the-state}]
-  (if-let [ifo (ca/inspect-form edn-code workspace!/inspect-fn-sym)]
+  (if-let [ifo (get-inspect-form edn-code)]
     (let [tut (nth tutorials tutorial-no)]
       [:<>
        (cond
@@ -398,14 +406,22 @@
      (map-indexed (fn [idx v]
                     ^{:key idx} [mixed-comp v])
                   stdout)
-     (if sci-error
-       [error-comp the-state]
-       (when result
-         (if-let [last-vec (is-last-div edn-code)]
-           [reagent-comp last-vec edn-code]
-           [result-comp the-state])))
-     [:div {:style {:column-count 2}}
-      [tex-comp desc]]]))
+     (cond
+       sci-error
+       [:<>
+        [error-comp the-state]
+        (when desc [desc-button])]
+       result
+       [:<>
+        (if-let [last-vec (is-last-div edn-code)]
+          [reagent-comp last-vec edn-code]
+          [result-comp the-state])
+        (when desc [desc-button])]
+       desc
+       [:div {:style {:column-count 2}}
+        [tex-comp desc]]
+       )
+     ]))
 
 (defn error-boundary [comp]
   (rc/create-class
