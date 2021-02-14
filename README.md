@@ -1,26 +1,27 @@
 # Clj-Tiles
 
-* Start to code in Clojure by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html?page=12).
-* Over 50 puzzels built in, leading to sophisticated examples taken from theoretical physics.
+* Start to code by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html?page=12).
+* Over 50 puzzels built in. Starting with simple examples, they continue to basic web-programming and lead to sophisticated examples taken from theoretical physics.
 * Investigate puzzles with the built in tracer.
 * Make new puzzle tutorials by using the built in parser.
 * Live coding made easy, just prepare a puzzle and solve it in front of the audience.
 
-Watch the [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04)
+Watch the [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04).
 
 ## Solve puzzles
+The first forty puzzles are taken from the book [Getting Clojure](https://pragprog.com/titles/roclojure/getting-clojure/). Another resource is [Clojure for the Brave and True](https://www.braveclojure.com).
 
-The first and most simple example looks like this:
+The most simple example looks like this:
 
 ![hello](screenshots/hello_world.png)
 
 Just press the `Run` button, as this is already a fully functional program.
 
-A more typical puzzle looks like this:
+A more sophisticated example looks like this:
 
 ![pendulum](screenshots/pendulum_begin.png)
 
-After completion, it represents a working computer program which can be executed. This one is based on the sophisticated [SICMutils](https://github.com/sicmutils/sicmutils) library. It has descriptions and explanations, and the solution is provided. By right clicking on the tiles and `inspect`, you can trace the program execution and get some type information.
+After completion, this puzzle (which uses the built in [SICMutils](https://github.com/sicmutils/sicmutils) library) represents a working computer program.  It has descriptions and explanations, and the solution is provided. By right clicking on the tiles and `inspect`, you can trace the program execution and get some type information.
 
 ## Create a new puzzle
 
@@ -51,7 +52,7 @@ Or paste:
 ```
 Notice that in the simplest last case, the workspace is not cleared before insert.
 
-You can paste everything in the [examples](https://github.com/kloimhardt/clj-tiles/tree/master/examples) directory. It contains code from the [sicmutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb).
+The [examples](https://github.com/kloimhardt/clj-tiles/tree/master/examples) directory contains pastable code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). Reading the first pages of the book `Structure and Interpretation of Classical Mechanics` ([original](https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html), [reprint](https://tgvaughan.github.io/sicm/)) is mandatory for understanding.
 
 ## A kind note on types
 
