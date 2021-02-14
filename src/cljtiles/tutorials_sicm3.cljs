@@ -47,3 +47,5 @@
 
 (def chapnames ["Pendulum restult"])
 (def chaps [(count e-vect)])
+
+(def content {:tutorials e-vect :chapnames chapnames :chaps chaps})

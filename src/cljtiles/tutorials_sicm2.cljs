@@ -202,3 +202,5 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
 
 (def chapnames ["Pendulum begin"])
 (def chaps [(count e-vect)])
+
+(def content {:tutorials e-vect :chapnames chapnames :chaps chaps})

@@ -364,3 +364,5 @@
                        ))))
       )
   )
+
+(def content {:tutorials e-vect :chapnames chapnames :chaps chaps})

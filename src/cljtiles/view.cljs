@@ -35,18 +35,15 @@
     page
     (assoc page :xml-code (apply gb/rpg (:blockpos page) (:code page)))))
 
-(def chaps (concat t-0/chaps
-                   t-s2/chaps
-                   t-s/chaps
-                   t-s3/chaps))
+(def content (let [f (fn [ks v]
+                       (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
+               (-> (f [:tutorials :chapnames :chaps :xml-code]
+                      [t-0/content t-s2/content t-s/content t-s3/content])
+                   (update :tutorials #(map generate-xml %)))))
 
-(def chapnames (concat t-0/chapnames
-                       t-s2/chapnames
-                       t-s/chapnames
-                       t-s3/chapnames))
-
-(def tutorials (mapcat #(map generate-xml %)
-                 [t-0/e-vect t-s2/e-vect t-s/e-vect t-s3/e-vect]))
+(def tutorials (:tutorials content))
+(def chaps (:chaps content))
+(def chapnames (:chapnames content))
 
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
@@ -160,7 +157,6 @@
                      (js/clearInterval @timer)
                      msg)
         step (fn []
-               (.log js/console (str @counter @app-state))
                (swap! counter inc)
                (if (< @counter max) (fu nil) (stop-timer nil)))]
     (reset! timer (js/setInterval step ms))
