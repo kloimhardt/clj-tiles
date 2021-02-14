@@ -69,7 +69,6 @@
 (defn reset-state [tutorial-no]
   (swap! state merge
           {:stdout [] :inspect [] :sci-error nil
-           :result nil
            :result-raw nil
            :code nil
            :edn-code nil
@@ -122,13 +121,6 @@
          (interpose "\n"
                     (map (partial apply str)
                          (partition-all width s)))))
-(defn my-str [x]
-  (if (nil? x) "nil" (str x)))
-
-(defn my-str-brk [e]
-  (if (seq? e)
-    (part-str output-width (apply str (interpose " " (map my-str e))))
-    (part-str output-width (my-str e))))
 
 (defn augment-code-fu [edn-code flat-code fn-code]
   (if (seq (filter #{(second fn-code)} flat-code))
@@ -177,7 +169,8 @@
                               (swap! counter inc)
                               (if (< @counter max)
                                 (fu nil)
-                                (stop-timer nil))) ms))
+                                (stop-timer nil)))
+                            ms))
     msg))
 
 (defn bindings [new-println tex-print tex-inspect]
@@ -206,12 +199,8 @@
         cbr (code->break-str aug-edn-code)
         _ (reset-state nil)
         erg (try (sci/eval-string cbr {:bindings bindings2})
-                 (catch js/Error e (swap! state assoc :sci-error (.-message e)) nil))
-        result (cond #_(some? erg) true (my-str erg)
-                     (= "nil" (str (last edn-code))) "nil"
-                     :else "")]
+                 (catch js/Error e (swap! state assoc :sci-error (.-message e)) nil))]
     (swap! state assoc
-           :result result
            :result-raw erg
            :code (if error "Cannot even parse the blocks" cbr)
            :edn-code aug-edn-code
@@ -329,6 +318,14 @@
     [tex-comp txt]
     [:pre txt]))
 
+(defn my-str [x]
+  (if (nil? x) "nil" (str x)))
+
+(defn my-str-brk [e]
+  (if (seq? e)
+    (part-str output-width (apply str (interpose " " (map my-str e))))
+    (part-str output-width (my-str e))))
+
 (defn error-comp [{:keys [sci-error code]}]
   (let [flex50 {:style {:flex "50%"}}
         mod-error (if (= (subs (:sci-error @state) 0 40)
@@ -343,20 +340,20 @@
       [:h3 "Code"]
       [:pre code]]]))
 
-(defn result-comp [{:keys [result edn-code edn-code-orig code]}]
-  (if false #_(= edn-code edn-code-orig)
-      [:pre result]
-      (let [flex50 {:style {:flex "50%"}}]
-        [:div {:style {:display "flex"}}
-         [:div flex50
-          [:h3 "Result"]
-          [:pre (my-str-brk result)]]
-         [:div flex50
-          [:h3 "Code"]
-          [:pre code]]])))
+(defn result-comp [{:keys [result-raw edn-code edn-code-orig code]}]
+  (if (= edn-code edn-code-orig :showcode) ;;never true, remove :showcode to supress code display.
+    [:pre (my-str result-raw)]
+    (let [flex50 {:style {:flex "50%"}}]
+      [:div {:style {:display "flex"}}
+       [:div flex50
+        [:h3 "Result"]
+        [:pre (my-str-brk result-raw)]]
+       [:div flex50
+        [:h3 "Code"]
+        [:pre code]]])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
-                           desc result result-raw edn-code-orig] :as the-state}]
+                           desc result-raw edn-code-orig code] :as the-state}]
   (if-let [ifo (get-inspect-form edn-code)]
     (let [tut (nth tutorials tutorial-no)]
       [:<>
@@ -387,7 +384,7 @@
        [:<>
         [error-comp the-state]
         (when desc [desc-button])]
-       result
+       code
        [:<>
         (if (start-with-div? (last edn-code-orig))
           [result-raw]
