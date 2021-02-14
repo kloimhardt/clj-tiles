@@ -70,6 +70,7 @@
   (swap! state merge
           {:stdout [] :inspect [] :sci-error nil
            :result nil
+           :result-raw nil
            :code nil
            :edn-code nil
            :edn-code-orig nil
@@ -134,6 +135,18 @@
     (into [] (cons fn-code edn-code))
     edn-code))
 
+(defn start-with-div? [last-edn-code]
+  (and (vector? last-edn-code)
+       (= (symbol ":div") (first last-edn-code))))
+
+(defn augment-code-div [edn-code]
+  (let [l (last edn-code)]
+    (if (start-with-div? l)
+      (conj (into [] (butlast edn-code))
+            (list 'defn 'cljtiles-comp [] l)
+            'cljtiles-comp)
+      edn-code)))
+
 (defn augment-code [edn-code]
   (let [flat-code (flatten (w/postwalk #(if (map? %) (vec %) %) edn-code))]
     (-> edn-code
@@ -146,7 +159,7 @@
         (augment-code-fu flat-code
                          '(defn L-free-particle "added by clj-tiles parser" [x]
                             (comp sicmutils-double (L-free-particle-sicm x))))
-        )))
+        (augment-code-div))))
 
 (def timer (atom nil))
 (def counter (atom 0))
@@ -163,7 +176,7 @@
             (js/setInterval (fn []
                               (swap! counter inc)
                               (if (< @counter max)
-                                (fu)
+                                (fu nil)
                                 (stop-timer nil))) ms))
     msg))
 
@@ -199,6 +212,7 @@
                      :else "")]
     (swap! state assoc
            :result result
+           :result-raw erg
            :code (if error "Cannot even parse the blocks" cbr)
            :edn-code aug-edn-code
            :edn-code-orig edn-code)))
@@ -304,46 +318,6 @@
         [desc-button]
         [:button {:on-click #(startsci nil)} "Run"]))]])
 
-(defn filter-defns [edn-code fu]
-  (conj
-   (vec (filter #(= (symbol "defn") (first %)) edn-code))
-   (list fu)
-   (last edn-code)))
-
-(defn to-kw [edn-code sy]
-  (cond
-    (symbol? sy)
-    (let [s (str sy)]
-      (cond
-        (= ":" (first s)) (keyword (subs s 1 (count s)))
-        (= "nil" s) nil
-        (= "@app-state" s) @app-state
-        :else sy))
-    (map? sy)
-    (if (:on-click sy)
-      (assoc sy
-             :on-click
-             #(run-code (filter-defns edn-code (:on-click sy))
-                        nil))
-      sy)
-    (list? sy)
-    (try (sci/eval-string (pr-str sy))
-         (catch js/Error e (.-message e)))
-    :else sy))
-
-(defn transform-vec [vect edn-code]
-  (w/postwalk #(to-kw edn-code %)
-              vect))
-
-(defn is-last-div [edn-code]
-  (let [v? #(when (vector? %) %)
-        last-vec (v? (last edn-code))]
-    (when (= (symbol ":div") (first last-vec))
-      last-vec)))
-
-(defn reagent-comp [last-vec edn-code]
-  (transform-vec last-vec edn-code))
-
 (defn tex-comp [txt]
   [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
                                     #js ["Typeset" (.-Hub js/MathJax) el])
@@ -382,7 +356,7 @@
           [:pre code]]])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
-                           desc result] :as the-state}]
+                           desc result result-raw edn-code-orig] :as the-state}]
   (if-let [ifo (get-inspect-form edn-code)]
     (let [tut (nth tutorials tutorial-no)]
       [:<>
@@ -415,8 +389,8 @@
         (when desc [desc-button])]
        result
        [:<>
-        (if-let [last-vec (is-last-div edn-code)]
-          [reagent-comp last-vec edn-code]
+        (if (start-with-div? (last edn-code-orig))
+          [result-raw]
           [result-comp the-state])
         (when desc [desc-button])]
        desc

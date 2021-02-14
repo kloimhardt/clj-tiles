@@ -273,7 +273,7 @@
    (gb/rpg [[0 0] [150 0] [0 50] [150 50] [0 150]]
            'click-function
            'click-function
-           '(defn :tiles/slot [] :tiles/slot)
+           '(defn :tiles/slot _dummy :tiles/slot)
            '(println @app-state)
            '(:tiles/vert [:div
                           [:hr]
@@ -284,7 +284,7 @@
            '@app-state
            'app-state
            'inc
-           '(defn click-function [ ]
+           '(defn click-function _
               (do (swap! :tiles/slot :tiles/slot)
                   (println :tiles/slot)))
            '(:tiles/vert [:div
@@ -293,7 +293,7 @@
                           (:tiles/vert [:button {:id "first-button" :on-click click-function} "Hello, World. I count!"])
                           [:hr]]))
    (gb/rpg [[0 0] [0 150] [0 200] [200 400]]
-           '(defn click-function []
+           '(defn click-function _
               (do (swap! app-state inc)
                   (println @app-state)))
            '(str " " :tiles/slot)
@@ -306,10 +306,10 @@
            '@app-state)
    (gb/rpg [[0 0] [0 100] [0 200] [0 250]]
            '(defn click-function
-              []
+              _
               (swap! app-state inc))
            '(defn start-rocket
-              []
+              _
               (start-timer click-function
                            30
                            200
