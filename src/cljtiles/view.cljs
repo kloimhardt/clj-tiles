@@ -153,24 +153,17 @@
                             (comp sicmutils-double (L-free-particle-sicm x))))
         (augment-code-div))))
 
-(def timer (atom nil))
-(def counter (atom 0))
-
-(defn stop-timer [msg]
-  (js/clearInterval @timer)
-  (reset! timer nil)
-  (reset! counter 0)
-  msg)
-
 (defn start-timer [fu ms max msg]
-  (when-not @timer
-    (reset! timer
-            (js/setInterval (fn []
-                              (swap! counter inc)
-                              (if (< @counter max)
-                                (fu nil)
-                                (stop-timer nil)))
-                            ms))
+  (let [timer (atom nil)
+        counter (atom 0)
+        stop-timer (fn [msg]
+                     (js/clearInterval @timer)
+                     msg)
+        step (fn []
+               (.log js/console (str @counter @app-state))
+               (swap! counter inc)
+               (if (< @counter max) (fu nil) (stop-timer nil)))]
+    (reset! timer (js/setInterval step ms))
     msg))
 
 (defn bindings [new-println tex-print tex-inspect]
@@ -184,8 +177,7 @@
     'tex tex-print
     workspace!/inspect-fn-sym tex-inspect
     'app-state app-state
-    'start-timer start-timer
-    'stop-timer stop-timer}))
+    'start-timer start-timer}))
 
 (defn run-code [edn-code error]
   (let [aug-edn-code (augment-code edn-code)
