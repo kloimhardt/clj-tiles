@@ -37,7 +37,7 @@
 
 (def content (let [f (fn [ks v]
                        (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
-               (-> (f [:tutorials :chapnames :chaps :xml-code]
+               (-> (f [:tutorials :chapnames :chaps]
                       [t-0/content t-s2/content t-s/content t-s3/content])
                    (update :tutorials #(map generate-xml %)))))
 
@@ -410,7 +410,7 @@
                        (.get "page"))]
     (if (= p "freeparticle")
       (do
-        (goto-page! (dec 51))
+        (goto-lable-page! :free-particle)
         (swap! state assoc :run-button false)
         (swap! state assoc :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
       (-> p

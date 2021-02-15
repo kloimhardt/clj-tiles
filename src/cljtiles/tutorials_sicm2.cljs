@@ -4,7 +4,13 @@
 (def bold {:style {:font-weight "bold"}})
 
 (def e-vect
-  [{:description
+  [{:scroll [0 0]
+    :blockpos [[0 0] [0 100]]
+    :code [[:div>b "This is bold text in HTML and the formula is LaTeX" :tiles/slot]
+           ['html-tex "sin^2{x} + cos^2{x} = 1"]]
+    }
+   {:lable :free-particle
+    :description
     [:div
      [:div bold "Description"]
      [:p "We start by creating a function Path-of-a-Free-Particle. Newtons first law states that in some inertial frame of reference, an object continues to move in space at a constant velocity. This movement takes time, so our function depends on time. It returns a vector of two elements because we choose our path to live in two dimensions."]
