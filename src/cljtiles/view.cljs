@@ -126,14 +126,41 @@
 
 (defn start-with-div? [last-edn-code]
   (and (vector? last-edn-code)
-       (#{":div" "html"} (subs (str (first last-edn-code)) 0 4))))
+       (let [f (str (first last-edn-code))]
+         (or (= ":div" f)
+             (= ":div>" (subs f 0 5))))))
+
+(defn tex-comp [txt]
+  [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
+                                    #js ["Typeset" (.-Hub js/MathJax) el])
+                            (catch js/Error e (println (.-message e)))))}
+   txt])
+
+(defn html-tex-comp [e]
+  [tex-comp (sicm/tex e)])
+
+(def reagent-component-bindings
+  {'tex html-tex-comp})
+
+(defn parse-:div> [e]
+  (let [sf (str (first e))
+        sb (symbol (subs sf 5))]
+    (cond-> e
+      (get reagent-component-bindings sb) (assoc 0 sb)
+      (= ":div>" sf) (assoc 0 (symbol ":div")))))
+
+(defn remove-all-:div> [edn-code]
+  (w/postwalk #(if (= (symbol ":div>") %) (symbol ":div") %) edn-code))
 
 (defn augment-code-div [edn-code inspect-fn]
   (let [l (last edn-code)]
     (if (and (not inspect-fn) (start-with-div? l))
       (conj (into [] (butlast edn-code))
-            (list 'defn 'cljtiles-comp [] l)
-            'cljtiles-comp)
+            (list 'defn 'cljtiles-reagent-component
+                  "added by clj-tiles parser"
+                  []
+                  (parse-:div> l))
+            'cljtiles-reagent-component)
       edn-code)))
 
 (defn augment-code [edn-code inspect-fn]
@@ -148,7 +175,8 @@
         (augment-code-fu flat-code
                          '(defn L-free-particle "added by clj-tiles parser" [x]
                             (comp sicmutils-double (L-free-particle-sicm x))))
-        (augment-code-div inspect-fn))))
+        (augment-code-div inspect-fn)
+        remove-all-:div>)))
 
 (defn start-timer [fu ms max msg]
   (let [timer (atom nil)
@@ -162,15 +190,6 @@
     (reset! timer (js/setInterval step ms))
     msg))
 
-(defn tex-comp [txt]
-  [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
-                                    #js ["Typeset" (.-Hub js/MathJax) el])
-                            (catch js/Error e (println (.-message e)))))}
-   txt])
-
-(defn html-tex-comp [e]
-  [tex-comp (sicm/tex e)])
-
 (defn bindings [new-println tex-inspect]
   (merge
    (es/namespaces 'sicmutils.numerical.minimize)
@@ -178,6 +197,7 @@
    (es/namespaces 'sicmutils.env)
    (es/namespaces 'sicmutils.abstract.function) ;;needs to be after sicmutils.env
    sicm/bindings
+   reagent-component-bindings
    {'println new-println
     'html-tex html-tex-comp
     workspace!/inspect-fn-sym tex-inspect

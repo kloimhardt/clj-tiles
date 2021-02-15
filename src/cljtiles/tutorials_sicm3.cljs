@@ -39,7 +39,7 @@
         (:tiles/vert
          (up (* 'l (sin angle))
              (- (Hight-of-Pivot time) (* 'l (cos angle))))))
-     '[html-tex
+     '[:div>tex
            (((Lagrange-equations
                (compose Lagrangian (F->C Rectangular-Angle)))
              (up (literal-function 'phi)))

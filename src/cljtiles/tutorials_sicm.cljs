@@ -111,7 +111,7 @@ If you now apply this operator to the Path-of-a-Free-Particle, the zero row vect
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '[html-tex :tiles/slot]
+           '[:div>tex :tiles/slot]
            '(:tiles/slot :tiles/slot)
            '(:tiles/slot :tiles/slot)
            '(Lagrange-equations :tiles/slot)
@@ -131,7 +131,7 @@ If you now apply this operator to the Path-of-a-Free-Particle, the zero row vect
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations Lagrangian)
                    Path-of-a-Free-Particle)
                   10)])
@@ -180,7 +180,7 @@ my not be linear in time."
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations Lagrangian)
                    Path-of-a-Free-Particle)
                   10)]
@@ -201,7 +201,7 @@ my not be linear in time."
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
@@ -238,7 +238,7 @@ second you introduce the mass \\(m\\) into the kinetic energy. You throw away th
               [[time position velocity]]
               (Kinetic-Energy velocity))
            ''t
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
@@ -252,7 +252,7 @@ second you introduce the mass \\(m\\) into the kinetic energy. You throw away th
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
@@ -291,7 +291,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            '(Potential-Energy :tiles/slot)
            'hight
 
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
@@ -312,7 +312,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
               [[time [_ hight] velocity]]
               (- (Kinetic-Energy velocity)
                  (Potential-Energy hight)))
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
@@ -360,7 +360,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            '(up :tiles/slot)
            '(literal-function :tiles/slot)
            ''phi
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
@@ -388,7 +388,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
               (:tiles/vert
                (up (* 'l (sin angle))
                    (- 'h (* 'l (cos angle))))))
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations
                      (compose Lagrangian (F->C Rectangular-Angle)))
                    (up (literal-function 'phi)))
@@ -423,7 +423,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                    (- 'h (* 'l (cos angle))))))
            'time
            '(Hight-of-Pivot :tiles/slot) 'time
-           '[html-tex
+           '[:div>tex
                  (((Lagrange-equations
                      (compose Lagrangian (F->C Rectangular-Angle)))
                    (up (literal-function 'phi)))

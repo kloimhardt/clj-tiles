@@ -6,8 +6,9 @@
 (def e-vect
   [{:scroll [0 0]
     :blockpos [[0 0] [0 100]]
-    :code [[:div>b "This is bold text in HTML and the formula is LaTeX" :tiles/slot]
-           ['html-tex "sin^2{x} + cos^2{x} = 1"]]
+    :code [['tex "sin^2{x} + cos^2{x} = 1"]
+           [:div>b "This is bold text in HTML and the formula is LaTeX" :tiles/slot]
+           ]
     }
    {:lable :free-particle
     :description
