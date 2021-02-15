@@ -204,6 +204,63 @@
     'app-state app-state
     'start-timer start-timer}))
 
+(comment
+
+  (do
+
+    (def the-errs (atom []))
+    (def the-env (atom nil))
+    (defn r [code-str env errs]
+      (try (sci/eval-string (str code-str)  {:bindings nil :env env})
+           (catch js/Error e (swap! errs conj e) :sci-error)))
+
+    (def c ['(def n 4) 'a '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 x) "lasti" 'z])
+    (def c [])
+    (def c ['(def n 4) '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 n) "lasti"])
+    (def c ['a 'b 'c])
+    (def cbr (map #(zp/zprint-str % 3) c))
+    (def cbr-noflines (map (fn [y] (inc (count (filter (fn [x] (= "\n" x)) y)))) cbr))
+    (def cbr-sumlines (reductions + (cons 0 cbr-noflines)))
+    (def results (doall (map #(r % the-env the-errs) cbr)))
+    (def errs (map #(select-keys (.-data %) [:message :line :column]) @the-errs))
+    (def err-lines (map #(.-data %) @the-errs))
+    (def err-msgs (map #(.-message %) @the-errs))
+    (def first-err-num (count (take-while #(not= % :sci-error) results)))
+    (def err-correct-line (update (first err-lines) :line #(+ % (nth cbr-sumlines first-err-num))))
+
+    (def r (drop-while #(= % :sci-error) (reverse results)))
+    {:result {:expression (first r) :line (inc (nth cbr-sumlines (dec (count r)) -1))}
+     :err {:message (first err-msgs) :line (:line err-correct-line)}
+     :str-code (apply str (interpose "\n" cbr))}
+    )
+  )
+
+(defn cljtiles-eval [edn-code bindings]
+  (let [the-errs (atom [])
+        the-env (atom nil)
+        sci-eval (fn [code-str env errs]
+          (try (sci/eval-string (str code-str)  {:bindings bindings :env env})
+               (catch js/Error e (swap! errs conj e) :sci-error)))
+        cbr (map #(zp/zprint-str % output-width) edn-code)
+        cbr-noflines (map (fn [y] (inc (count (filter (fn [x] (= "\n" x)) y)))) cbr)
+        cbr-sumlines (reductions + (cons 0 cbr-noflines))
+        results (doall (map #(sci-eval % the-env the-errs) cbr))
+        err-lines (map #(.-data %) @the-errs)
+        err-msgs (map #(.-message %) @the-errs)
+        first-err-num (count (take-while #(not= % :sci-error) results))
+        err-correct-line (update (first err-lines) :line #(+ % (nth cbr-sumlines first-err-num)))
+        good-results (drop-while #(= % :sci-error) (reverse results))]
+    {:result {:expression (first good-results) :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
+     :err {:message (first err-msgs) :line (:line err-correct-line)}
+     :str-code (apply str (interpose "\n" cbr))}))
+
+(comment
+  (cljtiles-eval ['(def n 4) 'a '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 x) "lasti" 'z] nil)
+  (cljtiles-eval [] nil)
+  (cljtiles-eval ['(def n 4) '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 n) "lasti"] nil)
+  (cljtiles-eval ['a 'b 'c] nil)
+  )
+
 (defn run-code [edn-code inspect-fn]
   (let [aug-edn-code (augment-code edn-code inspect-fn)
         new-println
