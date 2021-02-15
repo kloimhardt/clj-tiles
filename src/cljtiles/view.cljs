@@ -235,7 +235,7 @@
     )
   )
 
-(defn cljtiles-eval [edn-code bindings]
+(defn cljtiles-eval-1 [edn-code bindings]
   (let [the-errs (atom [])
         the-env (atom nil)
         sci-eval (fn [code-str env errs]
@@ -261,21 +261,33 @@
   (cljtiles-eval ['a 'b 'c] nil)
   )
 
+(defn cljtiles-eval [edn-code bindings]
+  (let [the-err-msg (atom nil)
+        cbr (code->break-str edn-code)
+        erg (try (sci/eval-string cbr {:bindings bindings})
+                 (catch js/Error e
+                   (reset! the-err-msg (.-message e))
+                   ;;(swap! state assoc :sci-error (.-message e))
+                   nil))]
+    {:result {:expression erg :line 0}
+     :err {:message @the-err-msg :line 0}
+     :str-code cbr}))
+
 (defn run-code [edn-code inspect-fn]
   (let [aug-edn-code (augment-code edn-code inspect-fn)
         new-println
         (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
         tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
         bindings2 (bindings new-println tex-inspect)
-        cbr (code->break-str aug-edn-code)
         _ (reset-state nil)
-        erg (try (sci/eval-string cbr {:bindings bindings2})
-                 (catch js/Error e (swap! state assoc :sci-error (.-message e)) nil))]
-    (swap! state assoc
-           :result-raw erg
-           :code cbr
-           :edn-code aug-edn-code
-           :edn-code-orig edn-code)))
+        erg (cljtiles-eval aug-edn-code bindings2)]
+    (swap! state merge
+           (let [{:keys [result err str-code]} erg]
+             {:sci-error (:message err)
+              :result-raw (:expression result)
+              :code str-code
+              :edn-code aug-edn-code
+              :edn-code-orig edn-code}))))
 
 (defn insert-inspect [edn-code inspect-form]
     (if inspect-form
