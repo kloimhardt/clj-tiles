@@ -252,7 +252,7 @@
            '(println @app-state))
    (gb/rpg []
            [:div :tiles/slot]
-           [:p "Hello, World!"])
+           [:h1 "Hello, World!"])
    (gb/rpg [[0 0] [100 0] [0 50] [0 100]]
            [:hr]
            [:hr]
