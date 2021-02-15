@@ -126,17 +126,17 @@
 
 (defn start-with-div? [last-edn-code]
   (and (vector? last-edn-code)
-       (= (symbol ":div") (first last-edn-code))))
+       (#{":div" "html"} (subs (str (first last-edn-code)) 0 4))))
 
-(defn augment-code-div [edn-code]
+(defn augment-code-div [edn-code inspect-fn]
   (let [l (last edn-code)]
-    (if (start-with-div? l)
+    (if (and (not inspect-fn) (start-with-div? l))
       (conj (into [] (butlast edn-code))
             (list 'defn 'cljtiles-comp [] l)
             'cljtiles-comp)
       edn-code)))
 
-(defn augment-code [edn-code]
+(defn augment-code [edn-code inspect-fn]
   (let [flat-code (flatten (w/postwalk #(if (map? %) (vec %) %) edn-code))]
     (-> edn-code
         (augment-code-fu flat-code
@@ -148,7 +148,7 @@
         (augment-code-fu flat-code
                          '(defn L-free-particle "added by clj-tiles parser" [x]
                             (comp sicmutils-double (L-free-particle-sicm x))))
-        (augment-code-div))))
+        (augment-code-div inspect-fn))))
 
 (defn start-timer [fu ms max msg]
   (let [timer (atom nil)
@@ -162,7 +162,16 @@
     (reset! timer (js/setInterval step ms))
     msg))
 
-(defn bindings [new-println tex-print tex-inspect]
+(defn tex-comp [txt]
+  [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
+                                    #js ["Typeset" (.-Hub js/MathJax) el])
+                            (catch js/Error e (println (.-message e)))))}
+   txt])
+
+(defn html-tex-comp [e]
+  [tex-comp (sicm/tex e)])
+
+(defn bindings [new-println tex-inspect]
   (merge
    (es/namespaces 'sicmutils.numerical.minimize)
    (es/namespaces 'sicmutils.mechanics.lagrange)
@@ -170,27 +179,24 @@
    (es/namespaces 'sicmutils.abstract.function) ;;needs to be after sicmutils.env
    sicm/bindings
    {'println new-println
-    'tex tex-print
+    'html-tex html-tex-comp
     workspace!/inspect-fn-sym tex-inspect
     'app-state app-state
     'start-timer start-timer}))
 
-(defn run-code [edn-code error]
-  (let [aug-edn-code (augment-code edn-code)
+(defn run-code [edn-code inspect-fn]
+  (let [aug-edn-code (augment-code edn-code inspect-fn)
         new-println
         (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
-        tex-print
-        (fn [& x] (swap! state #(update % :stdout conj
-                                        (sicm/tex (last x)))) nil)
         tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
-        bindings2 (bindings new-println tex-print tex-inspect)
+        bindings2 (bindings new-println tex-inspect)
         cbr (code->break-str aug-edn-code)
         _ (reset-state nil)
         erg (try (sci/eval-string cbr {:bindings bindings2})
                  (catch js/Error e (swap! state assoc :sci-error (.-message e)) nil))]
     (swap! state assoc
            :result-raw erg
-           :code (if error "Cannot even parse the blocks" cbr)
+           :code cbr
            :edn-code aug-edn-code
            :edn-code-orig edn-code)))
 
@@ -210,14 +216,14 @@
         (map insert-inspect ec ifo))
       eci)))
 
-(defn ^:export startsci [context]
+(defn ^:export startsci [{:keys [inspect-fn] :as context}]
   (let [xml-str (->> (.-mainWorkspace blockly)
                      (.workspaceToDom blockly/Xml)
                      (.domToPrettyText blockly/Xml))
         edn-code (get-edn-code xml-str
                                (when context (.-id (get context "block")))
-                               (:inspect-fn context))]
-    (run-code edn-code nil)))
+                               inspect-fn)]
+    (run-code edn-code inspect-fn)))
 
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
@@ -295,17 +301,6 @@
         [desc-button]
         [:button {:on-click #(startsci nil)} "Run"]))]])
 
-(defn tex-comp [txt]
-  [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
-                                    #js ["Typeset" (.-Hub js/MathJax) el])
-                            (catch js/Error e (println (.-message e)))))}
-   txt])
-
-(defn mixed-comp [txt]
-  (if (re-find #"(\\\(|\\\[)" txt)
-    [tex-comp txt]
-    [:pre txt]))
-
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
 
@@ -350,7 +345,7 @@
          [:<>
           (map-indexed (fn [idx v]
                          ^{:key idx} [:<>
-                                      [mixed-comp (sicm/kind? v)]
+                                      [tex-comp (sicm/kind? v)]
                                       [:hr]])
                        inspect)
           (when-let [msg-fn (:message-fn tut)]
@@ -365,7 +360,7 @@
          )])
     [:<>
      (map-indexed (fn [idx v]
-                    ^{:key idx} [mixed-comp v])
+                    ^{:key idx} [:pre v])
                   stdout)
      (cond
        sci-error

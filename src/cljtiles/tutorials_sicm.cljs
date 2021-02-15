@@ -111,7 +111,7 @@ If you now apply this operator to the Path-of-a-Free-Particle, the zero row vect
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '(tex "Title" :tiles/slot)
+           '[html-tex :tiles/slot]
            '(:tiles/slot :tiles/slot)
            '(:tiles/slot :tiles/slot)
            '(Lagrange-equations :tiles/slot)
@@ -131,10 +131,10 @@ If you now apply this operator to the Path-of-a-Free-Particle, the zero row vect
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations Lagrangian)
                    Path-of-a-Free-Particle)
-                  10)))
+                  10)])
    [:div
     [:div bold "Description"]
     [:p
@@ -180,10 +180,10 @@ my not be linear in time."
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations Lagrangian)
                    Path-of-a-Free-Particle)
-                  10))
+                  10)]
            '(up :tiles/slot :tiles/slot)
            '(literal-function :tiles/slot)
            'q_x
@@ -201,11 +201,11 @@ my not be linear in time."
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
-                  10)))
+                  10)])
    [:div
     [:div bold "Description"]
     [:p
@@ -238,11 +238,11 @@ second you introduce the mass \\(m\\) into the kinetic energy. You throw away th
               [[time position velocity]]
               (Kinetic-Energy velocity))
            ''t
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
-                  10)))
+                  10)])
    "After running, you see Newtons equations of motion for the two dimensional free particle in their standard form."
    [0 0]
    (gb/rpg [[0 0] [0 150] [0 300]]
@@ -252,11 +252,11 @@ second you introduce the mass \\(m\\) into the kinetic energy. You throw away th
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
-                  't)))
+                  't)])
    "Now you model a particle in the gravitational field by introducing the potential energy. It depends on
 the hight of the particle above ground. It is \\(m \\times g \\times hight\\), where \\(g\\) is \\(9.81 \\frac{m}{s^2}\\), the acceleration due to the gravity of the earth. The Lagrangain is kintic energy minus potential energy. And the Lagrangian now depends on the hight."
    [0 0]
@@ -291,11 +291,11 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            '(Potential-Energy :tiles/slot)
            'hight
 
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
-                  't)))
+                  't)])
    "Run the workspace and Newtons equations of motion for the particle in the homogeneous gravitational field are delivered."
    [0 0]
    (gb/rpg [[0 0]
@@ -312,11 +312,11 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
               [[time [_ hight] velocity]]
               (- (Kinetic-Energy velocity)
                  (Potential-Energy hight)))
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
-                  't)))
+                  't)])
    "To get the equations for the pendulum, you introduce a transformation of coordiantes. The new single coordinate is the angle between the rod and its position at rest. So the old coordinates become dependent on each other. The horizontal position x of the bob is \\( l \\times \\sin(angle)\\), where l is the length of the pendulum. The hight of the bob is \\(h - l \\times \\cos(angle)\\) (h is the hight of the pivot). The Lagangian of the pendulum is obtained by prepending the transformation. In this function composition, the Lagrangian of the independently moving particle is reused completely unchanged. The new Lagrangian equations are now applied to some function \\(\\phi\\). You can do the functional replacements using the blcks you just built."
    [0 -400]
    (gb/rpg [[0 0]
@@ -360,11 +360,11 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            '(up :tiles/slot)
            '(literal-function :tiles/slot)
            ''phi
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations Lagrangian)
                    (up (literal-function 'q_x)
                        (literal-function 'q_y)))
-                  't))
+                  't)]
            )
    "Run the workbook and get the equations for the pendulum delivered."
    [0 -400]
@@ -388,11 +388,11 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
               (:tiles/vert
                (up (* 'l (sin angle))
                    (- 'h (* 'l (cos angle))))))
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations
                      (compose Lagrangian (F->C Rectangular-Angle)))
                    (up (literal-function 'phi)))
-                  't)))
+                  't)])
    "In the last step, you introduce the function Hight-of-Pivot as a driver to the pendulum. It is an arbitrary funtion of time. The replacement is easily done, but notice that the transformation of coordinates now becomes time dependent. And with this, the Lagrangian becomes time dependent in an explicit manner."
    [0 -400]
    (gb/rpg [[0 0]
@@ -423,11 +423,11 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                    (- 'h (* 'l (cos angle))))))
            'time
            '(Hight-of-Pivot :tiles/slot) 'time
-           '(tex "Title"
+           '[html-tex
                  (((Lagrange-equations
                      (compose Lagrangian (F->C Rectangular-Angle)))
                    (up (literal-function 'phi)))
-                  't)))
+                  't)])
    ])
 
 (def desc (take-nth 3 ee-vect))

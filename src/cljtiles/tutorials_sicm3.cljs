@@ -39,11 +39,11 @@
         (:tiles/vert
          (up (* 'l (sin angle))
              (- (Hight-of-Pivot time) (* 'l (cos angle))))))
-     '(tex "Title"
+     '[html-tex
            (((Lagrange-equations
                (compose Lagrangian (F->C Rectangular-Angle)))
              (up (literal-function 'phi)))
-            't))]}])
+            't)]]}])
 
 (def chapnames ["Pendulum restult"])
 (def chaps [(count e-vect)])
