@@ -65,13 +65,16 @@
 
 (defn reset-state [tutorial-no]
   (swap! state merge
-          {:stdout [] :inspect [] :sci-error nil
-           :result-raw nil
-           :code nil
-           :edn-code nil
-           :edn-code-orig nil
-           :modal-style-display "none"
-           :run-button true})
+         {:stdout []
+          :inspect []
+          :sci-error nil
+          :sci-error-full nil
+          :result-raw nil
+          :code nil
+          :edn-code nil
+          :edn-code-orig nil
+          :modal-style-display "none"
+          :run-button true})
   (when tutorial-no
     (swap! state assoc :tutorial-no tutorial-no)
     (swap! state assoc :desc (:description (nth tutorials tutorial-no)))))
