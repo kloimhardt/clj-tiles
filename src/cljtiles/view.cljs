@@ -211,14 +211,17 @@
 
 ;; this executes every form one by one, no matter whether an error occurs
 ;; lets inspect expressions after an error
-;; would also have the advantage of showing the last valid result
-;; if there were not this stack overflow problem
-;; but very useful for inspect, so it is used there
+;; would also appear to have the advantage of showing the last valid result
+;; if there were not  1) this stack overflow problem
+;; and 2) experience shows, that it is confusing anyway to show some result
+;; along with an error after pressing the run button.
+;; So: the thing is very useful for inspect, so it is used there
+;; and there only the errors are important, no results needed.
 (defn cljtiles-eval-one-by-one [edn-code bindings]
   (let [the-errs (atom [])
         the-env (atom nil)
         sci-eval (fn [code-str env errs]
-          (try (sci/eval-string (str code-str)  {:bindings bindings :env env})
+                   (try (sci/eval-string code-str {:bindings bindings :env env})
                (catch js/Error e (swap! errs conj e) :sci-error)))
         cbr (map #(zp/zprint-str % output-width) edn-code)
         _results (doall (map #(sci-eval % the-env the-errs) cbr))
