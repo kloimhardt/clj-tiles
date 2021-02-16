@@ -204,40 +204,10 @@
     'app-state app-state
     'start-timer start-timer}))
 
-(comment
-
-  (do
-
-    (def the-errs (atom []))
-    (def the-env (atom nil))
-    (defn r [code-str env errs]
-      (try (sci/eval-string (str code-str)  {:bindings nil :env env})
-           (catch js/Error e (swap! errs conj e) :sci-error)))
-
-    (def c ['(def n 4) 'a '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 x) "lasti" 'z])
-    (def c [])
-    (def c ['(def n 4) '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 n) "lasti"])
-    (def c ['a 'b 'c])
-    (def cbr (map #(zp/zprint-str % 3) c))
-    (def cbr-noflines (map (fn [y] (inc (count (filter (fn [x] (= "\n" x)) y)))) cbr))
-    (def cbr-sumlines (reductions + (cons 0 cbr-noflines)))
-    (def results (doall (map #(r % the-env the-errs) cbr)))
-    (def errs (map #(select-keys (.-data %) [:message :line :column]) @the-errs))
-    (def err-lines (map #(.-data %) @the-errs))
-    (def err-msgs (map #(.-message %) @the-errs))
-    (def first-err-num (count (take-while #(not= % :sci-error) results)))
-    (def err-correct-line (update (first err-lines) :line #(+ % (nth cbr-sumlines first-err-num))))
-
-    (def r (drop-while #(= % :sci-error) (reverse results)))
-    {:result {:expression (first r) :line (inc (nth cbr-sumlines (dec (count r)) -1))}
-     :err {:message (first err-msgs) :line (:line err-correct-line)}
-     :str-code (apply str (interpose "\n" cbr))}
-    )
-  )
-
-;; this executes form by form
+;; this executes every form one by one, no matter whether an error occurs
 ;; has the advantage of showing the last valid result
-#_(defn cljtiles-eval-new [edn-code bindings]
+;; and lets inspect expressions after an error
+(defn cljtiles-eval-one-by-one [edn-code bindings]
   (let [the-errs (atom [])
         the-env (atom nil)
         sci-eval (fn [code-str env errs]
@@ -251,23 +221,29 @@
         err-msgs (map #(.-message %) @the-errs)
         first-err-num (count (take-while #(not= % :sci-error) results))
         err-correct-line (update (first err-lines) :line #(+ % (nth cbr-sumlines first-err-num)))
-        ;;good-results (drop-while #(= % :sci-error) (reverse results))
-        good-results (take-while #(not= % :sci-error) results)
+        ;; takes last good result
+        good-results (drop-while #(= % :sci-error) (reverse results))
+        good-result (first good-results)
+        ;; takes result before first error
+        ;;good-results (take-while #(not= % :sci-error) results)
+        ;;good-result (last good-results)
         ]
-    {:result {:expression (last good-results) ;;(first good-results)
+    {:result {:expression good-result
               :number (dec (count good-results))
               :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
      :err {:message (first err-msgs)
            :line (:line err-correct-line)
-           :column (:column err-correct-line)}
+           :column (:column err-correct-line)
+           :err-msgs err-msgs}
      :str-expressions cbr
      :str-code (apply str (interpose "\n" cbr))}))
 
-#_(comment
-  (cljtiles-eval ['(def n 4) 'a '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 x) "lasti" 'z] nil)
-  (cljtiles-eval [] nil)
-  (cljtiles-eval ['(def n 4) '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 n) "lasti"] nil)
-  (cljtiles-eval ['a 'b 'c] nil)
+(comment
+  ;; cases demonstrate especially the one by one execution
+  (cljtiles-eval-one-by-one ['(def n 4) 'a '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 x) "lasti" 'z] nil)
+  (cljtiles-eval-one-by-one [] nil)
+  (cljtiles-eval-one-by-one ['(def n 4) '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 n) "lasti"] nil) ;;error line is last line if no error occurs
+  (cljtiles-eval-one-by-one ['a 'b 'c] nil)
   )
 
 (defn cljtiles-eval [edn-code bindings]
@@ -290,7 +266,9 @@
         tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
         bindings2 (bindings new-println tex-inspect)
         _ (reset-state nil)
-        erg (cljtiles-eval aug-edn-code bindings2)]
+        erg (if inspect-fn
+              (cljtiles-eval-one-by-one aug-edn-code bindings2)
+              (cljtiles-eval aug-edn-code bindings2))]
     (swap! state merge
            (let [{:keys [result err str-code]} erg]
              {:sci-error (:message err)
@@ -409,16 +387,30 @@
     (part-str output-width (apply str (interpose " " (map my-str e))))
     (part-str output-width (my-str e))))
 
-(defn error-comp [{:keys [sci-error-full sci-error code]}]
-  (let [flex50 {:style {:flex "50%"}}
-        mod-error (if (= (subs sci-error 0 40)
-                         "Parameter declaration should be a vector")
-                    (str "Wrong Parameter declaration" (subs sci-error 40))
-                     sci-error)]
+(defn modify-error [msg]
+  (if (= (subs msg 0 40)
+         "Parameter declaration should be a vector")
+    (str "Wrong Parameter declaration" (subs msg 40))
+    msg))
+
+(defn error-comp-inspect [{:keys [sci-error-full code]} ifo]
+  (let [flex50 {:style {:flex "50%"}}]
     [:div {:style {:display "flex"}}
      [:div flex50
       [:h3 "Code interpretation result"]
-      [:pre (my-str-brk mod-error)]
+      [:pre (my-str-brk (str "The expression " ifo " could not be displayed due to one of the following errors:"))]
+      (map-indexed (fn [idx msg] ^{:key idx} [:pre (my-str-brk (str (inc idx) ". " (modify-error msg)))])
+                   (:err-msgs sci-error-full) )]
+     [:div flex50
+      [:h3 "Code"]
+      [:pre code]]]))
+
+(defn error-comp [{:keys [sci-error-full sci-error code]}]
+  (let [flex50 {:style {:flex "50%"}}]
+    [:div {:style {:display "flex"}}
+     [:div flex50
+      [:h3 "Code interpretation result"]
+      [:pre (my-str-brk (modify-error sci-error))]
       [:pre (str "line " (:line sci-error-full) " column " (:column sci-error-full))]]
      [:div flex50
       [:h3 "Code"]
@@ -455,9 +447,10 @@
          [:<>
           (when-let [error-msg-fn (:error-message-fn tut)]
             [:p (error-msg-fn the-state ifo (:message-fn tut))])
-          [error-comp the-state]]
+          [error-comp-inspect the-state (last ifo)]]
          (= (last ifo) :start-interactive)
          [tex-comp ((:message-fn tut) the-state ifo goto-lable-page!)]
+         :else (str "Expression " (last ifo) " was never called.")
          )])
     [:<>
      (map-indexed (fn [idx v]
