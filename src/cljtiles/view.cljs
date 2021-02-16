@@ -64,20 +64,29 @@
 (defonce state (rc/atom nil))
 
 (defn reset-state [tutorial-no]
-  (swap! state merge
-         {:stdout []
-          :inspect []
-          :sci-error nil
-          :sci-error-full nil
-          :result-raw nil
-          :code nil
-          :edn-code nil
-          :edn-code-orig nil
-          :modal-style-display "none"
-          :run-button true})
-  (when tutorial-no
-    (swap! state assoc :tutorial-no tutorial-no)
-    (swap! state assoc :desc (:description (nth tutorials tutorial-no)))))
+  (let [tn (:tutorial-no @state)
+        ds (:desc @state)
+        init {:stdout []
+              :inspect []
+              :sci-error nil
+              :sci-error-full nil
+              :result-raw nil
+              :code nil
+              :edn-code nil
+              :edn-code-orig nil
+              :modal-style-display "none"
+              :run-button true
+              :tutorial-no tn
+              :desc ds}
+        check (or (not @state) (= (into (hash-set) (keys init))
+                                  (into (hash-set) (keys @state))))]
+    (reset! state (merge init
+                         (when tutorial-no
+                           {:tutorial-no tutorial-no
+                            :desc (:description (nth tutorials tutorial-no))})))
+    (when-not check
+      (swap! state assoc :stdout ["state is not in best state, pls. report this bug"]))
+    ))
 
 (defonce app-state (rc/atom nil))
 
