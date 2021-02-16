@@ -67,6 +67,7 @@
   (swap! state merge
           {:stdout [] :inspect [] :sci-error nil
            :result-raw nil
+           :full-result nil
            :code nil
            :edn-code nil
            :edn-code-orig nil
@@ -235,7 +236,7 @@
     )
   )
 
-(defn cljtiles-eval-1 [edn-code bindings]
+(defn cljtiles-eval-new [edn-code bindings]
   (let [the-errs (atom [])
         the-env (atom nil)
         sci-eval (fn [code-str env errs]
@@ -249,9 +250,16 @@
         err-msgs (map #(.-message %) @the-errs)
         first-err-num (count (take-while #(not= % :sci-error) results))
         err-correct-line (update (first err-lines) :line #(+ % (nth cbr-sumlines first-err-num)))
-        good-results (drop-while #(= % :sci-error) (reverse results))]
-    {:result {:expression (first good-results) :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
-     :err {:message (first err-msgs) :line (:line err-correct-line)}
+        ;;good-results (drop-while #(= % :sci-error) (reverse results))
+        good-results (take-while #(not= % :sci-error) results)
+        ]
+    {:result {:expression (last good-results) ;;(first good-results)
+              :number (dec (count good-results))
+              :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
+     :err {:message (first err-msgs)
+           :line (:line err-correct-line)
+           :column (:column err-correct-line)}
+     :str-expressions cbr
      :str-code (apply str (interpose "\n" cbr))}))
 
 (comment
@@ -287,7 +295,8 @@
               :result-raw (:expression result)
               :code str-code
               :edn-code aug-edn-code
-              :edn-code-orig edn-code}))))
+              :edn-code-orig edn-code
+              :full-result erg}))))
 
 (defn insert-inspect [edn-code inspect-form]
     (if inspect-form
@@ -398,16 +407,44 @@
     (part-str output-width (apply str (interpose " " (map my-str e))))
     (part-str output-width (my-str e))))
 
-(defn error-comp [{:keys [sci-error code]}]
+(defn exe-comp [header text full-result result-raw result-number result-line]
+  (when-not (neg? result-number)
+    [:<>
+     [:h3 header]
+     [:pre (str text result-line ":")]
+     [:pre (nth (get-in full-result [:str-expressions])
+                result-number)]
+     [:pre (my-str-brk result-raw)]])
+  )
+
+(defn inter-comp [full-result err-line mod-error]
+  [:<>
+   [:h3 "Code interpretation"]
+   [:pre (str "stumbled at line "
+              err-line
+              " column " (get-in full-result [:err :column]) ":")]
+   [:pre (my-str-brk mod-error)]])
+
+(defn error-comp [{:keys [full-result result-raw sci-error code]}]
   (let [flex50 {:style {:flex "50%"}}
         mod-error (if (= (subs (:sci-error @state) 0 40)
                          "Parameter declaration should be a vector")
                     (str "Wrong Parameter declaration" (subs (:sci-error @state) 40))
-                    sci-error)]
+                    sci-error)
+        result-number (get-in full-result [:result :number])
+        result-line (get-in full-result [:result :line])
+        err-line (get-in full-result [:err :line])]
     [:div {:style {:display "flex"}}
      [:div flex50
-      [:h3 "Code interpretation result"]
-      [:pre (my-str-brk mod-error)]]
+      (if (> err-line result-line)
+        [:<>
+         [exe-comp "Interim result" "from code completion until line " full-result result-raw result-number result-line]
+         [inter-comp full-result err-line mod-error]]
+        [:<>
+         [inter-comp full-result err-line mod-error]
+         #_[exe-comp "Some Result" "from line " full-result result-raw result-number result-line]
+         ])
+      ]
      [:div flex50
       [:h3 "Code"]
       [:pre code]]]))
