@@ -72,17 +72,12 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                             edn-code))
                )
           (msg-fn the-state '(nil time-error) nil)
-          (and (= (subs sci-error 0 30) "Could not resolve symbol: time")
-               (or (#{"10" "'t"} (str frm))
-                   (and (coll? frm)
-                        (= (first frm) 'Path-of-a-Free-Particle))))
-          (str "The below message is because a \"time\" block is still unconnected. For now, move the block " frm " upwards to help the interpreter reaching it before having to deal with this \"time\" block.")
           (= (subs sci-error 0 35) "Could not resolve symbol: Path-of-a")
           (msg-fn the-state '(nil particle-error) nil)
           (and (= 'defn (first frmcoll)) (= "Parameter declaration missing" (subs sci-error 0 29)))
           "The \"defn\" block has three connections, but only one is actually connected. You notice the \"Path-of-a-Free-Particle\" block. You connect it and inspect the whole \"defn\" block."
           :else
-          "No specific explanation is programmed for the below message. This shows that you are exploring. So don't worry, just try something else you can think of.")))
+          "No specific explanation is programmed for the below message. This shows that you are exploring. So don't worry, just make another step.")))
     :message-fn
     (fn [{:keys [inspect]} ifo goto-lable-page!]
       (let [frm (last ifo)
@@ -134,7 +129,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
              "A cryptic output without any type at all. But you realize from prior experience that you just created a stub for a function definition. The name of the function is \"Path-of-a-Free-Particle\" and its argument is \"time\". You add a block \\( (4 * time )\\) to the last connection of the \"defn\" block."
              (list 'defn 'Path-of-a-Free-Particle ['time]
                    (list '* (symbol :4) 'time))
-             "A cryptic output without any type at all. This is expected, as you know that functions need to be called. You right-click on empty space to open the parser and create the call statement."
+             "A cryptic output without any type at all. This is expected, as you know that functions need to be called. You right-click on empty space to open the parser and create the call statement (you notice the hint button)."
              'Path-of-a-Free-Particle-num
              "You are pleased to finally get some number. Inspecting \"time\", the argument of the function just called, seems intersting."
              't-symbol

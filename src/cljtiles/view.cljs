@@ -85,7 +85,7 @@
                            {:tutorial-no tutorial-no
                             :desc (:description (nth tutorials tutorial-no))})))
     (when-not check
-      (swap! state assoc :stdout ["state is not in best state, pls. report this bug"]))
+      (swap! state assoc :stdout ["state is not in best state, pls. report."]))
     ))
 
 (defonce app-state (rc/atom nil))
@@ -210,8 +210,10 @@
     'start-timer start-timer}))
 
 ;; this executes every form one by one, no matter whether an error occurs
-;; has the advantage of showing the last valid result
-;; and lets inspect expressions after an error
+;; lets inspect expressions after an error
+;; would also have the advantage of showing the last valid result
+;; if there were not this stack overflow problem
+;; but very useful for inspect, so it is used there
 (defn cljtiles-eval-one-by-one [edn-code bindings]
   (let [the-errs (atom [])
         the-env (atom nil)
@@ -219,37 +221,31 @@
           (try (sci/eval-string (str code-str)  {:bindings bindings :env env})
                (catch js/Error e (swap! errs conj e) :sci-error)))
         cbr (map #(zp/zprint-str % output-width) edn-code)
-        cbr-noflines (map (fn [y] (inc (count (filter (fn [x] (= "\n" x)) y)))) cbr)
-        cbr-sumlines (reductions + (cons 0 cbr-noflines))
-        results (doall (map #(sci-eval % the-env the-errs) cbr))
-        err-lines (map #(.-data %) @the-errs)
+        _results (doall (map #(sci-eval % the-env the-errs) cbr))
         err-msgs (map #(.-message %) @the-errs)
-        first-err-num (count (take-while #(not= % :sci-error) results))
-        err-correct-line (update (first err-lines) :line #(+ % (nth cbr-sumlines first-err-num)))
+        ;; cbr-noflines (map (fn [y] (inc (count (filter (fn [x] (= "\n" x)) y)))) cbr)
+        ;; cbr-sumlines (reductions + (cons 0 cbr-noflines))
+        ;; err-lines (map #(.-data %) @the-errs)
+        ;;first-err-num (count (take-while #(not= % :sci-error) results))
+        ;;!!!! this produces a stack overflow as comaring to sicm expressions seems to be very expensive !!!
+        ;;err-correct-line (update (first err-lines) :line #(+ % (nth cbr-sumlines first-err-num)))
         ;; takes last good result
-        good-results (drop-while #(= % :sci-error) (reverse results))
-        good-result (first good-results)
+        ;;good-results (drop-while #(= % :sci-error) (reverse results))
+        ;;good-result (first good-results)
+
         ;; takes result before first error
         ;;good-results (take-while #(not= % :sci-error) results)
         ;;good-result (last good-results)
         ]
-    {:result {:expression good-result
+    {:result nil #_{:expression good-result
               :number (dec (count good-results))
               :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
      :err {:message (first err-msgs)
-           :line (:line err-correct-line)
-           :column (:column err-correct-line)
+           :line nil ;;(:line err-correct-line)
+           :column nil ;;(:column err-correct-line)
            :err-msgs err-msgs}
      :str-expressions cbr
      :str-code (apply str (interpose "\n" cbr))}))
-
-(comment
-  ;; cases demonstrate especially the one by one execution
-  (cljtiles-eval-one-by-one ['(def n 4) 'a '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 x) "lasti" 'z] nil)
-  (cljtiles-eval-one-by-one [] nil)
-  (cljtiles-eval-one-by-one ['(def n 4) '(do "sdfsdfas" "haha" "holololoo") '[:l] '(- 5 n) "lasti"] nil) ;;error line is last line if no error occurs
-  (cljtiles-eval-one-by-one ['a 'b 'c] nil)
-  )
 
 (defn cljtiles-eval [edn-code bindings]
   (let [the-err-msg (atom nil)
@@ -403,7 +399,7 @@
     [:div {:style {:display "flex"}}
      [:div flex50
       [:h3 "Code interpretation result"]
-      [:pre (my-str-brk (str "The expression " ifo " could not be displayed due to one of the following errors:"))]
+      [:pre (my-str-brk (str "The expression " ifo " could not be displayed due to one of the following reasons:"))]
       (map-indexed (fn [idx msg] ^{:key idx} [:pre (my-str-brk (str (inc idx) ". " (modify-error msg)))])
                    (:err-msgs sci-error-full) )]
      [:div flex50
