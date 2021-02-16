@@ -344,10 +344,6 @@
                        ))))
       (assoc-in [13 :message-fn]
                  (fn [{:keys [result inspect stdout]} ifo goto-page!]
-                   (do
-                     (def result result)
-                     (def ifo1 ifo)
-                     (def inspect inspect))
                    (let [frm (last ifo)
                          frmcoll (when (coll? frm) frm)]
                      (cond
