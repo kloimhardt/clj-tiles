@@ -470,7 +470,7 @@
         (if (start-with-div? (last edn-code-orig))
           [result-raw]
           [result-comp the-state])
-        (when desc [desc-button])]
+        (when desc [:p [desc-button]])]
        desc
        [:div {:style {:column-count 2}}
         [tex-comp desc]]

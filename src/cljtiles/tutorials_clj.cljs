@@ -362,6 +362,9 @@
                                      stdout)
                         [:p "You remember from previous experience that this is typical for the println function: it does not return a result but writes to the console. You use the arrow-button > to work through the next two workspaces in order to refresh your knowledge about defining and calling functions."]]
                        ))))
+      (assoc-in [49 :description]
+                [:div "For more scripting of react-ive web apps in Clojure, look at the "
+                 [:a {:href "https://github.com/kloimhardt/bb-web"} "bb-web"] " repository."])
       )
   )
 
