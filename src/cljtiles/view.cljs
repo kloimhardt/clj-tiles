@@ -70,7 +70,6 @@
            :code nil
            :edn-code nil
            :edn-code-orig nil
-           :reagent-error nil
            :modal-style-display "none"
            :run-button true})
   (when tutorial-no
@@ -126,9 +125,7 @@
 
 (defn start-with-div? [last-edn-code]
   (and (vector? last-edn-code)
-       (let [f (str (first last-edn-code))]
-         (or (= ":div" f)
-             (= ":div>" (subs f 0 5))))))
+       (= ":div" (subs (str (first last-edn-code)) 0 4))))
 
 (defn tex-comp [txt]
   [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
@@ -146,11 +143,8 @@
   (let [sf (str (first e))
         sb (symbol (subs sf 5))]
     (cond-> e
-      (get reagent-component-bindings sb) (assoc 0 sb)
-      (= ":div>" sf) (assoc 0 (symbol ":div")))))
-
-(defn remove-all-:div> [edn-code]
-  (w/postwalk #(if (= (symbol ":div>") %) (symbol ":div") %) edn-code))
+      (and (= ":div>" (subs sf 0 5)) (get reagent-component-bindings sb))
+      (assoc 0 sb))))
 
 (defn augment-code-div [edn-code inspect-fn]
   (let [l (last edn-code)]
@@ -175,8 +169,7 @@
         (augment-code-fu flat-code
                          '(defn L-free-particle "added by clj-tiles parser" [x]
                             (comp sicmutils-double (L-free-particle-sicm x))))
-        (augment-code-div inspect-fn)
-        remove-all-:div>)))
+        (augment-code-div inspect-fn))))
 
 (defn start-timer [fu ms max msg]
   (let [timer (atom nil)
@@ -474,23 +467,28 @@
      ]))
 
 (defn error-boundary [comp]
-  (rc/create-class
-    {:component-did-catch (fn [this e info] nil)
-     :get-derived-state-from-error (fn [e]
-                                     (swap! state assoc :reagent-error e)
-                                     #js {})
-     :reagent-render (fn [comp reagent-error]
-                       (if reagent-error
-                         [:pre "Something went wrong."]
-                         comp))}))
+  (let [error (rc/atom nil)]
+    (rc/create-class
+      {:component-did-catch (fn [this e info] nil)
+       :get-derived-state-from-error (fn [e]
+                                       (reset! error e)
+                                       #js {})
+       :reagent-render (fn [comp]
+                         (if @error
+                           (do
+                             (reset-state nil)
+                             (swap! state assoc :stdout ["Something went wrong rendering the result"])
+                             (reset! error nil)
+                             nil)
+                           comp))})))
 
 (defn theview []
   [:div
    [modal-comp @state]
    [tutorials-comp @state]
    [error-boundary
-    [output-comp @state]
-    (:reagent-error @state)]])
+    [output-comp @state]]])
+
 
 (defn ^{:dev/after-load true} render []
   ;;((tutorial-fu identity)) ;;load currenet workspace new
