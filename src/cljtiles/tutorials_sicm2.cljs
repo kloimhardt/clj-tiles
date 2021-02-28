@@ -7,7 +7,7 @@
   [{:scroll [0 0]
     :blockpos [[0 0] [0 100]]
     :code [['tex "sin^2{x} + cos^2{x} = 1"]
-           [:div>b "This is bold text in HTML and the formula is LaTeX" :tiles/slot]
+           [:div>b "This is bold text in HTML and the formula is LaTeX" {:tiles/numslot 0}]
            ]
     }
    {:lable :free-particle

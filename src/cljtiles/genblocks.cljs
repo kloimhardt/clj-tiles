@@ -148,14 +148,15 @@
     (if (empty? l)
       (num "[ ]")
       (apply args (map parse l)))
-    (map? l) (apply t-map (map (fn [[k v]] [k (parse v)]) l))
-    :else
-    (cond
-      (= :tiles/slot l) slot
-      (nil? l) (num "nil")
-      (string? l) (text l)
-      (keyword? l) (kw l)
-      :else (num l))))
+    (map? l)
+    (if (:tiles/numslot l)
+      slot
+      (apply t-map (map (fn [[k v]] [k (parse v)]) l)))
+    (= :tiles/slot l) slot
+    (nil? l) (num "nil")
+    (string? l) (text l)
+    (keyword? l) (kw l)
+    :else (num l)))
 
 (defn shift-coords [nofblocks & coords]
   (->> (range 0 nofblocks)

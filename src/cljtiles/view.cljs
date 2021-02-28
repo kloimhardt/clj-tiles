@@ -22,12 +22,12 @@
    [cljtiles.blockly :as workspace!]
    [cljtiles.code-analysis :as ca]
 
-   ;;[cljtiles.tests :as tst]
+   [cljtiles.tests :as tst]
    ;;[sc.api]
    ;;[cljtiles.sc]
    ))
 
-#_(when workspace!/dev
+(when workspace!/dev
   (print (tst/test-pure)))
 
 (defn generate-xml [page]
