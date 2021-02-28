@@ -7,10 +7,11 @@
    [sicmutils.env.sci :as es]
    ["blockly" :as blockly]
    [cljtiles.xmlparse-2 :as edn->code]
-   [cljtiles.tutorials-clj :as t-0]
    [cljtiles.genblocks :as gb]
-   [cljtiles.tutorials-sicm :as t-s]
+   [cljtiles.tutorials-clj :as t-0]
+   [cljtiles.tutorials-katas :as t-k]
    [cljtiles.tutorials-sicm2 :as t-s2]
+   [cljtiles.tutorials-sicm :as t-s]
    [cljtiles.tutorials-sicm3 :as t-s3]
    [cljs.reader :as edn]
    [clojure.walk :as w]
@@ -27,23 +28,31 @@
    ;;[cljtiles.sc]
    ))
 
-(when workspace!/dev
-  (print (tst/test-pure)))
-
 (defn generate-xml [page]
   (if (:xml-code page)
     page
     (assoc page :xml-code (apply gb/rpg (:blockpos page) (:code page)))))
 
-(def content (let [f (fn [ks v]
-                       (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
-               (-> (f [:tutorials :chapnames :chaps]
-                      [t-0/content t-s2/content t-s/content t-s3/content])
-                   (update :tutorials #(map generate-xml %)))))
+(def content
+  (let [tuts [t-0/content t-k/content t-s2/content t-s/content t-s3/content]
+        f (fn [ks v]
+            (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
+    (-> (f [:tutorials :chapnames :chaps]
+           tuts)
+        (update :tutorials #(map generate-xml %)))))
 
 (def tutorials (:tutorials content))
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
+
+(when workspace!/dev
+  (print (tst/test-pure))
+  (if-not (= (count tutorials) (reduce + chaps))
+    (print "Sum of chaps not number tutorials")
+    (print "sum chaps ok"))
+  (if-not (= (count chaps) (count chapnames))
+    (print "count chaps not count chapnames")
+    (print "count chaps ok")))
 
 (defn page->chapter [page-no]
   (- (count chaps) (count (filter #(> % page-no) (reductions + chaps)))))
@@ -502,7 +511,7 @@
 
 
 (defn ^{:dev/after-load true} render []
-  ;;((tutorial-fu identity)) ;;load currenet workspace new
+  ((tutorial-fu identity)) ;;load currenet workspace new
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
