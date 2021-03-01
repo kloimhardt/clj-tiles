@@ -147,7 +147,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
               (if (> (count (into #{} c)) 1)
                 [:<>
                  [:p (str "The block changes type during the course of the program. It is first a " (last (first c)) ", than a " (last (last c))". You notice a button below.")]
-                 [:div [:button {:on-click (fn [] (goto-lable-page! :pendulum-final))} "Make a huge leap"]]]
+                 [:div [:button {:on-click (fn [] (goto-lable-page! :pendulum-final nil))} "Make a huge leap"]]]
                 (if (= :cljtiles.sicm/nu (first (first c)))
                   [:<>
                    ;;after 'Path-of-a-Free-Particle-num
@@ -172,7 +172,7 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
           (when (= (take 3 frmcoll) '(defn time [Path-of-a-Free-Particle]))
             [:<>
              [:p "This looks ok at first sight. However, your gut feeling tells you that something is not right. You think of going back to your former exercises about defining functions, albeit you know that you are going to lose your work. Or maybe just permute things?"]
-             [:button {:on-click #(goto-lable-page! :defn)} "defining functions"]]
+             [:button {:on-click #(goto-lable-page! :defn nil)} "defining functions"]]
 
             )
 

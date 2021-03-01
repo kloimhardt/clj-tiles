@@ -45,7 +45,9 @@
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
 
-(when workspace!/dev
+(def dev true)
+
+(when dev
   (print (tst/test-pure))
   (if-not (= (count tutorials) (reduce + chaps))
     (print "Sum of chaps not number tutorials")
@@ -111,9 +113,15 @@
   (reset! app-state 0)
   page-no)
 
-(defn goto-lable-page! [lable]
+(defn goto-lable-page!-1 [lable]
   (let [cnt (count (take-while false? (map #(= lable (:lable %)) tutorials)))]
     (when (< cnt (count tutorials)) (goto-page! cnt))))
+
+(defn goto-lable-page! [lable swap-state-fn]
+  (let [cnt (count (take-while false? (map #(= lable (:lable %)) tutorials)))]
+    (when (< cnt (count tutorials)) (goto-page! cnt))
+    (when swap-state-fn
+      (swap! state swap-state-fn))))
 
 (defn tutorial-fu [inc-or-dec]
   (fn []
@@ -511,7 +519,7 @@
 
 
 (defn ^{:dev/after-load true} render []
-  ((tutorial-fu identity)) ;;load currenet workspace new
+  ;;(when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
@@ -521,10 +529,8 @@
                        js/URLSearchParams.
                        (.get "page"))]
     (if (= p "freeparticle")
-      (do
-        (goto-lable-page! :free-particle)
-        (swap! state assoc :run-button false)
-        (swap! state assoc :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
+      (goto-lable-page! :free-particle
+                        #(assoc % :run-button false :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
       (-> p
           js/parseInt
           dec
