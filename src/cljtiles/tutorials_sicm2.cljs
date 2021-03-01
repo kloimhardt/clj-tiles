@@ -51,6 +51,8 @@ In familiar notation, the path is denoted by:
 and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \\frac{m}{s}\\) in \\(y\\) direction. Imagine the body as a "
       [:a {:href "https://www.youtube.com/watch?v=z74OwRy8o9I"} "Pizza in space"]
       " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]
+     [:div bold "Interactive tutorial"]
+     [:p "Number 5 on the upper left catches your attention. Full of curiosity, you right click and inspect it."]
      ]
     :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
