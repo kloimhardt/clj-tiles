@@ -35,10 +35,14 @@
                (map #(tag-m % id) (rest content)))
         augment-arg (fn [e] (if (and (symbol? e) (not= "[" (first (str e)))) [e] e))
         modi-erg ;; modify (defn x x) -> (defn [x] x)
-        (if (and (= 'defn (first erg)) true (> (count erg) 2))
+        (cond
+          (and (= 'defn (first erg)) true (> (count erg) 2))
           (apply list 'defn (nth erg 1) (augment-arg (nth erg 2))
                  (drop 3 erg))
-          erg)]
+          (and (= 'fn (first erg)) true (> (count erg) 1))
+          (apply list 'fn (augment-arg (nth erg 1))
+                 (drop 2 erg))
+          :else erg)]
     (->> modi-erg
          (inspect attributes id))))
 

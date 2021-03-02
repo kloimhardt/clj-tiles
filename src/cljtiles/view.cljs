@@ -11,6 +11,7 @@
    [cljtiles.tutorials-clj :as t-0]
    [cljtiles.tutorials-katas :as t-k]
    [cljtiles.tutorials-sicm2 :as t-s2]
+   [cljtiles.tutorials-lagr :as t-l]
    [cljtiles.tutorials-sicm :as t-s]
    [cljtiles.tutorials-sicm3 :as t-s3]
    [cljs.reader :as edn]
@@ -34,7 +35,9 @@
     (assoc page :xml-code (apply gb/rpg (:blockpos page) (:code page)))))
 
 (def content
-  (let [tuts [t-0/content t-k/content t-s2/content t-s/content t-s3/content]
+  (let [tuts [t-0/content t-k/content
+              t-s2/content t-l/content
+              t-s/content t-s3/content]
         f (fn [ks v]
             (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
     (-> (f [:tutorials :chapnames :chaps]
@@ -519,7 +522,7 @@
 
 
 (defn ^{:dev/after-load true} render []
-  ;;(when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
+  (when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
