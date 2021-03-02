@@ -36,7 +36,7 @@
 
 (def content
   (let [tuts [t-0/content t-k/content
-              t-s2/content t-l/content
+              t-l/content t-s2/content
               t-s/content t-s3/content]
         f (fn [ks v]
             (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
@@ -151,7 +151,7 @@
                          (partition-all width s)))))
 
 (defn augment-code-fu [edn-code flat-code fn-code]
-  (if (seq (filter #{(second fn-code)} flat-code))
+  (if (seq (filter #{(second fn-code)} flat-code)) ;;consider use of function "some"
     (into [] (cons fn-code edn-code))
     edn-code))
 
@@ -522,7 +522,7 @@
 
 
 (defn ^{:dev/after-load true} render []
-  (when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
+  ;;(when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []

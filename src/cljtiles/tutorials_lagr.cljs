@@ -1,10 +1,71 @@
 (ns cljtiles.tutorials-lagr)
 
+(def bold {:style {:font-weight "bold"}})
+
 (def content
   {:chapnames ["Lagrangian"]
-   :chaps [5] #_(count (:tutorials content))
+   :chaps [7] #_(count (:tutorials content))
    :tutorials
-   [{:blockpos [[0 0] [150 170] [0 250]
+   [{:scroll [0 0]
+     :blockpos [[0 0] [0 100]]
+     :code [['tex "sin^2{x} + cos^2{x} = 1"]
+            [:div>b "This is bold text in HTML and the formula is LaTeX" {:tiles/numslot 0}]
+            ]
+     }
+    {:description
+     [:div
+      [:div bold "Explanation"]
+      [:p "A mathematical vector is created with the function \"up\". In usual notation this workspace reads:
+   \\[
+      \\begin{pmatrix}
+      1 \\\\
+      3 \\\\
+      5
+      \\end{pmatrix}
++
+      \\begin{pmatrix}
+      2 \\\\
+      4 \\\\
+      6
+      \\end{pmatrix}
+=
+      \\begin{pmatrix}
+      3 \\\\
+      7 \\\\
+      11
+      \\end{pmatrix}
+
+      \\]"]]
+     :blockpos [[0 0] [0 100] [0 200]]
+     :code [[:div>tex :tiles/slot]
+            '(+ (:tiles/vert (up :tiles/slot 3 5)) (:tiles/vert (up 2 4 6)))
+            1]}
+    {:blockpos [[0 0] [150 170] [400 170]
+                [0 300] [150 300]]
+     :code ['(defn test-path
+               t
+               (:tiles/vert (up (+ (* 4 t) 7)
+                                (+ (* 3 t) 5)
+                                :tiles/slot)))
+            '(+ (* 2 :tiles/slot) 1) 't
+            '(test-path :tiles/slot) 10
+
+            ]}
+    {:blockpos [[0 0]
+                [0 300] [250 300]]
+     :code ['(defn test-path
+               t
+               (:tiles/vert (up (+ (* 4 t) 7)
+                                (+ (* 3 t) 5)
+                                (+ (* 2 t) 1))))
+            '[:div>tex (test-path :tiles/slot)] ''t
+
+            ]}
+    {:code [;;'((L-free-particle 'm) (->local 't (up 'x 'y 'z) (up 'v_x 'v_y 'v_z)))
+            '((L-free-particle 'm)
+              (->local 't (up 'x 'y 'z) (up 'v_x 'v_y 'v_z)))
+            ]}
+    {:blockpos [[0 0] [150 170] [0 250]
                 [150 300] [350 300]
                 [170 350] [350 350] [400 350]]
      :code ['(defn test-path
