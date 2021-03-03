@@ -4,7 +4,7 @@
 
 (def content
   {:chapnames ["Lagrangian"]
-   :chaps [7] #_(count (:tutorials content))
+   :chaps [10] #_(count (:tutorials content))
    :tutorials
    [{:scroll [0 0]
      :blockpos [[0 0] [0 100]]
@@ -61,19 +61,21 @@
             '[:div>tex (test-path :tiles/slot)] ''t
 
             ]}
-    {:code [;;'((L-free-particle 'm) (->local 't (up 'x 'y 'z) (up 'v_x 'v_y 'v_z)))
-            '((L-free-particle 'm)
-              (->local 't (up 'x 'y 'z) (up 'v_x 'v_y 'v_z)))
+    {:blockpos [[0 0] [0 100] [0 200]]
+     :code [[:div>tex :tiles/slot]
+            '((L-free-particle 'm) :tiles/slot)
+            '(:tiles/vert (up 't
+                              (:tiles/vert (up 'x 'y 'z))
+                              (:tiles/vert (up 'v_x 'v_y 'v_z))))
             ]}
-    {:blockpos [[0 0] [150 170] [0 250]
+    {:blockpos [[0 0] [0 250]
                 [150 300] [350 300]
                 [170 350] [350 350] [400 350]]
      :code ['(defn test-path
               t
                (:tiles/vert (up (+ (* 4 t) 7)
                                 (+ (* 3 t) 5)
-                                :tiles/slot)))
-            '(+ (* 2 t) 1)
+                                (+ (* 2 t) 1))))
             '(Lagrangian-action :tiles/slot :tiles/slot :tiles/slot :tiles/slot)
             '(L-free-particle :tiles/slot) 3
             'test-path 0 10
@@ -90,9 +92,9 @@
     {:blockpos [[0 0] [300 0] [600 0] [0 150] [0 200] [300 200]]
      :code ['(defn f1 t (* 1 t))
             '(defn f2 t (* 2 t))
-            '(defn f3 t (* 3 t))
+            3
             '(:tiles/slot :tiles/slot)
-            '(+ f1 (* f2 f3)) 4
+            '(+ f1 (* :tiles/slot f2)) 4
             ]}
     {:blockpos [[0 0]
                 [0 150] [200 170]
@@ -115,7 +117,9 @@
 
 
             ]}
-    {:blockpos [[0 0]]
+    {:description
+     [:p "Some more tutorials are needed to make the following chapter understandable. For mitigation, solutions are provided. In any case, try the first page: it has an additional level of interactivity and is simple enough still."]
+     :blockpos [[0 0]]
      :code []}
 
     ]})

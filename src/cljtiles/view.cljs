@@ -190,7 +190,13 @@
       edn-code)))
 
 (defn augment-code [edn-code inspect-fn]
-  (let [flat-code (flatten (w/postwalk #(if (map? %) (vec %) %) edn-code))]
+  (let [s "(L-free-particle 'm)"
+        flat-code
+        (->> edn-code
+             (w/postwalk #(if (and (list? %) (= s (str %))) s %))
+             (w/postwalk #(if (map? %) (vec %) %))
+             flatten
+             )]
     (-> edn-code
         (augment-code-fu flat-code
                          '(defn vec-rest "added by clj-tiles parser" [x]
