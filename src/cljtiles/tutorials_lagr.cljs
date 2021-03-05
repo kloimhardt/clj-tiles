@@ -4,7 +4,7 @@
 
 (def content
   {:chapnames ["Lagrangian"]
-   :chaps [18] #_(count (:tutorials content))
+   :chaps [31] #_(count (:tutorials content))
    :tutorials
    [{:scroll [0 0]
      :blockpos [[0 0] [0 100]]
@@ -61,12 +61,25 @@
             '[:div>tex (test-path :tiles/slot)] ''t
 
             ]}
-    {:blockpos [[0 0] [0 100] [0 200]]
+    {:blockpos [[0 0] [0 100]
+                [0 200] [100 200] [100 250] [100 300]]
      :code [[:div>tex :tiles/slot]
             '((L-free-particle 'm) :tiles/slot)
-            '(:tiles/vert (up 't
-                              (:tiles/vert (up 'x 'y 'z))
-                              (:tiles/vert (up 'v_x 'v_y 'v_z))))
+            '(:tiles/vert (up :tiles/slot :tiles/slot :tiles/slot))
+            ''t ''x ''v_x
+            ]}
+    {:blockpos [[0 0] [70 30] [150 30] [150 70] [150 150]
+                [0 250]
+                [0 350]]
+     :code ['(def local :tiles/slot)
+            '(:tiles/vert (up :tiles/slot
+                             (:tiles/vert :tiles/slot)
+                             (:tiles/vert :tiles/slot)))
+            ''t
+            '(:tiles/vert (up 'x 'y))
+            '(:tiles/vert (up 'v_x 'v_y))
+            '[:div>tex ((L-free-particle 'm) :tiles/slot)]
+            'local
             ]}
     {:blockpos [[0 0] [0 250]
                 [150 300] [350 300]
@@ -152,11 +165,11 @@
                 [100 50] [300 50] [500 50]
                 [100 100]
                 [0 250] [400 250]]
-     :code ['(def derivative-of-function-q :tiles/slot)
+     :code ['(def second-derivative-of-function-q :tiles/slot)
             '(:tiles/slot :tiles/slot)
             '(literal-function :tiles/slot) ''q
             '(square D)
-            '[:div>tex (derivative-of-function-q :tiles/slot)]
+            '[:div>tex (second-derivative-of-function-q :tiles/slot)]
             8]}
     {:blockpos [[0 0] [300 0]
                 [120 50]
@@ -167,6 +180,10 @@
             '(:tiles/slot :tiles/slot)
             ''t
             '[:div>tex (:tiles/slot :tiles/slot)]]}
+    {:blockpos [[0 0] [300 0]
+                [0 100]]
+     :code ['(literal-function :tiles/slot) ''q
+            '[:div>tex (((square D) :tiles/slot) 't)]]}
     {:blockpos [[0 0] [200 0] [0 100]]
      :code ['(Lagrange-equations :tiles/slot)
             '(L-free-particle 'm)
@@ -188,9 +205,104 @@
     {:blockpos [[0 0] [200 0] [250 0]
                 [0 100]]
      :code ['(L-harmonic :tiles/slot :tiles/slot) ''m ''k
+            '[:div>tex (:tiles/slot (up 't 'x 'v_x))]]}
+    {:blockpos [[0 0]
+                [0 100]]
+     :code ['(L-harmonic 'm 'k)
             '[:div>tex (((Lagrange-equations :tiles/slot)
                          (literal-function 'q))
                         't)]]}
+    {:blockpos [[0 0] [200 50] [300 100] [350 100] [450 100] [600 100] [700 100]
+                [0 200] [0 300]]
+     :code ['(defn proposed-solution t (* 'A :tiles/slot))
+            '(cos :tiles/slot)
+            ''t '(* :tiles/slot :tiles/slot) ''omega '(+ :tiles/slot :tiles/slot) ''phi
+            '[:div>tex (((Lagrange-equations (L-harmonic 'm 'k)) :tiles/slot) 't)]
+            'proposed-solution]}
+    {:blockpos [[0 0] [200 50] [250 50] [400 50]
+                [0 150] [450 200]
+                [0 300]]
+     :code ['(def omega (sqrt :tiles/slot)) ''k '(/ :tiles/slot :tiles/slot) ''m
+            '(defn proposed-solution t (* 'A (cos (+ (* t :tiles/slot) 'phi))))
+            'omega
+            '[:div>tex (((Lagrange-equations (L-harmonic 'm 'k)) proposed-solution) 't)]]}
+    {:blockpos [[0 0] [150 50] [150 150]
+                [0 250] [150 300] [300 300]
+                [0 400] [150 400]]
+     :code ['(def local (:tiles/vert (up 't
+                                         (:tiles/vert :tiles/slot)
+                                         (:tiles/vert :tiles/slot))))
+            '(:tiles/vert (up 'x 'y))
+            '(:tiles/vert (up 'v_x 'v_y))
+            '(defn get-time tuple :tiles/slot)
+            '(first :tiles/slot)
+            'tuple
+            '(get-time :tiles/slot)
+            'local]}
+    {:blockpos [[0 0] [150 50] [150 150]
+                [0 250] [300 280] [400 280]
+                [0 400]]
+     :code ['(def local (:tiles/vert (up 1
+                                         (:tiles/vert :tiles/slot)
+                                         (:tiles/vert :tiles/slot))))
+            '(:tiles/vert (up 2.1 2.2))
+            '(:tiles/vert (up 3.1 3.2))
+
+            '(defn get-time :tiles/slot
+               (first tuple))
+            [:tiles/slot]
+            'tuple
+            '(get-time local)]}
+    {:blockpos [[0 0]
+                [0 100] [100 130] [200 130] [350 130] [400 130] [500 130]
+                [200 200]
+                [0 300]]
+     :code ['(def local
+               (up 1 (up 2.1 2.2) (up 3.1 3.2)))
+            '(defn get-time :tiles/slot
+               :tiles/slot)
+            [:tiles/slot]
+            [:tiles/slot :tiles/slot :tiles/slot]
+            't
+            'position 'velocity
+            't
+            '(get-time local)]}
+    {:blockpos [[0 0]
+                [0 100] [300 130] [400 130] [500 130]
+                [200 200]
+                [0 300]]
+     :code ['(def local
+              (up 1 (up 2.1 2.2) (up 3.1 3.2)))
+            '(defn get-y-velocity [[t position :tiles/slot]] :tiles/slot)
+            [:tiles/slot :tiles/slot] 'v_x 'v_y
+            'v_y
+            '(get-y-velocity local)]}
+    {:blockpos [[0 0] [100 50] [100 150]
+                [0 250]]
+     :code ['(:tiles/vert (up 't
+                              (:tiles/vert :tiles/slot)
+                              (:tiles/vert :tiles/slot)))
+            '(:tiles/vert (up 'x 'y))
+            '(:tiles/vert (up 'v_x 'v_y))
+            '[:div>tex ((L-free-particle 'm) :tiles/slot)]
+            ]}
+    {:blockpos [[0 0] [150 20] [150 50] [150 80] [150 110]
+                [0 250]]
+     :code ['(:tiles/vert (up 't
+                              (:tiles/vert (up :tiles/slot :tiles/slot))
+                              (:tiles/vert (up :tiles/slot :tiles/slot))))
+            ''r ''φ
+            ''rdot ''φdot
+            '[:div>tex ((L-free-particle 'm) ((F->C p->r) :tiles/slot))]
+            ]}
+    {:blockpos [[0 0] [0 200] [150 200]]
+     :code ['[:div>tex (:tiles/slot (:tiles/vert (up 't
+                                                     (:tiles/vert (up 'r 'φ))
+                                                     (:tiles/vert (up 'rdot 'φdot)))))]
+            '(F->C :tiles/slot) 'p->r]}
+    {:blockpos [[0 0] [0 200] [150 200]]
+     :code ['[:div>tex (:tiles/slot (:tiles/slot (up 't (up 'r 'φ) (up 'rdot 'φdot))))]
+            '(F->C :tiles/slot) 'p->r]}
     {:description
      [:p "Some more tutorials are needed to make the following chapter understandable. For mitigation, solutions are provided. In any case, try the first page: it has an additional level of interactivity and is simple enough still."]
      :blockpos [[0 0]]
