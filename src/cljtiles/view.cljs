@@ -190,10 +190,16 @@
       edn-code)))
 
 (defn augment-code [edn-code inspect-fn]
-  (let [s "(L-free-particle 'm)"
+  (let [s1 "(L-free-particle 'm)"
+        s2 "(L-free-particle m)"
+        s3 "(L-free-particle 'mass)"
+        s4 "(L-free-particle mass)"
         flat-code
         (->> edn-code
-             (w/postwalk #(if (and (list? %) (= s (str %))) s %))
+             (w/postwalk #(if (and (list? %) (= s1 (str %))) s1 %))
+             (w/postwalk #(if (and (list? %) (= s2 (str %))) s2 %))
+             (w/postwalk #(if (and (list? %) (= s3 (str %))) s3 %))
+             (w/postwalk #(if (and (list? %) (= s4 (str %))) s4 %))
              (w/postwalk #(if (map? %) (vec %) %))
              flatten
              )]

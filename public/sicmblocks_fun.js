@@ -891,7 +891,7 @@ Blockly.Blocks["list-h-2"]= {
             ],
             "inputsInline": true,
             "output": null,
-            "colour": 270,
+            "colour": 70,
             "tooltip": "",
             "helpUrl": ""
         }

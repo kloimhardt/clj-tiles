@@ -4,7 +4,7 @@
 
 (def content
   {:chapnames ["Lagrangian"]
-   :chaps [31] #_(count (:tutorials content))
+   :chaps [33] #_(count (:tutorials content))
    :tutorials
    [{:scroll [0 0]
      :blockpos [[0 0] [0 100]]
@@ -24,40 +24,49 @@
       \\end{pmatrix}
 +
       \\begin{pmatrix}
+      0 \\\\
       2 \\\\
-      4 \\\\
-      6
+      4
       \\end{pmatrix}
 =
       \\begin{pmatrix}
-      3 \\\\
-      7 \\\\
-      11
+      1 \\\\
+      5 \\\\
+      9
       \\end{pmatrix}
 
       \\]"]]
-     :blockpos [[0 0] [0 100] [0 200]]
+     :blockpos [[0 0] [0 100]
+                [0 250]
+                [0 300] [150 300]
+                [0 350] [150 350]
+                ]
      :code [[:div>tex :tiles/slot]
-            '(+ (:tiles/vert (up :tiles/slot 3 5)) (:tiles/vert (up 2 4 6)))
-            1]}
-    {:blockpos [[0 0] [150 170] [400 170]
+            '(+ (:tiles/vert (up :tiles/slot 3 5)) (:tiles/vert (up :tiles/slot :tiles/slot (square 2))))
+            1
+            '(sin :tiles/slot) ''pi
+            '(sqrt :tiles/slot) 4
+            ]}
+    {:blockpos [[0 0] [400 50] [400 100]
+                [150 170] [400 170]
                 [0 300] [150 300]]
      :code ['(defn test-path
-               t
-               (:tiles/vert (up (+ (* 4 t) 7)
-                                (+ (* 3 t) 5)
+               time
+               (:tiles/vert (up (+ (* 4 time) :tiles/slot)
+                                (+ (* :tiles/slot time) 5)
                                 :tiles/slot)))
-            '(+ (* 2 :tiles/slot) 1) 't
+            7 3
+            '(+ (* 2 :tiles/slot) 1) 'time
             '(test-path :tiles/slot) 10
 
             ]}
     {:blockpos [[0 0]
                 [0 300] [250 300]]
      :code ['(defn test-path
-               t
-               (:tiles/vert (up (+ (* 4 t) 7)
-                                (+ (* 3 t) 5)
-                                (+ (* 2 t) 1))))
+               time
+               (:tiles/vert (up (+ (* 4 time) 7)
+                                (+ (* 3 time) 5)
+                                (+ (* 2 time) 1))))
             '[:div>tex (test-path :tiles/slot)] ''t
 
             ]}
@@ -83,15 +92,15 @@
             ]}
     {:blockpos [[0 0] [0 250]
                 [150 300] [350 300]
-                [170 350] [350 350] [400 350]]
+                [170 350]]
      :code ['(defn test-path
               t
                (:tiles/vert (up (+ (* 4 t) 7)
                                 (+ (* 3 t) 5)
                                 (+ (* 2 t) 1))))
-            '(Lagrangian-action :tiles/slot :tiles/slot :tiles/slot :tiles/slot)
+            '(Lagrangian-action :tiles/slot :tiles/slot 0 10)
             '(L-free-particle :tiles/slot) 3
-            'test-path 0 10
+            'test-path
             ]}
     {:blockpos [[0 0] [0 150] [100 150] [200 150] [0 250] [0 300] [0 350]]
      :code ['(defn make-η
@@ -193,13 +202,13 @@
                 [200 120] [500 120]
                 [200 190] [500 190]
                 [0 300] [0 400]]
-     :code ['(defn straight-line t
+     :code ['(defn straight-line time
                (:tiles/vert (up :tiles/slot
                                 :tiles/slot
                                 :tiles/slot)))
-            '(+ (* :tiles/slot t) 'a0) ''a
-            '(+ (* 'b :tiles/slot) 'b0) 't
-            '(+ (* 'c t) :tiles/slot) ''c0
+            '(+ (* :tiles/slot time) 'a0) ''a
+            '(+ (* 'b :tiles/slot) 'b0) 'time
+            '(+ (* 'c time) :tiles/slot) ''c0
             '[:div>tex (((Lagrange-equations (L-free-particle 'm)) :tiles/slot) 't)]
             'straight-line]}
     {:blockpos [[0 0] [200 0] [250 0]
@@ -212,18 +221,18 @@
             '[:div>tex (((Lagrange-equations :tiles/slot)
                          (literal-function 'q))
                         't)]]}
-    {:blockpos [[0 0] [200 50] [300 100] [350 100] [450 100] [600 100] [700 100]
+    {:blockpos [[0 0] [200 50] [250 100] [350 100] [450 100] [600 100] [700 100]
                 [0 200] [0 300]]
-     :code ['(defn proposed-solution t (* 'A :tiles/slot))
+     :code ['(defn proposed-solution time (* 'A :tiles/slot))
             '(cos :tiles/slot)
-            ''t '(* :tiles/slot :tiles/slot) ''omega '(+ :tiles/slot :tiles/slot) ''phi
+            ''omega '(* :tiles/slot :tiles/slot) 'time '(+ :tiles/slot :tiles/slot) ''phi
             '[:div>tex (((Lagrange-equations (L-harmonic 'm 'k)) :tiles/slot) 't)]
             'proposed-solution]}
     {:blockpos [[0 0] [200 50] [250 50] [400 50]
-                [0 150] [450 200]
+                [0 150] [500 200]
                 [0 300]]
      :code ['(def omega (sqrt :tiles/slot)) ''k '(/ :tiles/slot :tiles/slot) ''m
-            '(defn proposed-solution t (* 'A (cos (+ (* t :tiles/slot) 'phi))))
+            '(defn proposed-solution time (* 'A (cos (+ (* :tiles/slot time) 'phi))))
             'omega
             '[:div>tex (((Lagrange-equations (L-harmonic 'm 'k)) proposed-solution) 't)]]}
     {:blockpos [[0 0] [150 50] [150 150]
@@ -277,35 +286,93 @@
             [:tiles/slot :tiles/slot] 'v_x 'v_y
             'v_y
             '(get-y-velocity local)]}
-    {:blockpos [[0 0] [100 50] [100 150]
-                [0 250]]
-     :code ['(:tiles/vert (up 't
-                              (:tiles/vert :tiles/slot)
-                              (:tiles/vert :tiles/slot)))
-            '(:tiles/vert (up 'x 'y))
-            '(:tiles/vert (up 'v_x 'v_y))
-            '[:div>tex ((L-free-particle 'm) :tiles/slot)]
-            ]}
-    {:blockpos [[0 0] [150 20] [150 50] [150 80] [150 110]
-                [0 250]]
-     :code ['(:tiles/vert (up 't
-                              (:tiles/vert (up :tiles/slot :tiles/slot))
-                              (:tiles/vert (up :tiles/slot :tiles/slot))))
+    {:blockpos [[0 0] [450 30] [550 30]
+                [0 100] [450 130] [500 130] [550 130] [650 130]
+                [200 250] [350 250]
+                [0 300]
+                ]
+     :code ['(def local
+               (up 't (up :tiles/slot :tiles/slot) (up 'v_x 'v_y)))
+            ''x ''y
+            '(defn r->p
+              [[_ [:tiles/slot :tiles/slot :tiles/slot :tiles/slot] _]]
+              (up (sqrt (square :tiles/slot)) (atan (/ :tiles/slot x))))
+            'x 'y :as 'q
+            'q 'y
+            '[:div>tex (r->p local)]]}
+    {:blockpos [[0 0] [0 100] [0 270]
+                [0 330] [0 400]]
+     :code ['(def local
+              (up 't (up 'x 'y) (up 'v_x 'v_y)))
+            '(defn r->p
+              [[_ [x y :as q] _]]
+              (up (sqrt (square q)) (atan (/ y x))))
+            '(F->C :tiles/slot)
+            '[:div>tex (:tiles/slot local)]
+             'r->p]}
+    {:blockpos [[0 0] [200 50] [200 80] [200 110] [200 140]
+                [0 270] [0 330] [0 400]]
+     :code ['(def local (:tiles/vert (up 't
+                                         (:tiles/vert (up :tiles/slot :tiles/slot))
+                                         (:tiles/vert (up :tiles/slot :tiles/slot)))))
             ''r ''φ
             ''rdot ''φdot
-            '[:div>tex ((L-free-particle 'm) ((F->C p->r) :tiles/slot))]
+            '(F->C :tiles/slot)
+            '[:div>tex (:tiles/slot local)]
+            'p->r
             ]}
-    {:blockpos [[0 0] [0 200] [150 200]]
-     :code ['[:div>tex (:tiles/slot (:tiles/vert (up 't
-                                                     (:tiles/vert (up 'r 'φ))
-                                                     (:tiles/vert (up 'rdot 'φdot)))))]
-            '(F->C :tiles/slot) 'p->r]}
-    {:blockpos [[0 0] [0 200] [150 200]]
-     :code ['[:div>tex (:tiles/slot (:tiles/slot (up 't (up 'r 'φ) (up 'rdot 'φdot))))]
-            '(F->C :tiles/slot) 'p->r]}
-    {:description
-     [:p "Some more tutorials are needed to make the following chapter understandable. For mitigation, solutions are provided. In any case, try the first page: it has an additional level of interactivity and is simple enough still."]
-     :blockpos [[0 0]]
-     :code []}
-
-    ]})
+    {:blockpos [[0 0] [0 200]
+                [0 300] [300 300]]
+     :code ['(def local
+               (:tiles/vert (up 't (:tiles/vert (up 'r 'φ)) (:tiles/vert (up 'rdot 'φdot)))))
+            '[:div>tex (:tiles/slot :tiles/slot)]
+            '(L-free-particle 'm)
+            '((F->C p->r) local)
+            ]}
+    {:blockpos [[0 0]
+                [0 180] [150 230] [350 230] [550 230]
+                [0 350]
+                ]
+     :code ['(def local
+               (:tiles/vert (up 't (:tiles/vert (up 'r 'φ)) (:tiles/vert (up 'rdot 'φdot)))))
+            '(defn L-free-particle-polar mass
+               :tiles/slot)
+            '(compose :tiles/slot :tiles/slot)
+            '(L-free-particle mass) '(F->C p->r)
+            '[:div>tex ((L-free-particle-polar 'm) local)]
+            ]}
+    {:blockpos [[0 0]
+                [200 30] [400 30]
+                [200 70] [400 70]
+                [0 120]
+                [0 250]
+                [0 350] [300 350] [400 350]
+                ]
+     :code ['(def path
+               (:tiles/vert (up :tiles/slot :tiles/slot)))
+            '(literal-function :tiles/slot) ''r
+            '(literal-function :tiles/slot) ''φ
+            '(defn L-free-particle-polar mass
+               (compose (L-free-particle mass) (F->C p->r)))
+            '[:div>tex (((Lagrange-equations :tiles/slot) :tiles/slot) :tiles/slot)]
+            '(L-free-particle-polar 'm)
+            'path
+            ''t
+            ]}
+    {:blockpos [[0 0] [50 0] [100 0] [150 0] [200 0] [300 0]
+                [0 50] [200 50] [400 50] [600 50]
+                [0 100] [200 100] [300 100] [400 100]
+                [0 150] [200 150]]
+     :code [''m ''r ''φ ''t 'p->r :div>tex
+            '(literal-function :tiles/slot)
+            '(literal-function :tiles/slot)
+            '(L-free-particle :tiles/slot)
+            '(F->C :tiles/slot)
+            '(Lagrange-equations :tiles/slot)
+            '(:tiles/slot :tiles/slot)
+            '(:tiles/slot :tiles/slot)
+            '[:tiles/slot :tiles/slot]
+            '(:tiles/vert (up :tiles/slot :tiles/slot))
+            '(compose :tiles/slot
+                     :tiles/slot)
+            ]}]})
