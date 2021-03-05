@@ -878,7 +878,7 @@ Blockly.Blocks["list-h-2"]= {
     init: function() {this.jsonInit(
         {
             "type": "list-h-2",
-            "message0": "%1 %2",
+            "message0": " %1 ⟯ %2",
             "args0": [
                 {
                     "type": "input_value",
