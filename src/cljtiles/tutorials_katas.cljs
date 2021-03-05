@@ -2,7 +2,7 @@
 
 (def content
   {:chapnames ["Higher order"]
-   :chaps [21]
+   :chaps [22] #_(count (:tutorials content))
    :tutorials
    [{:blockpos [[0 0] [100 0] [200 0] [300 0] [0 100]]
      :code ['(:tiles/vert (let :tiles/slot :tiles/slot))
@@ -107,7 +107,9 @@
       [:tiles/slot :tiles/slot] [:tiles/slot :tiles/slot] [:tiles/slot :tiles/slot]
       'vector 'mapv '(apply :tiles/slot :tiles/slot :tiles/slot)
       ]}
-    {:blockpos [[0 0] [100 70] [200 70] [200 120] [0 250] [0 300] [250 300] [0 350]]
+    {:blockpos [[0 0] [100 70] [200 70] [200 120]
+                [0 200] [150 230] [400 230]
+                [0 300] [150 300]]
      :code
      [
       '(defn this-returns-a-function
@@ -116,6 +118,15 @@
       '(:tiles/vert (fn :tiles/slot :tiles/slot))
       'number
       '(str text number)
+      '(def a-function :tiles/slot)
+      '(this-returns-a-function :tiles/slot) "three="
+      '(a-function :tiles/slot) 3
+      ]}
+    {:blockpos [[0 0] [0 300] [150 300]]
+     :code
+     ['(defn this-returns-a-function
+        text
+         (:tiles/vert (fn [number] (str text number))))
       '(:tiles/slot 3)
       '(this-returns-a-function "three=")
       ]}

@@ -4,7 +4,7 @@
 
 (def content
   {:chapnames ["Lagrangian"]
-   :chaps [10] #_(count (:tutorials content))
+   :chaps [18] #_(count (:tutorials content))
    :tutorials
    [{:scroll [0 0]
      :blockpos [[0 0] [0 100]]
@@ -101,7 +101,7 @@
                 [0 250]
                 [300 280] [650 280] [700 280]
                 [300 320] [380 320] [500 320]
-                [0 400]]
+                [0 380] [600 380]]
      :code ['(defn make-η
                [ν t1 t2]
                (:tiles/vert (fn t (* (- t t1) (- t t2) (ν t)))))
@@ -113,10 +113,84 @@
             'ε
             '(* :tiles/slot :tiles/slot)
             '(make-η square t0 t1)
-            '(map (make-varied-line 0.01 2 3) [1 2 3 4])
+            '(map (make-varied-line :tiles/slot 2 3) [1 2 3 4]) 0.01
 
 
             ]}
+    {:scroll [0 -110]
+     :blockpos [[0 0] [0 150]
+                [0 270] [600 350]
+                [0 420] [500 450]
+                [0 500] [500 500]]
+     :code ['(defn make-η
+              [ν t1 t2]
+               (fn [t] (* (- t t1) (- t t2) (ν t))))
+            '(defn test-path
+              t
+                (up (+ (* 4 t) 7)
+                                 (+ (* 3 t) 5)
+                                 (+ (* 2 t) 1)))
+            '(defn make-varied-path
+              [ε t0 t1]
+               (+ test-path (* ε (make-η :tiles/slot t0 t1))))
+            '(up sin cos square)
+            '(def varied-path (make-varied-path :tiles/slot 0 10)) 0.01
+            '(Lagrangian-action (L-free-particle 3) :tiles/slot 0 10)
+            'varied-path
+            ]}
+    {:blockpos [[0 0] [100 50] [200 50] [0 250] [200 250]]
+     :code ['(def derivative-of-sine :tiles/slot)
+            '(D :tiles/slot)
+            'sin
+            '(derivative-of-sine :tiles/slot)
+            ''t]}
+    {:blockpos [[0 0] [0 250] [200 250]]
+     :code ['(def derivative-of-sine (D sin))
+            '(derivative-of-sine :tiles/slot)
+            0]}
+    {:blockpos [[0 0]
+                [100 50] [300 50] [500 50]
+                [100 100]
+                [0 250] [400 250]]
+     :code ['(def derivative-of-function-q :tiles/slot)
+            '(:tiles/slot :tiles/slot)
+            '(literal-function :tiles/slot) ''q
+            '(square D)
+            '[:div>tex (derivative-of-function-q :tiles/slot)]
+            8]}
+    {:blockpos [[0 0] [300 0]
+                [120 50]
+                [550 150]
+                [100 200]]
+     :code ['(square D)
+            'sin
+            '(:tiles/slot :tiles/slot)
+            ''t
+            '[:div>tex (:tiles/slot :tiles/slot)]]}
+    {:blockpos [[0 0] [200 0] [0 100]]
+     :code ['(Lagrange-equations :tiles/slot)
+            '(L-free-particle 'm)
+            '[:div>tex ((:tiles/slot (literal-function 'q)) 't)]] }
+    {:blockpos [[0 0]
+                [200 50] [500 50]
+                [200 120] [500 120]
+                [200 190] [500 190]
+                [0 300] [0 400]]
+     :code ['(defn straight-line t
+               (:tiles/vert (up :tiles/slot
+                                :tiles/slot
+                                :tiles/slot)))
+            '(+ (* :tiles/slot t) 'a0) ''a
+            '(+ (* 'b :tiles/slot) 'b0) 't
+            '(+ (* 'c t) :tiles/slot) ''c0
+            '[:div>tex (((Lagrange-equations (L-free-particle 'm)) :tiles/slot) 't)]
+            'straight-line]}
+    {:blockpos [[0 0] [200 0] [250 0]
+                [0 100]]
+     :code ['(L-harmonic :tiles/slot :tiles/slot) ''m ''k
+            '[:div>tex (((Lagrange-equations :tiles/slot)
+                         (literal-function 'q))
+                        't)]]}
     {:description
      [:p "Some more tutorials are needed to make the following chapter understandable. For mitigation, solutions are provided. In any case, try the first page: it has an additional level of interactivity and is simple enough still."]
      :blockpos [[0 0]]
