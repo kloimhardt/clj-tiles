@@ -1,7 +1,7 @@
 # Clj-Tiles
 
 * Start to code by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html?page=12).
-* Over 50 puzzels built in. Starting with simple examples, they continue to basic web-programming and lead to sophisticated examples taken from theoretical physics.
+* Over 100 puzzels built in. Starting with simple examples, they continue to basic web-programming and lead to sophisticated examples taken from theoretical physics.
 * Investigate puzzles with the built in tracer.
 * Make new puzzle tutorials by using the built in parser.
 * Live coding made easy, just prepare a puzzle and solve it in front of the audience.
