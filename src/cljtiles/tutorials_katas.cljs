@@ -4,7 +4,8 @@
   {:chapnames ["Higher order"]
    :chaps [21] #_(count (:tutorials content))
    :tutorials
-   [{:blockpos [[0 0] [100 0] [200 0] [300 0] [0 100]]
+   [{:lable :higher-order
+     :blockpos [[0 0] [100 0] [200 0] [300 0] [0 100]]
      :code ['(:tiles/vert (let :tiles/slot :tiles/slot))
             [:tiles/slot :tiles/slot]
             'x 2 '(square x)]}

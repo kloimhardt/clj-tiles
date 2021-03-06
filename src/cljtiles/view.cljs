@@ -543,9 +543,13 @@
   (when-let [p (some-> (not-empty (.. js/window -location -search))
                        js/URLSearchParams.
                        (.get "page"))]
-    (if (= p "freeparticle")
+    (cond
+      (= p "freeparticle")
       (goto-lable-page! :free-particle
                         #(assoc % :run-button false :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
+      (= p "higherorder")
+      (goto-lable-page! :higher-order nil)
+      :else
       (-> p
           js/parseInt
           dec

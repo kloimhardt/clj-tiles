@@ -18,7 +18,9 @@
             [sci.impl.vars]))
 
 (defn tex [x]
-  (str "\\["  (render/->TeX (gn/simplify x)) "\\]"))
+  (binding [render/*TeX-sans-serif-symbols* false
+            render/*TeX-vertical-down-tuples* false]
+    (str "\\["  (render/->TeX (gn/simplify x)) "\\]")))
 
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
