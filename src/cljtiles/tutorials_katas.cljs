@@ -2,7 +2,7 @@
 
 (def content
   {:chapnames ["Higher order"]
-   :chaps [22] #_(count (:tutorials content))
+   :chaps [21] #_(count (:tutorials content))
    :tutorials
    [{:blockpos [[0 0] [100 0] [200 0] [300 0] [0 100]]
      :code ['(:tiles/vert (let :tiles/slot :tiles/slot))
@@ -141,7 +141,7 @@
       '((this-is-of-higher-order :tiles/slot :tiles/slot) :tiles/slot)
       'first "one=" [1 2]
       ]}
-    {:blockpos [[0 0]
+    #_{:blockpos [[0 0]
                 [0 200] [50 200] [120 200] [200 200] [300 200] [450 200] [600 200] [700 200]
                 [0 250] [200 250]
                 [0 300] [200 300] [400 300] [600 300]

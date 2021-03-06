@@ -48,7 +48,7 @@
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
 
-(def dev true)
+(def dev false)
 
 (when dev
   (print (tst/test-pure))
