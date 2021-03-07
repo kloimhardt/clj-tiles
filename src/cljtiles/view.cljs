@@ -48,7 +48,7 @@
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
 
-(def dev false)
+(def dev true)
 
 (when dev
   (print (tst/test-pure))
@@ -324,8 +324,10 @@
   (let [edn-xml (sax/xml->clj xml-str)
         eci (edn->code/parse edn-xml {:id inspect-id :fun inspect-fn})
         inspect-fn-name (when inspect-fn (first (inspect-fn 0)))
-        ifo (ca/inspect-froms eci inspect-fn-name)]
-    (if (not-every? nil? ifo)
+        ;;ifo (ca/inspect-froms eci inspect-fn-name)
+        ]
+    (ca/prepare-fns eci inspect-fn-name)
+    #_(if (not-every? nil? ifo)
       (let [ec (edn->code/parse edn-xml {:id nil :fun nil})]
         (map insert-inspect ec ifo))
       eci)))
