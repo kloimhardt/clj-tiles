@@ -33,11 +33,11 @@
   (let [erg
         (apply list (symbol (first (:content (first content))))
                (map #(tag-m % id) (rest content)))
-        augment-arg (fn [e]
-                      (if (or (list? e) ;; then it is probably (inspect-fn x)
-                              (and (symbol? e) (not= "[" (first (str e)))))
-                        [e]
-                        e))
+        augment-arg (fn [ee]
+                      (let [e (if (list? ee) (last ee) ee)]
+                        (if (and (symbol? e) (not= "[" (first (str e))))
+                          [ee]
+                          ee)))
         modi-erg ;; modify (defn x x) -> (defn [x] x)
         (cond
           (and (= 'defn (first erg)) true (> (count erg) 2))

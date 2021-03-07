@@ -54,6 +54,7 @@
       (= spc ::fn) (function-name e)
       (= spc ::sci-var) (str text "\\ " (subs (str e) 7))
       (= spc ::ratom) "ReagentAtom"
+      (= spc ::keyword) (str text "\\ " e)
       :else
       (if text
         (str text "\\ " (inline-tex e))
