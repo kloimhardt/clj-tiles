@@ -23,7 +23,9 @@
     (str "\\["  (render/->TeX (gn/simplify x)) "\\]")))
 
 (defn inline-tex [x]
-  (render/->TeX (gn/simplify x)))
+  (binding [render/*TeX-sans-serif-symbols* false
+            render/*TeX-vertical-down-tuples* false]
+    (render/->TeX (gn/simplify x))))
 
 (def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Definition" ::fn "Function" ::sy "Symbol" ::up "ColumnVector" ::dow "RowVector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio" ::keyword "Keyword" ::ratom "ReagentAtom"])
 
