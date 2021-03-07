@@ -25,7 +25,7 @@
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
 
-(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Definition" ::fn "Function" ::sy "Symbol" ::up "ColumnVector" ::dow "RowVector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio" ::keyword "Keyword"])
+(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Definition" ::fn "Function" ::sy "Symbol" ::up "ColumnVector" ::dow "RowVector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio" ::keyword "Keyword" ::ratom "ReagentAtom"])
 
 (defn function-name [e]
   (if (= (subs (str e) 0 18) "function cljs$core" )
@@ -53,6 +53,7 @@
       (str text "\\{" (apply str (map (fn [[k v]] (str (kind-s? k)  "\\ " (kind-s? v) "\\ ")) e))"\\}")
       (= spc ::fn) (function-name e)
       (= spc ::sci-var) (str text "\\ " (subs (str e) 7))
+      (= spc ::ratom) "ReagentAtom"
       :else
       (if text
         (str text "\\ " (inline-tex e))
@@ -96,6 +97,7 @@
                'kind? kind?
                'tex tex})
 
+(s/def ::ratom #(instance? reagent.ratom/RAtom %))
 (s/def ::keyword keyword?)
 (s/def ::ratio rt/ratio?)
 (s/def ::clojure-vector vector?)

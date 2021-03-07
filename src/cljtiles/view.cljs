@@ -425,9 +425,15 @@
     [:div {:style {:display "flex"}}
      [:div flex50
       [:h3 "Code interpretation result"]
-      [:pre (my-str-brk (str "The expression " ifo " could not be displayed due to one of the following reasons:"))]
-      (map-indexed (fn [idx msg] ^{:key idx} [:pre (my-str-brk (str (inc idx) ". " (modify-error msg)))])
-                   (:err-msgs sci-error-full) )]
+      (if (> (count (:err-msgs sci-error-full)) 1)
+        [:<>
+         [:pre (my-str-brk (str "The expression " ifo " could not be displayed due to one of the following reasons:"))]
+         (map-indexed (fn [idx msg] ^{:key idx} [:pre (my-str-brk (str (inc idx) ". " (modify-error msg)))])
+                      (:err-msgs sci-error-full) )]
+        [:<>
+         [:pre (my-str-brk (str "The expression " ifo " could not be displayed  because"))]
+         [:pre (str (my-str-brk (modify-error (first (:err-msgs sci-error-full)))))]]
+        )]
      [:div flex50
       [:h3 "Code"]
       [:pre code]]]))

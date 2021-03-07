@@ -49,10 +49,10 @@
     edn-code))
 
 (defn trans-defn-name [edn-code i-fn-name]
-  (if (and (coll? edn-code) (= 'defn (first edn-code)))
+  (if (and (coll? edn-code) (#{'def 'defn} (first edn-code)))
     (let [sc (second edn-code)]
       (if (and (list? sc) (= i-fn-name (first sc)))
-        (list i-fn-name  (list 'defn (last sc) (drop 2 edn-code)))
+        (list i-fn-name  (concat [(first edn-code) (last sc)] (drop 2 edn-code)))
         edn-code))
     edn-code))
 
