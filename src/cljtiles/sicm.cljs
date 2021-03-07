@@ -25,12 +25,21 @@
 (defn inline-tex [x]
   (render/->TeX (gn/simplify x)))
 
-(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Var" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio" ::keyword "Keyword"])
+(def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Definition" ::fn "Function" ::sy "Symbol" ::up "Column Vector" ::dow "Row Vector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio" ::keyword "Keyword"])
+
+(defn function-name [e]
+  (cond
+    (= (subs (str e) 0 20) "function sci$impl$fn")
+    "AnonymousFunction"
+    (= (subs (str e) 0 18) "function cljs$core" )
+    (str "ClojureCoreFunction \\ " (subs (.-name e) 10))
+    :else "Function"))
 
 (defn classify [e]
   (first (filter #(s/valid? (first %) e) (partition 2 sps))))
 
 (defn kind-s? [e]
+  (def ei e)
   (let [[spc text] (classify e)
         differential (fn [^dr/Differential e1] (let [t (.-terms  e1)] [(second (first t)) (last (last t))]))]
     (cond
@@ -46,6 +55,8 @@
       (str text "[" (apply str (map #(str (kind-s? %) "\\ ") e)) "]")
       (= spc ::hash-table)
       (str text "\\{" (apply str (map (fn [[k v]] (str (kind-s? k)  "\\ " (kind-s? v) "\\ ")) e))"\\}")
+      (= spc ::fn) (function-name e)
+      (= spc ::sci-var) (str text "\\ " (subs (str e) 7))
       :else
       (if text
         (str text "\\ " (inline-tex e))

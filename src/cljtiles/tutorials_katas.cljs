@@ -127,7 +127,7 @@
      :code
      ['(defn this-returns-a-function
         text
-         (:tiles/vert (fn [number] (str text number))))
+         (:tiles/vert (fn number (str text number))))
       '(:tiles/slot 3)
       '(this-returns-a-function "three=")
       ]}
