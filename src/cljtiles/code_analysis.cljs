@@ -7,7 +7,7 @@
       s
       (reduce (fn [v vs] (or v (inspect-form vs fname))) nil s))))
 
-(defn inspect-froms [edn-code fname]
+#_(defn inspect-froms [edn-code fname]
   (map (fn [form]
          (when (and (list? form)
                     (> (count form) 2)
@@ -16,7 +16,7 @@
        edn-code))
 
 
-(defn inspect-form-2 [s fname]
+#_(defn inspect-form-2 [s fname]
   (when (coll? s)
     (if (= (first s) fname)
       s

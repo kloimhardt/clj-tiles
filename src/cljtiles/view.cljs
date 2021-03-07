@@ -314,23 +314,12 @@
               :edn-code aug-edn-code
               :edn-code-orig edn-code}))))
 
-(defn insert-inspect [edn-code inspect-form]
-    (if inspect-form
-      (concat (take 3 edn-code)
-              (conj (drop 3 edn-code) inspect-form))
-      edn-code))
-
 (defn get-edn-code [xml-str inspect-id inspect-fn]
   (let [edn-xml (sax/xml->clj xml-str)
         eci (edn->code/parse edn-xml {:id inspect-id :fun inspect-fn})
         inspect-fn-name (when inspect-fn (first (inspect-fn 0)))
-        ;;ifo (ca/inspect-froms eci inspect-fn-name)
         ]
-    (ca/prepare-fns eci inspect-fn-name)
-    #_(if (not-every? nil? ifo)
-      (let [ec (edn->code/parse edn-xml {:id nil :fun nil})]
-        (map insert-inspect ec ifo))
-      eci)))
+    (ca/prepare-fns eci inspect-fn-name)))
 
 (defn ^:export startsci [{:keys [inspect-fn] :as context}]
   (let [xml-str (->> (.-mainWorkspace blockly)
