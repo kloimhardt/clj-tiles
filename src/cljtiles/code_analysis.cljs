@@ -38,7 +38,7 @@
 
 (defn trans-fn [edn-code i-fn-name]
   (if (coll? edn-code)
-    (if-let [n (get {'fn 1 'defn 2} (first edn-code))]
+    (if-let [n (get {'let 1 'fn 1 'defn 2} (first edn-code))]
       (if (> (count edn-code) n)
         (if-let [ifo (inspect-form (nth edn-code n) i-fn-name)]
           (let [cclean (w/postwalk-replace {ifo (last ifo)} edn-code)]

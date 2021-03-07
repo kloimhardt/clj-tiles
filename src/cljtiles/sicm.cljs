@@ -109,7 +109,7 @@
 (s/def ::nil nil?)
 (s/def ::literal-expression #(instance? sicmutils.expression/Literal %))
 (s/def ::literal-function #(instance? sicmutils.abstract.function/Function %))
-(s/def ::fn fn?)
+(s/def ::fn #(or (instance? cljs.core/MultiFn %) (fn? %)))
 
 (s/def ::nu number?)
 (s/def ::sy symbol?)
