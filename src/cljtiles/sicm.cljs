@@ -30,6 +30,8 @@
 (def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Definition" ::fn "Function" ::sy "Symbol" ::up "ColumnVector" ::dow "RowVector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio" ::keyword "Keyword" ::ratom "ReagentAtom"])
 
 (defn function-name [e]
+  ;;does not work with tree-shaking and shadow-cljs simple optimization
+  ;;i.e. always return the :else branch
   (cond
     (= (subs (str e) 0 18) "function cljs$core")
     (str "ClojureCoreFunction \\ " (subs (.-name e) 10))

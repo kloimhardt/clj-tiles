@@ -14,6 +14,7 @@
    [cljtiles.tutorials-lagr :as t-l]
    [cljtiles.tutorials-sicm :as t-s]
    [cljtiles.tutorials-sicm3 :as t-s3]
+   [cljtiles.tutorials-appen :as t-ax]
    [cljs.reader :as edn]
    [clojure.walk :as w]
    [tubax.core :as sax]
@@ -36,8 +37,11 @@
 
 (def content
   (let [tuts [t-0/content t-k/content
-              t-l/content t-s2/content
-              t-s/content t-s3/content]
+              t-l/content
+              t-s2/content
+              t-s/content t-s3/content
+              t-ax/content
+              ]
         f (fn [ks v]
             (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
     (-> (f [:tutorials :chapnames :chaps]
