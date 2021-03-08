@@ -30,14 +30,19 @@
 (def sps [::string "Text" ::nil "Nothing" ::nu "Number" #_::sfunction #_"SicmFunction" ::sci-var "Definition" ::fn "Function" ::sy "Symbol" ::up "ColumnVector" ::dow "RowVector" ::differential "Differential" ::literal-expression "Expression" ::literal-function "LiteralFunction" ::hash-table "HashTable" ::list "List" ::clojure-vector "Collection" ::boolean "Boolean" ::ratio "Ratio" ::keyword "Keyword" ::ratom "ReagentAtom"])
 
 (defn function-name [e]
-  (if (= (subs (str e) 0 18) "function cljs$core" )
+  (cond
+    (= (subs (str e) 0 18) "function cljs$core")
     (str "ClojureCoreFunction \\ " (subs (.-name e) 10))
-    "Function"))
+    (= (subs (str e) 0 18) "function sicmutils")
+    (str "SicmutilsFunction \\ " (subs (.-name e) 10))
+    :else "Function"))
 
 (defn classify [e]
   (first (filter #(s/valid? (first %) e) (partition 2 sps))))
 
 (defn kind-s? [e]
+ ;; (def e e) (.-name e) (str e)
+
   (let [[spc text] (classify e)
         differential (fn [^dr/Differential e1] (let [t (.-terms  e1)] [(second (first t)) (last (last t))]))]
     (cond
@@ -281,4 +286,4 @@
 
 ;;If you like to activate spec: (ts/instrument) If you like to deactivate spec: (ts/unstrument)
 
-(ts/instrument)
+;;(ts/instrument)

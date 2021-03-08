@@ -378,7 +378,7 @@
          "About"]]])))
 
 (defn desc-button []
-  [:button {:on-click #(reset-state nil)} "Clear screen"])
+  [:button {:on-click #(reset-state nil)} "Clear output"])
 
 (defn get-inspect-form [edn-code]
   (ca/inspect-form edn-code workspace!/inspect-fn-sym))
