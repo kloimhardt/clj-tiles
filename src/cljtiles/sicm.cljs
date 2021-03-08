@@ -53,7 +53,11 @@
       (str text "[" (apply str (map #(str (kind-s? %) "\\ ") e)) "]")
       (= spc ::hash-table)
       (str text "\\{" (apply str (map (fn [[k v]] (str (kind-s? k)  "\\ " (kind-s? v) "\\ ")) e))"\\}")
-      (= spc ::fn) (function-name e)
+      (= spc ::fn) (let [a (fu/arity e)
+                         n (second a)
+                         s (if (> n 1) "s" "")]
+                     (str (function-name e) ",\\ " (subs (str (first a)) 1)
+                          "\\ " n "\\ parameter" s))
       (= spc ::sci-var) (str text "\\ " (subs (str e) 7))
       (= spc ::ratom) "ReagentAtom"
       (= spc ::keyword) (str text "\\ " e)
@@ -277,4 +281,4 @@
 
 ;;If you like to activate spec: (ts/instrument) If you like to deactivate spec: (ts/unstrument)
 
-;;(ts/instrument)
+(ts/instrument)
