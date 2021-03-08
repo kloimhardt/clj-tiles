@@ -41,8 +41,6 @@
   (first (filter #(s/valid? (first %) e) (partition 2 sps))))
 
 (defn kind-s? [e]
- ;; (def e e) (.-name e) (str e)
-
   (let [[spc text] (classify e)
         differential (fn [^dr/Differential e1] (let [t (.-terms  e1)] [(second (first t)) (last (last t))]))]
     (cond
