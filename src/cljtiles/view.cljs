@@ -52,7 +52,7 @@
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
 
-(def dev true) ;;!! also disable spec!!
+(def dev false) ;;!! also disable spec!!
 
 (when dev
   (print (tst/test-pure))
