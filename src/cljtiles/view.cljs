@@ -550,6 +550,8 @@
                         #(assoc % :run-button false :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
       (= p "higherorder")
       (goto-lable-page! :higher-order nil)
+      (= p "pendulumfinal")
+      (goto-lable-page! :pendulum-final nil)
       :else
       (-> p
           js/parseInt

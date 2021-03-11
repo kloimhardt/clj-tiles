@@ -6,7 +6,7 @@
     :description
     [:<>
      [:p "You came a long way to this final result. Maybe you skipped a view steps. Running this workspace yields the equation of motion for the driven pendulum."]
-     [:p "Inspecting the block \"(Hight-of-Pivot time)\" demonstrates another very general result: blocks change their type during the course of the program."]]
+     [:p "You right-click and inspect the block \"(Hight-of-Pivot time)\". This demonstrates another very general result: blocks change their type during the course of the program."]]
     :message-fn
     (fn [_ ifo _]
       (get
