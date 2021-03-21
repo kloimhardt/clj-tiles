@@ -217,6 +217,8 @@
         (augment-code-fu flat-code
                          '(defn L-free-particle "added by clj-tiles parser" [x]
                             (comp sicmutils-double (L-free-particle-sicm x))))
+        (augment-code-fu flat-code
+                         '(def Lagrangian-signature '(-> (UP Real Real Real) Real)))
         (augment-code-div inspect-fn))))
 
 (defn start-timer [fu ms max msg]

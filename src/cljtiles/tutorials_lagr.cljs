@@ -317,4 +317,23 @@
             '(:tiles/vert (up :tiles/slot :tiles/slot))
             '(compose :tiles/slot
                      :tiles/slot)
-            ]}]})
+            ]}
+    {:blockpos [[0 0]
+                [0 150] [350 150] [500 150]
+                [0 300]]
+     :code ['(def Lagrangian
+               (:tiles/vert (fn [[time position velocity]]
+                              :tiles/slot)))
+            '((literal-function 'T) velocity)
+            '(- :tiles/slot :tiles/slot )
+            '((literal-function 'V) position)
+            '[:div>tex (((Lagrange-equations Lagrangian)
+                         (literal-function 'q))
+                        't)]]}
+    {:blockpos [[0 0] [300 0]
+                [0 100]]
+     :code ['(literal-function 'L :tiles/slot)
+            'Lagrangian-signature
+            '[:div>tex (((Lagrange-equations :tiles/slot)
+                         (literal-function 'q))
+                        't)]]}]})
