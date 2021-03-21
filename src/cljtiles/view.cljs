@@ -26,9 +26,12 @@
    [cljtiles.code-analysis :as ca]
 
    [cljtiles.tests :as tst]
+   [flow-storm.api :as fsa]
    ;;[sc.api]
    ;;[cljtiles.sc]
    ))
+
+(fsa/connect)
 
 (defn generate-xml [page]
   (if (:xml-code page)
@@ -80,6 +83,8 @@
                             (.getMainWorkspace blockly))))
 
 (defonce state (rc/atom nil))
+
+(fsa/trace-ref state)
 
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
