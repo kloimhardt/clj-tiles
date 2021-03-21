@@ -25,3 +25,5 @@
 ;; shadow-cljs watch cljtiles
 
 ;; shadow-cljs release cljtiles
+
+;; clj -Sdeps '{:deps {jpmonettas/flow-storm-debugger {:mvn/version "0.6.0"}}}' -m flow-storm-debugger.main

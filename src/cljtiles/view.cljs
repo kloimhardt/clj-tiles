@@ -55,7 +55,7 @@
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
 
-(def dev false) ;;!! also disable spec!!
+(def dev true) ;;!! also disable spec!!
 
 (when dev
   (print (tst/test-pure))
@@ -84,7 +84,8 @@
 
 (defonce state (rc/atom nil))
 
-(fsa/trace-ref state)
+
+(when dev (fsa/trace-ref state))
 
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
