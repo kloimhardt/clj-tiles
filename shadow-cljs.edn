@@ -23,6 +23,7 @@
 ;; npm install fraction.js
 ;; npm install mathjax@2
 ;; shadow-cljs watch cljtiles
+;; http://localhost:8080/cljtiles.html
 
 ;; shadow-cljs release cljtiles
 

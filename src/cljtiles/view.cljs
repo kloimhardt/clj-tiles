@@ -8,6 +8,7 @@
    ["blockly" :as blockly]
    [cljtiles.xmlparse-2 :as edn->code]
    [cljtiles.genblocks :as gb]
+   [cljtiles.tutorials-achangin :as t-ac]
    [cljtiles.tutorials-clj :as t-0]
    [cljtiles.tutorials-katas :as t-k]
    [cljtiles.tutorials-sicm2 :as t-s2]
@@ -39,7 +40,8 @@
     (assoc page :xml-code (apply gb/rpg (:blockpos page) (:code page)))))
 
 (def content
-  (let [tuts [t-0/content t-k/content
+  (let [tuts [t-ac/content
+              t-0/content t-k/content
               t-l/content
               t-s2/content
               t-s/content t-s3/content
@@ -83,7 +85,6 @@
                             (.getMainWorkspace blockly))))
 
 (defonce state (rc/atom nil))
-
 
 (when dev (fsa/trace-ref state))
 
@@ -225,6 +226,8 @@
                             (comp sicmutils-double (L-free-particle-sicm x))))
         (augment-code-fu flat-code
                          '(def Lagrangian-signature '(-> (UP Real Real Real) Real)))
+        (augment-code-fu flat-code
+                         '(defn printlns [& lines] (run! println lines)))
         (augment-code-div inspect-fn))))
 
 (defn start-timer [fu ms max msg]
@@ -475,8 +478,8 @@
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc result-raw edn-code-orig code] :as the-state}]
-  (if-let [ifo (get-inspect-form edn-code)]
-    (let [tut (nth tutorials tutorial-no)]
+  (let [tut (nth tutorials tutorial-no)]
+    (if-let [ifo (get-inspect-form edn-code)]
       [:<>
        (cond
          (seq inspect)
@@ -496,27 +499,29 @@
          (= (last ifo) :start-interactive)
          [tex-comp ((:message-fn tut) the-state ifo goto-lable-page!)]
          :else (str "Expression " (last ifo) " was never called.")
-         )])
-    [:<>
-     (map-indexed (fn [idx v]
-                    ^{:key idx} [:pre v])
-                  stdout)
-     (cond
-       sci-error
-       [:<>
-        [error-comp the-state]
-        (when desc [desc-button])]
-       code
-       [:<>
-        (if (start-with-div? (last edn-code-orig))
-          [result-raw]
-          [result-comp the-state])
-        (when desc [:p [desc-button]])]
-       desc
-       [:div {:style {:column-count 2}}
-        [tex-comp desc]]
-       )
-     ]))
+         )]
+      [:<>
+       (map-indexed (fn [idx v]
+                      ^{:key idx} [:pre v])
+                    stdout)
+       (cond
+         sci-error
+         [:<>
+          [error-comp the-state]
+          (when desc [desc-button])]
+         code
+         [:<>
+          (cond
+            (start-with-div? (last edn-code-orig))
+            [result-raw]
+            :else
+            [result-comp the-state])
+          (when desc [:p [desc-button]])]
+         desc
+         [:div {:style {:column-count 2}}
+          [tex-comp desc]]
+         )
+       ])))
 
 (defn error-boundary [comp]
   (let [error (rc/atom nil)]
@@ -543,7 +548,7 @@
 
 
 (defn ^{:dev/after-load true} render []
-  ;;(when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
+  (when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
