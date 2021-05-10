@@ -13,13 +13,15 @@
 
 (def content
   {:chapnames ["Lyrics"]
-   :chaps [2] #_(count (:tutorials content))
+   :chaps [10] #_(count (:tutorials content))
    :tutorials
    [{:code ["Come gather 'round people"]
+     :no-code-display true
      :comp-fn (fn [{:keys [result-raw]}]
                 (lyric-format [result-raw] -472680540))}
     {:code ['(:tiles/vert (printlns "Wherever you roam"
                                     "And admit that the waters"))]
+     :no-code-display true
      :comp-fn (fn [{:keys [stdout]}]
                 (lyric-format stdout 1698792518))}
     {:blockpos [[0 0] [0 100] [0 150]]
@@ -28,6 +30,7 @@
                                     :tiles/slot))
             "Around you have grown"
             "You'll be drenched to the bone"]
+     :no-code-display true
      :comp-fn (fn [{:keys [stdout]}]
                 (lyric-format stdout -1282138944))}
     {:blockpos [[0 0] [0 150] [0 200] [0 250]]
@@ -38,8 +41,8 @@
                                     ))
             "For the times they are a-changin'"
             "Is worth savin'"
-            "Or you'll sink like a stone"
-            ]
+            "Or you'll sink like a stone"]
+     :no-code-display true
      :comp-fn (fn [{:keys [stdout result-raw]}]
                 (lyric-format (conj stdout result-raw) 1352137510))}
     {:blockpos [[0 0] [0   200] [0   250] [0   300]
@@ -56,6 +59,7 @@
             "And admit that the waters"
             "And accept it that soon"
             "Come gather 'round people"]
+     :no-code-display true
      :comp-fn (fn [{:keys [stdout]}]
                 (lyric-format stdout 331859347))}
     {:blockpos [[0 0] [0   200] [0   250] [0   300]
@@ -69,6 +73,7 @@
             "Or you'll sink like a stone"
             "If your time to you"
             "Then you better start swimmin'"]
+     :no-code-display true
      :comp-fn (fn [{:keys [stdout result-raw]}]
                 (lyric-format (conj stdout result-raw) 1352137510))}
     {:blockpos [[0 0] [0 50] [0 100]]

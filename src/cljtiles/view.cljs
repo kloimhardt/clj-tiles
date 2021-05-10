@@ -464,7 +464,8 @@
       [:h3 "Code"]
       [:pre code]]]))
 
-(defn result-comp [{:keys [result-raw edn-code edn-code-orig code]}]
+(defn result-comp [{:keys [result-raw edn-code edn-code-orig code
+                           tutorial-no]}]
   (if (= edn-code edn-code-orig :showcode) ;;never true, remove :showcode to supress code display.
     [:pre (my-str result-raw)]
     (let [flex50 {:style {:flex "50%"}}]
@@ -472,9 +473,10 @@
        [:div flex50
         [:h3 "Result"]
         [:pre (my-str-brk result-raw)]]
-       [:div flex50
-        [:h3 "Code"]
-        [:pre code]]])))
+       (when-not (:no-code-display (nth tutorials tutorial-no))
+         [:div flex50
+          [:h3 "Code"]
+          [:pre code]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc result-raw edn-code-orig code] :as the-state}]
