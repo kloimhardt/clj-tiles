@@ -500,28 +500,30 @@
          [tex-comp ((:message-fn tut) the-state ifo goto-lable-page!)]
          :else (str "Expression " (last ifo) " was never called.")
          )]
-      [:<>
-       (map-indexed (fn [idx v]
-                      ^{:key idx} [:pre v])
-                    stdout)
-       (cond
-         sci-error
-         [:<>
-          [error-comp the-state]
-          (when desc [desc-button])]
-         code
-         [:<>
-          (cond
-            (start-with-div? (last edn-code-orig))
-            [result-raw]
-            :else
-            [result-comp the-state])
-          (when desc [:p [desc-button]])]
-         desc
-         [:div {:style {:column-count 2}}
-          [tex-comp desc]]
-         )
-       ])))
+      (let [custom-comp (and (:comp-fn tut) ((:comp-fn tut) the-state))]
+        [:<>
+         (when-not custom-comp
+           (map-indexed (fn [idx v]
+                          ^{:key idx} [:pre v])
+                        stdout))
+         (cond
+           sci-error
+           [:<>
+            [error-comp the-state]
+            (when desc [desc-button])]
+           code
+           [:<>
+            (cond
+              custom-comp
+              [custom-comp]
+              (start-with-div? (last edn-code-orig))
+              [result-raw]
+              :else
+              [result-comp the-state])
+            (when desc [:p [desc-button]])]
+           desc
+           [:div {:style {:column-count 2}}
+            [tex-comp desc]])]))))
 
 (defn error-boundary [comp]
   (let [error (rc/atom nil)]
@@ -545,7 +547,6 @@
    [tutorials-comp @state]
    [error-boundary
     [output-comp @state]]])
-
 
 (defn ^{:dev/after-load true} render []
   (when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
