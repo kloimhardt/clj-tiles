@@ -27,7 +27,7 @@
 
 (def content
   {:chapnames ["Lyrics"]
-   :chaps [10] #_(count (:tutorials content))
+   :chaps [11] #_(count (:tutorials content))
    :tutorials
    [{:code ["Come gather 'round people"]
      :no-code-display true
@@ -137,4 +137,9 @@
             ''later
             ''times]
      :comp-fn (fn [{:keys [result-raw]}]
-                (lyric-from-vec result-raw 792318763))}]})
+                (lyric-from-vec result-raw 792318763))}
+    {:blockpos [[0 0] [0 100] [0 200]]
+     :code [:div.rotate
+            '(:tiles/vert [:tiles/slot
+                           "For the wheel's still in spin."
+                           "For the times they are a-changin’"])]}]})
