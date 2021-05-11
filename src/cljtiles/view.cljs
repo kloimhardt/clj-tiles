@@ -179,8 +179,12 @@
 (defn html-tex-comp [e]
   [tex-comp (sicm/tex e)])
 
+(defn html-verse-rotate-comp [& e]
+  (into [:div.rotate] (map #(vector :p %) e)))
+
 (def reagent-component-bindings
-  {'tex html-tex-comp})
+  {'tex html-tex-comp
+   'verse-rotate html-verse-rotate-comp})
 
 (defn parse-:div> [e]
   (let [sf (str (first e))

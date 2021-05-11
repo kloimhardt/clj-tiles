@@ -139,7 +139,7 @@
      :comp-fn (fn [{:keys [result-raw]}]
                 (lyric-from-vec result-raw 792318763))}
     {:blockpos [[0 0] [0 100] [0 200]]
-     :code [:div.rotate
+     :code [:div>verse-rotate
             '(:tiles/vert [:tiles/slot
                            "For the wheel's still in spin."
                            "For the times they are a-changin’"])]}]})
