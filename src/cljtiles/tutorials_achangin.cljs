@@ -1,15 +1,29 @@
-(ns cljtiles.tutorials-achangin)
+(ns cljtiles.tutorials-achangin
+  (:require [goog.string :as gstring]))
+
+(defn make-text [text css-class animation-delay anim-offset]
+  (let [f (fn [i x]
+            [:span {:class css-class
+                    :style {:animationDelay (str (+ anim-offset (* i animation-delay)) "ms")}}
+             (if (= x " ") (gstring/unescapeEntities "&nbsp;") x)])]
+    (into [:p] (map-indexed f text))))
+
+(defn offsets [textvec]
+  (cons 0 (reductions + (map count textvec))))
+
+(defn lyric-format-sub [textvec]
+  (fn [] (into [:<>] (map (fn [x os] (make-text x "char-in" 6 (* os 6))) textvec (offsets textvec)))))
 
 (defn lyric-format [textvec hash-code]
   (println "thehash " (hash textvec))
   (when (= (hash textvec) hash-code)
-    (fn [] (into [:<>] (map #(vector :p %) textvec)))))
+    (lyric-format-sub textvec)))
 
-(defn lyric-from-vec [textvec hash-code]
-  (println "thehash " (hash textvec))
-  (when (= (hash textvec) hash-code)
-    (fn [] (into [:<>] (map #(vector :p (apply str (interpose " " %)))
-                            textvec)))))
+(defn lyric-from-vec [vectextvec hash-code]
+  (println "thehash " (hash vectextvec))
+  (when (= (hash vectextvec) hash-code)
+    (let [textvec (map #(apply str (interpose " " %)) vectextvec)]
+      (lyric-format-sub textvec))))
 
 (def content
   {:chapnames ["Lyrics"]
