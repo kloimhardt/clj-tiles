@@ -122,14 +122,15 @@
             ]
      :comp-fn (fn [{:keys [result-raw]}]
                 (lyric-from-vec result-raw -395749415))}
-    {:blockpos [[0 0]
+    {:blockpos [[0 0] [0 200]
                 [0 300] [100 300] [200 300] [300 300] [400 300] [500 300]]
      :code ['(:tiles/vert
               [[:tiles/slot "there’s no tellin’ who"]
                ["that it’s" :tiles/slot]
                ["For the loser" :tiles/slot]
                ["will be" :tiles/slot "to win"]
-               ["For the" :tiles/slot "they are a-changin’"]])
+               :tiles/slot])
+            ["For the" :tiles/slot "they are a-changin’"]
             ''namin’
             ''now
             ''And
