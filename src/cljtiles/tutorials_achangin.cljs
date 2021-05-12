@@ -93,13 +93,13 @@
             ''Who
             ''spin
             ''eyes
-            ''won't
+            "won't"
             ''speak
             ]
      :comp-fn (fn [{:keys [result-raw]}]
-                (cmpnts/lyric-from-vec result-raw -395749415))}
+                (cmpnts/lyric-from-vec result-raw 150106325))}
     {:blockpos [[0 0] [0 200]
-                [0 300] [100 300] [200 300] [300 300] [400 300] [500 300]]
+                [0 300] [150 300] [250 300] [350 300] [450 300] [550 300]]
      :code ['(:tiles/vert
               [[:tiles/slot "there’s no tellin’ who"]
                ["that it’s" :tiles/slot]
@@ -107,13 +107,13 @@
                ["will be" :tiles/slot "to win"]
                :tiles/slot])
             ["For the" :tiles/slot "they are a-changin’"]
-            ''namin’
+            "namin'"
             ''now
             ''And
             ''later
             ''times]
      :comp-fn (fn [{:keys [result-raw]}]
-                (cmpnts/lyric-from-vec result-raw 792318763))}
+                (cmpnts/lyric-from-vec result-raw -237908802))}
     {:blockpos [[0 0] [0 100] [0 200]]
      :code [:div>verse-rotate
             '(:tiles/vert [:tiles/slot
