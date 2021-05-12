@@ -33,8 +33,6 @@
    ;;[cljtiles.sc]
    ))
 
-(fsa/connect)
-
 (defn generate-xml [page]
   (if (:xml-code page)
     page
@@ -58,9 +56,10 @@
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
 
-(def dev true) ;;!! also disable spec!!
+(def dev false) ;;!! also disable spec!!
 
 (when dev
+  (fsa/connect)
   (print (tst/test-pure))
   (if-not (= (count tutorials) (reduce + chaps))
     (print "Sum of chaps not number tutorials")
