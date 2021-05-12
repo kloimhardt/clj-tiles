@@ -28,7 +28,7 @@
    [cljtiles.components :as cmpnts]
 
    [cljtiles.tests :as tst]
-   [flow-storm.api :as fsa]
+   ;;[flow-storm.api :as fsa]
    ;;[sc.api]
    ;;[cljtiles.sc]
    ))
@@ -59,7 +59,7 @@
 (def dev false) ;;!! also disable spec!!
 
 (when dev
-  (fsa/connect)
+  ;;(fsa/connect)
   (print (tst/test-pure))
   (if-not (= (count tutorials) (reduce + chaps))
     (print "Sum of chaps not number tutorials")
@@ -86,7 +86,7 @@
 
 (defonce state (rc/atom nil))
 
-(when dev (fsa/trace-ref state))
+;;(when dev (fsa/trace-ref state))
 
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
