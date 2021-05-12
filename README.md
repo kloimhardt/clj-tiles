@@ -1,6 +1,6 @@
 # Clj-Tiles
 
-* Start to code by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html?page=12).
+* Start by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html).
 * Over 100 puzzels built in. Starting with simple examples, they continue to basic web-programming and lead to sophisticated examples taken from theoretical physics.
 * Investigate puzzles with the built in value inspector.
 * Make new puzzle tutorials by using the built in parser.
@@ -9,7 +9,7 @@
 Watch the [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04).
 
 ## Solve puzzles
-The first forty puzzles are taken from the book [Getting Clojure](https://pragprog.com/titles/roclojure/getting-clojure/). Another resource is [Clojure for the Brave and True](https://www.braveclojure.com).
+The first puzzles consist of completing the lyrics a famous song. Then, the following coding puzzles are taken from the book [Getting Clojure](https://pragprog.com/titles/roclojure/getting-clojure/). Another resource is [Clojure for the Brave and True](https://www.braveclojure.com). To you notice the simalarities between writing code and poetry?
 
 The most simple example looks like this:
 
@@ -83,8 +83,9 @@ For development install Clojure/Java and do:
  shadow-cljs watch cljtiles
  ```
 ## Related projects
-* [Werkbank](https://github.com/kloimhardt/werkbank)
 * [Blockly](https://developers.google.com/blockly)
 * [BlockPy](https://think.cs.vt.edu/blockpy/) 
-* [SCI](https://github.com/borkdude/sci)
+* [blockoid](https://github.com/ParkerICI/blockoid)
+* [Werkbank](https://github.com/kloimhardt/werkbank)
 * [sicmutils](https://github.com/sicmutils/sicmutils)
+* [SCI](https://github.com/borkdude/sci)
