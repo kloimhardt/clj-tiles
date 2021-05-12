@@ -25,6 +25,7 @@
    [cljtiles.sicm :as sicm]
    [cljtiles.blockly :as workspace!]
    [cljtiles.code-analysis :as ca]
+   [cljtiles.components :as cmpnts]
 
    [cljtiles.tests :as tst]
    [flow-storm.api :as fsa]
@@ -179,12 +180,11 @@
 (defn html-tex-comp [e]
   [tex-comp (sicm/tex e)])
 
-(defn html-verse-rotate-comp [& e]
-  (into [:div.rotate] (map #(vector :p %) e)))
-
 (def reagent-component-bindings
   {'tex html-tex-comp
-   'verse-rotate html-verse-rotate-comp})
+   'verse-rotate cmpnts/html-verse-rotate-comp
+   'verse-fade-in cmpnts/html-verse-fade-in-comp
+   'verse-fade-out cmpnts/html-verse-fade-out-comp})
 
 (defn parse-:div> [e]
   (let [sf (str (first e))
