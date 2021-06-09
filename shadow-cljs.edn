@@ -1,9 +1,9 @@
 {:dependencies [[cider/cider-nrepl "0.25.5"]
                 [reagent "1.0.0-rc1"]
-                [borkdude/sci "0.2.3"]
+                [borkdude/sci "0.2.5"]
                 [zprint "1.0.2"]
                 [hiccups "0.3.0"]
-                [sicmutils "0.16.0"]
+                [sicmutils "0.19.2"]
                 [jpmonettas/flow-storm "0.5.0"]]
  :source-paths ["src"]
  :dev-http {8080 ["public" "node_modules"]}
