@@ -15,7 +15,8 @@
             [sicmutils.mechanics.lagrange :as lg]
             [sicmutils.expression.render :as render]
             [sicmutils.abstract.function :as af :include-macros true]
-            [sci.impl.vars]))
+            [sci.impl.vars]
+            [reagent.ratom]))
 
 (defn tex [x]
   (binding [render/*TeX-sans-serif-symbols* false
