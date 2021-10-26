@@ -1,0 +1,10 @@
+ffmpeg -ss 00:00:00 -i MA_1.m4a -to 00:02:38  MAtrim_1_notice.m4a
+ffmpeg -ss 00:00:12 -i MA_1.m4a -to 00:02:26  MAtrim_1.m4a
+ffmpeg -ss 00:00:10 -i MA_2.m4a -to 00:04:13  MAtrim_2.m4a
+ffmpeg -ss 00:00:10 -i MA_3.m4a -to 00:02:29  MAtrim_3.m4a
+ffmpeg -ss 00:00:10 -i MA_4.m4a -to 00:02:43  MAtrim_4.m4a
+ffmpeg -ss 00:00:10 -i MA_5.m4a -to 00:02:25  MAtrim_5.m4a
+ffmpeg -ss 00:00:10 -i MA_6.m4a -to 00:01:43  MAtrim_6.m4a
+ffmpeg -ss 00:00:10 -i MA_7.m4a -to 00:01:16  MAtrim_7.m4a
+ffmpeg -ss 00:00:10 -i MA_8.m4a -to 00:02:07  MAtrim_8.m4a
+ffmpeg -ss 00:00:10 -i MA_9.m4a -to 00:02:15  MAtrim_9.m4a
