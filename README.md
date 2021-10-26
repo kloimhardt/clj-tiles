@@ -1,6 +1,6 @@
 # Clj-Tiles
 
-* Start to learn functional programming by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html).
+* Learn or teach functional programming by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html).
 * There are over 100 puzzles built in. Starting with simple examples, they continue to basic web-programming and lead to sophisticated examples taken from theoretical physics.
 * Investigate puzzles with the built in value inspector.
 * Make new puzzle tutorials by using the built in parser.
