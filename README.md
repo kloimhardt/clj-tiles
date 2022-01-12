@@ -1,5 +1,7 @@
 # Clj-Tiles
 
+Watch the [video](https://www.youtube.com/watch?v=bHBALgxjeLo) presented at the [re-clojure](https://www.reclojure.org/2021/speaker/markus-kloimwieder) 2021 conference, and also the [panel discussion](https://www.youtube.com/watch?v=euH8iZGbJD8)
+
 * Learn or teach functional programming by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html).
 * There are over 100 puzzles built in. Starting with simple examples, they continue to basic web-programming and lead to sophisticated examples taken from theoretical physics.
 * Investigate puzzles with the built in value inspector.
