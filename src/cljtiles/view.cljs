@@ -224,9 +224,15 @@
         (augment-code-fu flat-code
                          '(defn vec-cons "added by clj-tiles parser" [x coll]
                             (let [c (cons x coll)] (if (seq? c) (vec c) c))))
-        (augment-code-fu flat-code
+        #_(augment-code-fu flat-code
                          '(defn L-free-particle "added by clj-tiles parser" [x]
                             (comp sicmutils-double (L-free-particle-sicm x))))
+        ;; above line changed for next line, see sicm issue #271
+        (augment-code-fu flat-code
+                         '(defn Lagrangian-action
+                            "added by clj-tiles parser"
+                            [& opts]
+                            (apply Lagrangian-action-sicm (concat opts [{:compile? true}]))))
         (augment-code-fu flat-code
                          '(def Lagrangian-signature '(-> (UP Real Real Real) Real)))
         (augment-code-fu flat-code

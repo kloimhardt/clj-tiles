@@ -4,7 +4,7 @@
 
 (def content
   {:chapnames ["Lagrangian"]
-   :chaps [29] #_(count (:tutorials content))
+   :chaps [31] #_(count (:tutorials content))
    :tutorials
    [{:description
      [:div

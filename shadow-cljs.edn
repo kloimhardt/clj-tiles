@@ -3,7 +3,7 @@
                 [borkdude/sci "0.2.5"]
                 [zprint "1.0.2"]
                 [hiccups "0.3.0"]
-                [sicmutils "0.19.2"]
+                [sicmutils "0.21.0"]
                 [jpmonettas/flow-storm "0.5.0"]]
  :source-paths ["src"]
  :dev-http {8080 ["public" "node_modules"]}

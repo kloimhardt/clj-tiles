@@ -89,7 +89,8 @@
   (s/explain ::differential (first (first @u))))
 
 (def bindings {'sicmutils-double sicmutils.util/double
-               'L-free-particle-sicm lg/L-free-particle})
+               ;;'L-free-particle-sicm lg/L-free-particle ;; changed for nex line, see sicm issue #271
+               'Lagrangian-action-sicm lg/Lagrangian-action})
 
 ;;necessary for sicmutils version < 0.15.0
 #_(def bindings {'up st/up
