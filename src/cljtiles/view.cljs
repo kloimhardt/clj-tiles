@@ -227,8 +227,8 @@
         #_(augment-code-fu flat-code
                          '(defn L-free-particle "added by clj-tiles parser" [x]
                             (comp sicmutils-double (L-free-particle-sicm x))))
-        ;; above line changed for next line, see sicm issue #271
-        (augment-code-fu flat-code
+        ;; above line changed for next line, see sicm issue #271; not needed since sicmutils 0.21.1
+        #_(augment-code-fu flat-code
                          '(defn Lagrangian-action
                             "added by clj-tiles parser"
                             [& opts]

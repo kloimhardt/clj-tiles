@@ -90,7 +90,8 @@
 
 (def bindings {'sicmutils-double sicmutils.util/double
                ;;'L-free-particle-sicm lg/L-free-particle ;; changed for nex line, see sicm issue #271
-               'Lagrangian-action-sicm lg/Lagrangian-action})
+               ;;'Lagrangian-action-sicm lg/Lagrangian-action ;; not needed since sicmutils 0.21.1
+               })
 
 ;;necessary for sicmutils version < 0.15.0
 #_(def bindings {'up st/up
