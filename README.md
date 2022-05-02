@@ -83,6 +83,8 @@ For development install Clojure/Java and Node and do:
  
  shadow-cljs watch cljtiles
  ```
+ then open `http://localhost:8080/cljtiles.html` in your browser.
+ 
 ## Related projects
 * [Blockly](https://developers.google.com/blockly)
 * [BlockPy](https://think.cs.vt.edu/blockpy/) 
