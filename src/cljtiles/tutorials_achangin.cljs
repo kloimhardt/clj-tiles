@@ -8,7 +8,8 @@
    [{:code ["Come gather 'round people"]
      :no-code-display true
      :comp-fn (fn [{:keys [result-raw]}]
-                (cmpnts/lyric-format [result-raw] -472680540))}
+                (cmpnts/lyric-format [result-raw] -472680540))
+     :solution ["Solution"]}
     {:code ['(:tiles/vert (printlns "Wherever you roam"
                                     "And admit that the waters"))]
      :no-code-display true

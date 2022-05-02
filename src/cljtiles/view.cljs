@@ -36,7 +36,9 @@
 (defn generate-xml [page]
   (if (:xml-code page)
     page
-    (assoc page :xml-code (apply gb/rpg (:blockpos page) (:code page)))))
+    (-> page
+        (assoc :xml-code (apply gb/rpg (:blockpos page) (:code page)))
+        (assoc :xml-solution (apply gb/rpg nil (:solution page))))))
 
 (def content
   (let [tuts [t-ac/content
@@ -91,6 +93,7 @@
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
         ds (:desc @state)
+        sn (:solution-no @state)
         init {:stdout []
               :inspect []
               :sci-error nil
@@ -102,22 +105,31 @@
               :modal-style-display "none"
               :run-button true
               :tutorial-no tn
-              :desc ds}
+              :desc ds
+              :solution-no sn}
         check (or (not @state) (= (into (hash-set) (keys init))
                                   (into (hash-set) (keys @state))))]
     (reset! state (merge init
                          (when tutorial-no
                            {:tutorial-no tutorial-no
-                            :desc (:description (nth tutorials tutorial-no))})))
+                            :desc (:description (nth tutorials tutorial-no))
+                            :solution-no -1 ;; -1 means "Puzzle" loaded in workspace
+                            })))
     (when-not check
-      (swap! state assoc :stdout ["state is not in best state, pls. report."]))
-    ))
+      (swap! state assoc :stdout [(str "state is not in best state, pls. report. " (keys @state))]))))
 
 (defonce app-state (rc/atom nil))
 
 (defn set-scrollbar [x y]
   (when x
     (.. blockly -mainWorkspace (scroll x y))))
+
+(defn re-load-page []
+  (let [page-no (:tutorial-no @state)
+        solution-no (:solution-no @state)]
+    (if (= -1 solution-no)
+      (load-workspace (:xml-code (nth tutorials page-no)))
+      (load-workspace (:xml-solution (nth tutorials page-no))))))
 
 (defn goto-page! [page-no]
   (load-workspace (:xml-code (nth tutorials page-no)))
@@ -278,7 +290,7 @@
         the-env (atom nil)
         sci-eval (fn [code-str env errs]
                    (try (sci/eval-string code-str {:bindings bindings :env env})
-               (catch js/Error e (swap! errs conj e) :sci-error)))
+                        (catch js/Error e (swap! errs conj e) :sci-error)))
         cbr (map #(zp/zprint-str % output-width) edn-code)
         _results (doall (map #(sci-eval % the-env the-errs) cbr))
         err-msgs (map #(.-message %) @the-errs)
@@ -407,6 +419,20 @@
 (defn get-inspect-form [edn-code]
   (ca/inspect-form edn-code workspace!/inspect-fn-sym))
 
+(defn radios [solution-no]
+  [:<>
+   (-> (fn [[idx name]]
+         ^{:key name}
+         [:label {:style {:font-size "80%" :font-family "courier"}}
+          [:input {:type :radio :name "solution-radio1"
+                   :on-change #(do (swap! state assoc :solution-no idx)
+                                   (re-load-page))
+                   :checked (= idx solution-no)}]
+
+          name])
+       (map [[0 "Solution"] [-1 "Puzzle"]])
+       doall)])
+
 (defn tutorials-comp [{:keys [run-button tutorial-no edn-code]}]
   [:div
    [:span
@@ -424,6 +450,8 @@
              :value (str (inc tutorial-no) "/" (count tutorials))}]
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
+    " "
+    [radios (:solution-no @state)]
     " "
     (when run-button
       (if (get-inspect-form edn-code)
