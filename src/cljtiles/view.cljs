@@ -90,6 +90,8 @@
 
 ;;(when dev (fsa/trace-ref state))
 
+(def saved-workspace-xml (atom nil))
+
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
         ds (:desc @state)
@@ -111,6 +113,8 @@
                                   (into (hash-set) (keys @state))))]
     (reset! state (merge init
                          (when tutorial-no
+                           (reset! saved-workspace-xml {:xml-code (:xml-code (nth tutorials tutorial-no))
+                                                        :xml-solution (:xml-solution (nth tutorials tutorial-no))})
                            {:tutorial-no tutorial-no
                             :desc (:description (nth tutorials tutorial-no))
                             :solution-no -1 ;; -1 means "Puzzle" loaded in workspace
@@ -124,12 +128,21 @@
   (when x
     (.. blockly -mainWorkspace (scroll x y))))
 
-(defn re-load-page []
-  (let [page-no (:tutorial-no @state)
-        solution-no (:solution-no @state)]
-    (if (= -1 solution-no)
-      (load-workspace (:xml-code (nth tutorials page-no)))
-      (load-workspace (:xml-solution (nth tutorials page-no))))))
+(defn get-workspace-xml-str []
+  (->> (.-mainWorkspace blockly)
+       (.workspaceToDom blockly/Xml)
+       (.domToPrettyText blockly/Xml)))
+
+(defn swap-workspace []
+  (if (= (:solution-no @state) -1)
+    (do
+      (swap! saved-workspace-xml assoc :xml-code (get-workspace-xml-str))
+      (swap! state assoc :solution-no 0)
+      (load-workspace (:xml-solution @saved-workspace-xml)))
+    (do
+      (swap! saved-workspace-xml assoc :xml-solution (get-workspace-xml-str))
+      (swap! state assoc :solution-no -1)
+      (load-workspace (:xml-code @saved-workspace-xml)))))
 
 (defn goto-page! [page-no]
   (load-workspace (:xml-code (nth tutorials page-no)))
@@ -358,9 +371,7 @@
     (ca/prepare-fns eci inspect-fn-name)))
 
 (defn ^:export startsci [{:keys [inspect-fn] :as context}]
-  (let [xml-str (->> (.-mainWorkspace blockly)
-                     (.workspaceToDom blockly/Xml)
-                     (.domToPrettyText blockly/Xml))
+  (let [xml-str (get-workspace-xml-str)
         edn-code (get-edn-code xml-str
                                (when context (.-id (get context "block")))
                                inspect-fn)]
@@ -419,15 +430,14 @@
 (defn get-inspect-form [edn-code]
   (ca/inspect-form edn-code workspace!/inspect-fn-sym))
 
-(defn radios [solution-no]
+(defn radios []
   [:<>
    (-> (fn [[idx name]]
          ^{:key name}
          [:label {:style {:font-size "80%" :font-family "courier"}}
           [:input {:type :radio :name "solution-radio1"
-                   :on-change #(do (swap! state assoc :solution-no idx)
-                                   (re-load-page))
-                   :checked (= idx solution-no)}]
+                   :on-change swap-workspace
+                   :checked (= idx (:solution-no @state))}]
 
           name])
        (map [[0 "Solution"] [-1 "Puzzle"]])
@@ -451,7 +461,7 @@
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
-    [radios (:solution-no @state)]
+    [radios]
     " "
     (when run-button
       (if (get-inspect-form edn-code)
