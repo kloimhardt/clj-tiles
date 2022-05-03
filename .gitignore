@@ -1,5 +1,7 @@
 .DS_Store
 .shadow-cljs/
+.clj-kondo/
+.lsp/
 data/
 node_modules/
 package-lock.json
