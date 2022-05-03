@@ -589,11 +589,14 @@
                              (reset! error nil)
                              nil)
                            comp))})))
+(defn test-comp []
+  [:p [:span {:style {:background-color "green" :color "white"}} "h"] " " "i"])
 
 (defn theview []
   [:div
    [modal-comp @state]
    [tutorials-comp @state]
+   [test-comp]
    [error-boundary
     [output-comp @state]]])
 
