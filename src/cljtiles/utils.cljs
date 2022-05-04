@@ -56,11 +56,31 @@
 (def cont (find-contents sol puzz))
 (def lack (find-lacking sol puzz))
 
+(defn newsplit [ss s]
+  (let [erg (str/split ss s)]
+    (cond
+      (nil? ss) [""]
+      (nil? s) [ss]
+      (str/ends-with? ss s)  (conj erg "")
+      :else erg)))
+
+(comment
+  (defn uu [a b]
+    [(str/split a b) (newsplit a b)])
+  (str/split "a" nil)
+  (uu "a" nil)
+  (uu nil nil)
+  (uu nil "a")
+  (uu "ab" "b") ;; => [["a"] ["a" ""]] only case it differs
+  (uu "a" "b")
+  (uu "ba" "b")
+  :end)
+
 (defn s-i-e-recur [ml pl]
   (if (seq ml)
       (cond->> (map (fn [p]
                       (s-i-e-recur (rest ml)
-                                   (str/split p (first (rest ml)))))
+                                   (newsplit p (first (rest ml)))))
                     pl)
         (first ml) (interpose (first ml)))
       pl))
@@ -82,7 +102,7 @@
                       (s-i-e-recur2 (rest ml)
                                     (map (fn [txt]
                                            {:yellow true :text txt})
-                                         (str/split (:text p)
+                                         (newsplit (:text p)
                                                     (first (rest ml))))
                                     color-kw)
                       p))
@@ -93,22 +113,20 @@
 (defn split-into-expressions2 [puzz exprs color-kw]
   (flatten (s-i-e-recur2 (cons nil exprs) puzz color-kw)))
 
-(defn split-into-expressions2-initial [puzz exprs color-kw startstr endstr]
-  (split-into-expressions2 [{:text (str startstr puzz endstr) :yellow true}]
+(defn split-into-expressions2-initial [puzz exprs color-kw]
+  (split-into-expressions2 [{:text puzz :yellow true}]
                            exprs
                            color-kw))
 
 (defn mark-green-and-black [puzz green-expr black-expr]
-  (-> (split-into-expressions2-initial puzz green-expr :green
-                                       (str (random-uuid))
-                                       (str (random-uuid)))
-      (split-into-expressions2 black-expr :black)
-      (rest)
-      (butlast)))
+  (-> (split-into-expressions2-initial puzz green-expr :green)
+      (split-into-expressions2 black-expr :black)))
 
 (comment
 
   (mark-green-and-black puzz cont lack)
-  (mark-green-and-black puzz [] lack) ;;TDOD edge case
+  (mark-green-and-black puzz [] lack)
+  (mark-green-and-black puzz cont [])
+  (mark-green-and-black puzz [] [])
 
   :end)
