@@ -48,28 +48,67 @@
     (concat f (rest s))))
 
 (defn find-lacking [sol puzz]
-  (reduce remove-first-from-coll (get-symbols puzz) (get-symbols sol)))
+  (filter #(pos? (count %))
+  (reduce remove-first-from-coll (get-symbols puzz) (get-symbols sol))))
 
 (def sol "g (a b c d) koi {o p r i j} uio [h a l l o]")
-(def puzz "(a b c d) kuuu {o p r i j} koi [h a l l o] hooo")
+(def puzz "(a b c d) kuuu  {o p r i j} koi kaba [h a l l o]")
 (def cont (find-contents sol puzz))
 (def lack (find-lacking sol puzz))
 
-(defn s-i-e-recur [ml pl modifier1 modifier2]
+(defn s-i-e-recur [ml pl]
   (if (seq ml)
-    (interpose (modifier1 (first ml))
-               (map (fn [p]
+      (cond->> (map (fn [p]
                       (s-i-e-recur (rest ml)
-                                   (str/split p (first (rest ml)))
-                                   modifier1
-                                   modifier2))
-                    pl))
-    (modifier2 (apply str pl))))
+                                   (str/split p (first (rest ml)))))
+                    pl)
+        (first ml) (interpose (first ml)))
+      pl))
 
-(defn split-into-expressions [puzz exprs modifier1 modifier2]
-  (flatten (s-i-e-recur exprs (str/split puzz (first exprs)) modifier1 modifier2)))
+(defn split-into-expressions [puzz exprs]
+  (butlast (flatten (s-i-e-recur (cons nil exprs)  [(str puzz "ende999")]))))
 
-(defn expr-g [x] ^:green x)
-(defn expr-y [x] ^:yellow x)
+(comment
 
-(split-into-expressions puzz cont expr-g expr-y)
+  (def gr1 (split-into-expressions puzz cont))
+  (flatten (s-i-e-recur (cons nil lack) gr1))
+
+  :end)
+
+(defn s-i-e-recur2 [ml pl color-kw]
+  (if (seq ml)
+    (cond->> (map (fn [p]
+                    (if (:yellow p)
+                      (s-i-e-recur2 (rest ml)
+                                    (map (fn [txt]
+                                           {:yellow true :text txt})
+                                         (str/split (:text p)
+                                                    (first (rest ml))))
+                                    color-kw)
+                      p))
+                  pl)
+      (first ml) (interpose {color-kw true :text (first ml)}))
+    pl))
+
+(defn split-into-expressions2 [puzz exprs color-kw]
+  (flatten (s-i-e-recur2 (cons nil exprs) puzz color-kw)))
+
+(defn split-into-expressions2-initial [puzz exprs color-kw startstr endstr]
+  (split-into-expressions2 [{:text (str startstr puzz endstr) :yellow true}]
+                           exprs
+                           color-kw))
+
+(defn mark-green-and-black [puzz green-expr black-expr]
+  (-> (split-into-expressions2-initial puzz green-expr :green
+                                       (str (random-uuid))
+                                       (str (random-uuid)))
+      (split-into-expressions2 black-expr :black)
+      (rest)
+      (butlast)))
+
+(comment
+
+  (mark-green-and-black puzz cont lack)
+  (mark-green-and-black puzz [] lack) ;;TDOD edge case
+
+  :end)
