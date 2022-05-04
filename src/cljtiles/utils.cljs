@@ -48,9 +48,11 @@
     (concat f (rest s))))
 
 (defn find-lacking [sol puzz]
-  (filter #(pos? (count %))
-  (reduce remove-first-from-coll (get-symbols puzz) (get-symbols sol))))
+  (->> (reduce remove-first-from-coll (get-symbols puzz) (get-symbols sol))
+       (filter seq)
+       (map #(str " " % " "))))
 
+(seq "a")
 (def sol "g (a b c d) koi {o p r i j} uio [h a l l o]")
 (def puzz "(a b c d) kuuu  {o p r i j} koi kaba [h a l l o]")
 (def cont (find-contents sol puzz))
@@ -71,7 +73,7 @@
   (uu "a" nil)
   (uu nil nil)
   (uu nil "a")
-  (uu "ab" "b") ;; => [["a"] ["a" ""]] only case it differs
+  (uu "ab" "b") ;; => [["a"] ["a" ""]] only case it differs, all others same in cljs
   (uu "a" "b")
   (uu "ba" "b")
   :end)
