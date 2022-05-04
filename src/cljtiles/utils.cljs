@@ -50,62 +50,26 @@
 (defn find-lacking [sol puzz]
   (reduce remove-first-from-coll (get-symbols puzz) (get-symbols sol)))
 
-
-
-(def sol "g (a b c d) k {o p r i j} uio [h a l l o]")
-(def puzz "gii (a b c d) kuuu {o p r i j} [h a l l o] hooo")
+(def sol "g (a b c d) koi {o p r i j} uio [h a l l o]")
+(def puzz "(a b c d) kuuu {o p r i j} koi [h a l l o] hooo")
 (def cont (find-contents sol puzz))
+(def lack (find-lacking sol puzz))
 
-(defn hui [seplist puzzvec]
-  (mapcat #(interpose (first seplist)
-                       (str/split % (first seplist)))
-          puzzvec))
-
-(def a (hui cont [puzz]))
-(def b (hui (rest cont) a))
-(hui (rest (rest cont)) b)
-
-(defn hui2 [seplist puzzvec]
-  (if (seq seplist)
-    (mapcat #(interpose (first seplist)
-                        (hui2 (rest seplist) (str/split % (first seplist))))
-            puzzvec)
-    nil))
-
-(defn hui3 [mlist [a e]]
-  (if (seq mlist)
-    [(when a (hui3 (rest mlist) (str/split a (first mlist))))
-     (first mlist)
-     (when e (hui3 (rest mlist) (str/split e (first mlist))))]
-    [a e]))
-
-(defn hui7 [ml [a e]]
-  (let [erg
-        (if (seq ml)
-          (if e
-            [(hui7 (rest ml) (str/split a (first (rest ml))))
-             (first ml)
-             (hui7 (rest ml) (str/split e (first (rest ml))))]
-            [(hui7 (rest ml) (str/split a (first (rest ml))))])
-          (str a e))]
-    erg))
-
-(def anfange (str/split puzz (first cont)))
-(flatten (hui7 cont anfange))
-
-(defn hui8 [ml pl modifier]
+(defn s-i-e-recur [ml pl modifier1 modifier2]
   (if (seq ml)
-    (interpose (modifier (first ml))
+    (interpose (modifier1 (first ml))
                (map (fn [p]
-                      (hui8 (rest ml)
-                            (str/split p (first (rest ml)))
-                            modifier))
+                      (s-i-e-recur (rest ml)
+                                   (str/split p (first (rest ml)))
+                                   modifier1
+                                   modifier2))
                     pl))
-    (apply str pl)))
+    (modifier2 (apply str pl))))
 
-(defn split-into-expressions [puzz exprs modifier]
-  (flatten (hui8 exprs (str/split puzz (first exprs)) modifier)))
+(defn split-into-expressions [puzz exprs modifier1 modifier2]
+  (flatten (s-i-e-recur exprs (str/split puzz (first exprs)) modifier1 modifier2)))
 
-(defn expr-fu [x] {:word x})
+(defn expr-g [x] ^:green x)
+(defn expr-y [x] ^:yellow x)
 
-(split-into-expressions puzz cont expr-fu)
+(split-into-expressions puzz cont expr-g expr-y)
