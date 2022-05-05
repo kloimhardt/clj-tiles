@@ -90,16 +90,30 @@
        (take-while #(not= s %))
        count))
 
-(defn twosplit [ss s]
+(defn twosplit-sfn [ss s searchfun]
   (cond
     (nil? ss) [""]
     (nil? s) [ss]
     (not (seq s)) [ss]
     :else
-    (let [posi (stringsearch ss s)]
+    (let [posi (searchfun ss s)]
       (if (= posi (count ss))
         [ss]
         [(subs ss 0 posi) (subs ss (+ posi (count s)))]))))
+
+(defn twosplit [ss s] (twosplit-sfn ss s stringsearch))
+
+(defn twosplit-word [ss s]
+  (twosplit-sfn ss s
+                (fn [ss s]
+                  (if (re-find (re-pattern (str "\\b" s "\\b")) ss)
+                    (stringsearch ss s)
+                    (count ss)))))
+
+(defn nsplit [ss s]
+  (let [f s] (twosplit ss s)
+       (if (seq s)))
+  )
 
 (comment
   (defn uuv [a b]
@@ -166,7 +180,9 @@
   (if (not= :yellow (:color text))
     (list text)
     (let [[fir sec] (map #(paint % :yellow)
-                         (twosplit (:text text) word))]
+                         (if (= color :black)
+                           (twosplit-word (:text text) word)
+                           (twosplit (:text text) word)))]
       (cond
         (and sec words)
         (concat (text->colexps fir words color)
@@ -209,6 +225,9 @@
   (def lack (find-lacking sol puzz))
 
   (def exps (mark-green-and-black puzz cont lack))
+
+  (text->colexps (paint "a b c d a b c d" :yellow) ["b" "c" "d" "a"] :black)
+
   (mark-green-and-black puzz [] lack)
   (mark-green-and-black puzz cont [])
   (mark-green-and-black puzz [] [])
