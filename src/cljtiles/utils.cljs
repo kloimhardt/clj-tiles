@@ -49,8 +49,7 @@
 
 (defn find-lacking [sol puzz]
   (->> (reduce remove-first-from-coll (get-symbols puzz) (get-symbols sol))
-       (filter seq)
-       (map #(str " " % " "))))
+       (filter seq)))
 
 (comment
 
@@ -160,9 +159,33 @@
                            exprs
                            color-kw))
 
-(defn mark-green-and-black [puzz green-expr black-expr]
-  (-> (split-into-expressions2-initial puzz green-expr :green)
-      (split-into-expressions2 black-expr :black)))
+(defn paint [t c]
+  {:color c :text t})
+
+(defn text->colexps [text [word & words] color]
+  (if (not= :yellow (:color text))
+    (list text)
+    (let [[fir sec] (map #(paint % :yellow)
+                         (twosplit (:text text) word))]
+      (cond
+        (and sec words)
+        (concat (text->colexps fir words color)
+                (cons (paint word color)
+                      (text->colexps sec words color)))
+        sec (list fir (paint word color) sec)
+        words (text->colexps fir words color)
+        :else
+        (list fir)))))
+
+(defn textlist->colexps [textlist words color]
+  (mapcat #(text->colexps % words color) textlist))
+
+(def cg (text->colexps (paint puzz :yellow) cont :green))
+(textlist->colexps cg lack :black)
+
+(defn mark-green-and-black [puzz green-exprs black-exprs]
+  (-> (text->colexps (paint puzz :yellow) green-exprs :green)
+      (textlist->colexps black-exprs :black)))
 
 (defn split-into-words [expressions]
   (mapcat (fn [exp]
