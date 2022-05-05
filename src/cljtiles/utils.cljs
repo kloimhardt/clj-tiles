@@ -52,17 +52,21 @@
        (filter seq)
        (map #(str " " % " "))))
 
-(seq "a")
-(def sol "g (a b c d) koi {o p r i j} uio [h a l l o]")
-(def puzz "(a b c d) kuuu  {o p r i j} koi kaba [h a l l o]")
-(def cont (find-contents sol puzz))
-(def lack (find-lacking sol puzz))
+(comment
+
+  (def sol "g (a b c d) koi {oi p [ha k u] r i j} uio [h a l l o]")
+  (def puzz "(a b c d) kuuu {oi p [ha k u] r i j} koi kaba [h a l l o]")
+  (def cont (find-contents sol puzz))
+  (def lack (find-lacking sol puzz))
+
+  :end)
 
 (defn newsplit [ss s]
   (let [erg (str/split ss s)]
     (cond
       (nil? ss) [""]
       (nil? s) [ss]
+      (not (seq s)) erg
       (str/ends-with? ss s)  (conj erg "")
       :else erg)))
 
@@ -76,6 +80,9 @@
   (uu "ab" "b") ;; => [["a"] ["a" ""]] only case it differs, all others same in cljs
   (uu "a" "b")
   (uu "ba" "b")
+  (uu "" "a")
+  (uu "a" "")
+  (uu "" "")
   :end)
 
 (defn s-i-e-recur [ml pl]
@@ -100,23 +107,23 @@
 (defn s-i-e-recur2 [ml pl color-kw]
   (if (seq ml)
     (cond->> (map (fn [p]
-                    (if (:yellow p)
+                    (if (= :yellow (:color p))
                       (s-i-e-recur2 (rest ml)
                                     (map (fn [txt]
-                                           {:yellow true :text txt})
+                                           {:color :yellow :text txt})
                                          (newsplit (:text p)
-                                                    (first (rest ml))))
+                                                   (first (rest ml))))
                                     color-kw)
                       p))
                   pl)
-      (first ml) (interpose {color-kw true :text (first ml)}))
+      (first ml) (interpose {:color color-kw :text (first ml)}))
     pl))
 
 (defn split-into-expressions2 [puzz exprs color-kw]
   (flatten (s-i-e-recur2 (cons nil exprs) puzz color-kw)))
 
 (defn split-into-expressions2-initial [puzz exprs color-kw]
-  (split-into-expressions2 [{:text puzz :yellow true}]
+  (split-into-expressions2 [{:text puzz :color :yellow}]
                            exprs
                            color-kw))
 
@@ -124,11 +131,33 @@
   (-> (split-into-expressions2-initial puzz green-expr :green)
       (split-into-expressions2 black-expr :black)))
 
-(comment
+(defn split-into-words [expressions]
+  (mapcat (fn [exp]
+            (map (fn [word] {:color (:color exp) :text word})
+                 (newsplit (:text exp) " ")))
+          expressions))
 
-  (mark-green-and-black puzz cont lack)
+(defn remove-empty [words]
+  (filter #(seq (:text %)) words))
+
+(defn split-at-rec [[n & ns] coll]
+  (let [[f s] (split-at n coll)]
+    (if ns
+      (cons f (split-at-rec ns s))
+      (list f s))))
+
+(comment
+  (def sol "g (a b c d) koi {oi p [ha koi u] kaba i j} uio (dist [h a l l o])")
+  (def puzz "(a b c d) (a b c d) kuuu dist {oi p [ha koi u] r i j} koi kaba (dist [h a l l o])")
+  (def cont (find-contents sol puzz))
+  (def lack (find-lacking sol puzz))
+
+  (def exps (mark-green-and-black puzz cont lack))
   (mark-green-and-black puzz [] lack)
   (mark-green-and-black puzz cont [])
   (mark-green-and-black puzz [] [])
+  (def words (remove-empty (split-into-words exps)))
+  (def nls [2 3 4])
+  (split-at-rec nls words)
 
   :end)
