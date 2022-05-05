@@ -85,24 +85,57 @@
   (uu "" "")
   :end)
 
-(defn s-i-e-recur [ml pl]
-  (if (seq ml)
-      (cond->> (map (fn [p]
-                      (s-i-e-recur (rest ml)
-                                   (newsplit p (first (rest ml)))))
-                    pl)
-        (first ml) (interpose (first ml)))
-      pl))
+(defn stringsearch [ss s]
+  (->> (map #(subs ss % (+ % (count s))) (range))
+       (take-while seq)
+       (take-while #(not= s %))
+       count))
 
-(defn split-into-expressions [puzz exprs]
-  (butlast (flatten (s-i-e-recur (cons nil exprs)  [(str puzz "ende999")]))))
+(defn twosplit [ss s]
+  (cond
+    (nil? ss) [""]
+    (nil? s) [ss]
+    (not (seq s)) [ss]
+    :else
+    (let [posi (stringsearch ss s)]
+      (if (= posi (count ss))
+        [ss]
+        [(subs ss 0 posi) (subs ss (+ posi (count s)))]))))
 
 (comment
+  (defn uuv [a b]
+    [(str/split a b) (twosplit a b)])
 
-  (def gr1 (split-into-expressions puzz cont))
-  (flatten (s-i-e-recur (cons nil lack) gr1))
-
+  (uuv "a" nil)
+  (uuv nil nil)
+  (uuv nil "a")
+  (uuv "ab" "b") ;; => [["a"] ["a" ""]] only case it differs, all others same in cljs
+  (uuv "a" "b")
+  (uuv "ba" "b")
+  (uuv "" "a")
+  (uuv "a" "")
+  (uuv "" "") ;; here it differs as well
+  (uuv "(a)" "(a)")
+  (uuv "a b" "c")
   :end)
+
+(defn text->exps [text [word & words]]
+  (let [[fir sec] (twosplit text word)]
+    (cond
+      (and sec words) (concat (text->exps fir words)
+                              (cons word (text->exps sec words)))
+      words (text->exps fir words)
+      sec (list fir word sec)
+      :else (list fir))))
+
+(defn textlist->exps [textlist words]
+  (mapcat #(text->exps % words) textlist))
+
+(comment
+ (def te (text->exps puzz cont))
+ (textlist->exps te lack)
+
+ :end)
 
 (defn s-i-e-recur2 [ml pl color-kw]
   (if (seq ml)
