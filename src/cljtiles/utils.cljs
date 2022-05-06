@@ -261,18 +261,22 @@
                puzzd)))
 
 (defn convert-to-color [puzzd sold]
-  (let [solds (tree-seq coll? seq sold)]
-    (w/prewalk (fn [x]
-                 (let [s (pr-str x)
-                       found? (some #{x} solds)]
-                   (if (coll? x)
-                     (if found?
-                      (str green s)
-                       x)
-                     (if found?
-                       (str yellow s)
-                       (str black s)))))
-               puzzd)))
+  (cond
+    (= puzzd sold) (str green (pr-str puzzd))
+    (nil? sold) (str white (pr-str puzzd))
+    :else
+    (let [solds (tree-seq coll? seq sold)]
+      (w/prewalk (fn [x]
+                   (let [s (pr-str x)
+                         found? (some #{x} solds)]
+                     (if (coll? x)
+                       (if found?
+                         (str green s)
+                         x)
+                       (if found?
+                         (str yellow s)
+                         (str black s)))))
+                 puzzd))))
 
 (defn element-convert-parens [elem]
   (let [open-close-char (fn  [coll]
@@ -285,11 +289,13 @@
     (->> (concat [(str white open)] (seq elem) [(str white close)])
          (interpose (str white " ")))))
 
-(defn full-flat [edn]
-  (flatten (w/prewalk (fn [x]
-                        (if (coll? x)
-                          (element-convert-parens x) x))
-                      edn)))
+(defn convert-parens-to-strings [edn]
+  (if (coll? edn)
+    (flatten (w/prewalk (fn [x]
+                          (if (coll? x)
+                            (element-convert-parens x) x))
+                        edn))
+    (list edn)))
 
 (defn expand-greens [strings]
   (map (fn [s] (if (str/starts-with? s green)
@@ -316,19 +322,14 @@
     (map col-dispatch strings)))
 
 (defn gneit []
-  (->> (convert-to-color puzzd sold)
-       (full-flat)
+  (->> (convert-to-color sold puzzd)
+       (convert-parens-to-strings)
        (expand-greens)
        (flatten)
        (generate-hiccup)
        (into [:p])))
 
 (comment
-  (some #{})(tree-seq coll? seq puzzd)
-  (boolean (coll? {:a 4}))
-  (boolean (seq 3))
-
-  (rest #{:a 1 :b 3})
   (generate-hiccup ["g-3"])
 
   (defn fgen [s bgc c] [:span {:style {:background-color bgc
