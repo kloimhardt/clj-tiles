@@ -1,5 +1,7 @@
 (ns cljtiles.utils
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.walk :as w]
+            [clojure.zip :as zip]))
 
 (defn find-biggest-in-str [sol puzz]
   (some->> (js/LCSubStr sol puzz)
@@ -51,14 +53,10 @@
   (->> (reduce remove-first-from-coll (get-symbols puzz) (get-symbols sol))
        (filter seq)))
 
-(comment
-
-  (def sol "g (a b c d) koi {oi p [ha k u] r i j} uio [h a l l o]")
-  (def puzz "(a b c d) kuuu {oi p [ha k u] r i j} koi kaba [h a l l o]")
-  (def cont (find-contents sol puzz))
-  (def lack (find-lacking sol puzz))
-
-  :end)
+(def sol "g (a b c d) koi {oi p [ha k u] r i j} uio [h a l l o]")
+(def puzz "(a b c d) kuuu {oi p [ha k u] r i j} koi kaba [h a l l o]")
+(def cont (find-contents sol puzz))
+(def lack (find-lacking sol puzz))
 
 (defn newsplit [ss s]
   (let [erg (str/split ss s)]
@@ -110,11 +108,6 @@
                     (stringsearch ss s)
                     (count ss)))))
 
-(defn nsplit [ss s]
-  (let [f s] (twosplit ss s)
-       (if (seq s)))
-  )
-
 (comment
   (defn uuv [a b]
     [(str/split a b) (twosplit a b)])
@@ -129,7 +122,6 @@
   (uuv "a" "")
   (uuv "" "") ;; here it differs as well
   (uuv "(a)" "(a)")
-  (uuv "a b" "c")
   :end)
 
 (defn text->exps [text [word & words]]
@@ -197,7 +189,6 @@
   (mapcat #(text->colexps % words color) textlist))
 
 (def cg (text->colexps (paint puzz :yellow) cont :green))
-(textlist->colexps cg lack :black)
 
 (defn mark-green-and-black [puzz green-exprs black-exprs]
   (-> (text->colexps (paint puzz :yellow) green-exprs :green)
@@ -236,3 +227,127 @@
   (split-at-rec nls words)
 
   :end)
+
+
+
+(def sold '(g (a b c d) koi {p [ha koi u] kaba i j lua} uio (dist [h a l l o])))
+(def puzzd '((a b c d) (a b c d) "hi" :lo kuuu dist {oi p [ha koi u] r i j} koi kaba (dist [h a l l o])))
+
+(defn mysearch [s ss]
+  (let [posi (->> (map #(subs ss % (+ % (count s))) (range))
+                  (take-while seq)
+                  (take-while #(not= s %))
+                  count)]
+    (when (< posi (count ss)) posi)))
+
+;; need to be all the same atringlength
+(def white "w-")
+(def green "g-")
+(def black "b-")
+(def yellow "y-")
+(assert (= (count green) (count white) (count black) (count yellow)))
+
+(defn convert-to-color3 [puzzd sold]
+  (let [solds (pr-str sold)]
+    (w/prewalk (fn [x]
+                 (let [s (pr-str x)]
+                   (if (coll? x)
+                     (if (mysearch s solds)
+                       (str green s)
+                       x)
+                     (if (re-find (re-pattern (str "\\b" s "\\b")) solds)
+                       (str yellow s)
+                       (str black s)))))
+               puzzd)))
+
+(defn convert-to-color [puzzd sold]
+  (let [solds (tree-seq coll? seq sold)]
+    (w/prewalk (fn [x]
+                 (let [s (pr-str x)
+                       found? (some #{x} solds)]
+                   (if (coll? x)
+                     (if found?
+                      (str green s)
+                       x)
+                     (if found?
+                       (str yellow s)
+                       (str black s)))))
+               puzzd)))
+
+(defn element-convert-parens [elem]
+  (let [open-close-char (fn  [coll]
+                          (cond
+                            (map? coll) ["{" "}"]
+                            (list? coll) ["(" ")"]
+                            (vector? coll) ["[" "]"]
+                            (set? coll) ["#{" "}"]))
+        [open close] (open-close-char elem)]
+    (->> (concat [(str white open)] (seq elem) [(str white close)])
+         (interpose (str white " ")))))
+
+(defn full-flat [edn]
+  (flatten (w/prewalk (fn [x]
+                        (if (coll? x)
+                          (element-convert-parens x) x))
+                      edn)))
+
+(defn expand-greens [strings]
+  (map (fn [s] (if (str/starts-with? s green)
+                 (->> (str/split (subs s (count green)) #" ")
+                      (map #(str green %))
+                      (interpose (str green " ")))
+                 s))
+       strings))
+
+(defn generate-hiccup [strings]
+  (letfn [(fgen [s bgc c] [:span {:style {:background-color bgc
+                                          :color c}}
+                           s])
+          (fgreen [s] (fgen s "green" "white"))
+          (fwhite [s] (fgen s "white" "black"))
+          (fyellow [s] (fgen s "LightYellow" "black"))
+          (fblack [s] (fgen s "black" "white"))
+          (col-dispatch [s] ((get {green  fgreen
+                                   white  fwhite
+                                   yellow  fyellow
+                                   black  fblack}
+                                  (subs s 0 (count green)))
+                             (subs s (count green))))]
+    (map col-dispatch strings)))
+
+(defn gneit []
+  (->> (convert-to-color puzzd sold)
+       (full-flat)
+       (expand-greens)
+       (flatten)
+       (generate-hiccup)
+       (into [:p])))
+
+(comment
+  (some #{})(tree-seq coll? seq puzzd)
+  (boolean (coll? {:a 4}))
+  (boolean (seq 3))
+
+  (rest #{:a 1 :b 3})
+  (generate-hiccup ["g-3"])
+
+  (defn fgen [s bgc c] [:span {:style {:background-color bgc
+                                       :color c}}
+                        s])
+  (defn fgreen [s] (fgen s "green" "white"))
+  (defn fwhite [s] (fgen s "white" "black"))
+  (defn fyellow [s] (fgen s "yellow" "white"))
+  (defn fblack [s] (fgen s "black" "white"))
+  (def s "g-a")
+  (defn col-dispatch [s] ((get {green  fgreen
+                                white  fwhite
+                                yellow  fyellow
+                                black  fblack}
+                               (subs s (count green))) s))
+  (col-dispatch "g-t")
+
+  :end)
+
+
+
+

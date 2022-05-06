@@ -26,6 +26,7 @@
    [cljtiles.blockly :as workspace!]
    [cljtiles.code-analysis :as ca]
    [cljtiles.components :as cmpnts]
+   [cljtiles.utils :as utils]
 
    [cljtiles.tests :as tst]
    ;;[flow-storm.api :as fsa]
@@ -590,7 +591,10 @@
                              nil)
                            comp))})))
 (defn test-comp []
-  [:p [:span {:style {:background-color "green" :color "white"}} "h"] " " "i"])
+  [:div
+   [:p [:span {:style {:background-color "green" :color "white"}} "h"] " " "i"]
+   [utils/gneit]])
+
 
 (defn theview []
   [:div
