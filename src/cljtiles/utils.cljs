@@ -1,6 +1,7 @@
 (ns cljtiles.utils
   (:require [clojure.string :as str]
-            [clojure.walk :as w]))
+            [clojure.walk :as w]
+            [goog.string :as gstring]))
 
 (defn find-biggest-in-str [sol puzz]
   ;; sucht grössten gemeinsamen String via LCSubStr
@@ -68,7 +69,8 @@
 (def green "g-")
 (def black "b-")
 (def yellow "y-")
-(assert (= (count green) (count white) (count black) (count yellow)))
+(def clear "c-")
+(assert (= (count clear) (count green) (count white) (count black) (count yellow)))
 
 (defn convert-to-color [puzzd-list sold]
   (let [solds (tree-seq coll? seq sold)]
@@ -116,30 +118,14 @@
                  s))
        strings))
 
-(defn generate-hiccup [strings]
-  (letfn [(fgen [s bgc c] [:span {:style {:background-color bgc
-                                          :color c}}
-                           s])
-          (fgreen [s] (fgen s "green" "white"))
-          (fwhite [s] (fgen s "white" "black"))
-          (fyellow [s] (fgen s "LightYellow" "black"))
-          (fblack [s] (fgen s "black" "white"))
-          (col-dispatch [s] ((get {green  fgreen
-                                   white  fwhite
-                                   yellow  fyellow
-                                   black  fblack}
-                                  (subs s 0 (count green)))
-                             (subs s (count green))))]
-    (map col-dispatch strings)))
-
 (defn detect-real-planks [code [tuple & r]]
   (let [[firststr secondstr] (map #(subs % (count green)) tuple)
         firstpos (+ (stringsearch code firststr) (count firststr))
         secondpos (+ (stringsearch (subs code firstpos) secondstr) firstpos)
-        blanks (str white (subs code firstpos secondpos))]
+        blanks (str clear (subs code firstpos secondpos))]
     (if r
       (if (= firstpos (+ (count code) (count firststr)))
-        (cons white (detect-real-planks code r))
+        (cons clear (detect-real-planks code r))
         (cons blanks (detect-real-planks (subs code secondpos) r)))
       (list blanks))))
 
@@ -148,17 +134,37 @@
     (interleave words-no-blanks
                 (detect-real-planks code (partition-all 2 1 words-no-blanks)))))
 
+(defn generate-hiccup [strings]
+  (letfn [(fgen [s bgc c] [:span {:style {:background-color bgc
+                                          :color c}}
+                           s])
+          (fgreen [s] (fgen s "green" "white"))
+          (fwhite [s] (fgen s "white" "black"))
+          (fyellow [s] (fgen s "LightYellow" "black"))
+          (fblack [s] (fgen s "black" "white"))
+          (fclear [s]
+            (into [:span]
+                  (map #(case %
+                          " " (gstring/unescapeEntities "&nbsp;")
+                          "\n" [:br]
+                          [:span %])
+                       (seq s))))
+          (col-dispatch [s] ((get {green  fgreen
+                                   white  fwhite
+                                   yellow  fyellow
+                                   black  fblack
+                                   clear fclear}
+                                  (subs s 0 (count green)))
+                             (subs s (count green))))]
+    (map col-dispatch strings)))
 
 (defn render-colored [code puzz sol]
   ;;puzz is always a vector of code: => ["Hello, World!"]
-  (println "in rendercol")
-  ;;(def puzz puzz)
-  ;;(def sol sol)
-  ;;(def code code)
   (->> (convert-to-color puzz sol)
        (convert-parens-to-strings)
        (expand-greens)
        (flatten)
        (replace-blanks-with-newline code)
        (generate-hiccup)
-       (into [:p])))
+       (into [:p {:style {:display "block" :font-family "monospace"
+                          :white-space "pre" :margin ["1em" 0]}}])))

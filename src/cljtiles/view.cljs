@@ -516,7 +516,8 @@
                            tutorial-no]}]
   (if (= edn-code edn-code-orig :showcode) ;;never true, remove :showcode to supress code display.
     [:pre (my-str result-raw)]
-    (let [flex50 {:style {:flex "50%"}}]
+    (let [flex50 {:style {:flex "50%"}}
+          tut (nth tutorials tutorial-no)]
       [:div {:style {:display "flex"}}
        [:div flex50
         [:h3 "Result"]
@@ -524,6 +525,7 @@
        (when-not (:no-code-display (nth tutorials tutorial-no))
          [:div flex50
           [:h3 "Code"]
+          [utils/render-colored code edn-code (:solution tut)]
           [:pre code]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
@@ -590,17 +592,11 @@
                              (reset! error nil)
                              nil)
                            comp))})))
-(defn test-comp []
-  [:div
-   [:p [:span {:style {:background-color "green" :color "white"}} "h"] " " "i"]
-   [utils/gneit]])
-
 
 (defn theview []
   [:div
    [modal-comp @state]
    [tutorials-comp @state]
-   [test-comp]
    [error-boundary
     [output-comp @state]]])
 
