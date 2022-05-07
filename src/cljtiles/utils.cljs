@@ -14,10 +14,12 @@
        first))
 
 (defn stringsearch [ss s]
-  (->> (map #(subs ss % (+ % (count s))) (range))
-       (take-while seq)
-       (take-while #(not= s %))
-       count))
+  (if (seq s)
+    (->> (map #(subs ss % (+ % (count s))) (range))
+         (take-while seq)
+         (take-while #(not= s %))
+         count)
+    (count ss)))
 
 (defn twosplit-sfn [ss s searchfun]
   (cond
@@ -130,114 +132,33 @@
                              (subs s (count green))))]
     (map col-dispatch strings)))
 
-(defn render-colored [code puzz sol]
-  ;;puzz is always a vector of code: => ["Hello, World!"]
-  (println "in rendercol")
-  (def puzz puzz)
-  (def sol sol)
-  (def code code)
-  (->> (convert-to-color puzz sol)
-       (convert-parens-to-strings)
-       (expand-greens)
-       (flatten)
-       (generate-hiccup)
-       (into [:p])))
-
-
-(def sold '(g (a b c d) koi {p [ha koi u] kaba i j lua}
-              uio (dist [h a l l o])))
-(def puzzd '((a b c d) (a b c d) "hi" :lo kuuu dist
-             {oi p [ha koi u] r i j}
-             koi kaba (dist [h a l l o])))
-
-(defn gneit []
-  (render-colored nil puzzd sold))
-
-(def bb
-  (->> (convert-to-color puzz sol)
-       (convert-parens-to-strings)
-       (expand-greens)
-       (flatten)
-       ))
-(identity bb)
-
-(identity code)
-
-(def cc (partition 3 1 bb))
-
-(defn huxi [cc code]
-  (println "start")
-  (let [firststr (subs (nth (first cc) 0) (count green))
-        secondstr (subs (nth (first cc) 2) (count green))
-        firstpos (+ (stringsearch code firststr) (count firststr))
-        secondpos (+ (stringsearch (subs code firstpos) secondstr) firstpos)
-        end (+ secondpos (count secondstr))
-        blanks (subs code firstpos secondpos)]
-    ;;(println "end " firstpos firststr "||" secondpos secondstr "&&" (pr-str blanks))
-    (println code)
-    (println "dbg" firststr (pr-str blanks) secondstr)
-    (if (seq (rest cc))
-        (if (= (nth (first cc) 1) (str white " "))
-          (cons blanks (huxi (rest cc) (subs code end)))
-          (huxi (rest cc) (subs code firstpos)))
-        (if (= (nth (first cc) 1) (str white " "))
-          (list blanks)
-          (list)))))
-
-(def dd (partition 2 1 (remove #(= % (str white " ")) bb)))
-
-(defn huxi2 [[tuple & r] code]
+(defn detect-real-planks [code [tuple & r]]
   (let [[firststr secondstr] (map #(subs % (count green)) tuple)
         firstpos (+ (stringsearch code firststr) (count firststr))
         secondpos (+ (stringsearch (subs code firstpos) secondstr) firstpos)
-        blanks (subs code firstpos secondpos)]
-    (if (seq r)
-      (cons blanks (huxi2 r (subs code secondpos)))
+        blanks (str white (subs code firstpos secondpos))]
+    (if r
+      (if (= firstpos (+ (count code) (count firststr)))
+        (cons white (detect-real-planks code r))
+        (cons blanks (detect-real-planks (subs code secondpos) r)))
       (list blanks))))
 
-(comment
-  (println "----------------")
-  (println code)
-  (println (pr-str cc))
-  (huxi cc code)
-  (huxi2 dd code)
-(get code 31)
-  :end)
-(def blanks-puzz (map #(dec (count (fullsplit % " "))) bb))
-
-(def aa (map #(str/split % #" ") (str/split-lines code)))
-(def breaks-given (map #(dec (count %)) aa))
-
-(defn sumitup [xs]
-  (reduce (fn [acc n] (conj acc (+ n (peek acc)))) [] xs))
+(defn replace-blanks-with-newline [code colorwords]
+  (let [words-no-blanks (remove #(= % (str white " ")) colorwords)]
+    (interleave words-no-blanks
+                (detect-real-planks code (partition-all 2 1 words-no-blanks)))))
 
 
-(map sumitup [blanks-puzz breaks-given])
-(def coll-splits
-  (let [sip (sumitup blanks-puzz)]
-                   (map (fn [nofblanks] (count (take-while #(<= % nofblanks) sip))) (sumitup breaks-given))))
-
-(defn diffit [xs]
-  (reduce (fn [acc n] (conj acc (- n (peek acc)))) [] xs))
-
-(def cs (diffit coll-splits))
-
-(defn split-them [xs posis]
-  (let [[fi se] (split-at (first posis) xs)]
-    (if (seq (rest posis))
-      (cons fi (split-them se (rest posis)))
-      (list fi se) ;;se should always be the empty list if exerything gos right
-      )))
-
-(defn do-the-split [puzz-strings code]
-  (let [blanks-puzz (map #(dec (count (fullsplit % " "))) bb)
-        aa (map #(str/split % #" ") (str/split-lines code))
-        breaks-given (map #(dec (count %)) aa)
-        coll-splits
-        (let [sip (sumitup blanks-puzz)]
-          (map (fn [nofblanks] (count (take-while #(<= % nofblanks) sip))) (sumitup breaks-given)))
-        cs (diffit coll-splits)
-        _ :end]
-    (split-them puzz-strings cs)))
-
-(do-the-split bb cs)
+(defn render-colored [code puzz sol]
+  ;;puzz is always a vector of code: => ["Hello, World!"]
+  (println "in rendercol")
+  ;;(def puzz puzz)
+  ;;(def sol sol)
+  ;;(def code code)
+  (->> (convert-to-color puzz sol)
+       (convert-parens-to-strings)
+       (expand-greens)
+       (flatten)
+       (replace-blanks-with-newline code)
+       (generate-hiccup)
+       (into [:p])))
