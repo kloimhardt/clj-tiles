@@ -35,9 +35,15 @@
 
 (defn twosplit [ss s] (twosplit-sfn ss s stringsearch))
 
-(defn fullsplit [ss s]
+(defn fullsplit-no-tail-recursion [ss s]
   (let [[eins zwo] (twosplit ss s)]
-    (if zwo (cons eins (fullsplit zwo s)) (list eins))))
+    (if zwo (cons eins (fullsplit-no-tail-recursion zwo s)) (list eins))))
+
+(defn fullsplit [ss s]
+  (loop [ss ss result []]
+    (let [[eins zwo] (twosplit ss s)
+          new-result (conj result eins)]
+      (if zwo (recur zwo new-result) new-result))))
 
 (defn twosplit-word [ss s]
   ;; splittet nur wenn der String s als Wort gefunden wird
@@ -74,65 +80,69 @@
 
 (defn convert-to-color [puzzd-list sold]
   (let [solds (tree-seq coll? seq sold)]
-    (map (fn [puzzd]
-           (w/prewalk (fn [x]
-                        (let [s (pr-str x)
-                              found? (some #{x} solds)]
-                          (if (coll? x)
-                            (if found?
-                              (str green s)
-                              x)
-                            (if found?
-                              (str yellow s)
-                              (str black s)))))
-                      puzzd))
-         puzzd-list)))
+    (->> puzzd-list
+         (map #(->> % (w/prewalk (fn [x]
+                                 (let [s (pr-str x)
+                                       found? (some #{x} solds)]
+                                   (if (coll? x)
+                                     (if found?
+                                       (str green s)
+                                       x)
+                                     (if found?
+                                       (str yellow s)
+                                       (str black s)))))))))))
 
 (defn element-convert-parens [elem]
   (let [open-close-char (fn  [coll]
                           (cond
-                            (map? coll) ["{" "}"]
-                            (list? coll) ["(" ")"]
-                            (vector? coll) ["[" "]"]
-                            (set? coll) ["#{" "}"]))
-        [open close] (open-close-char elem)]
+                            (map? coll) ["{" "}" (apply concat (seq coll))]
+                            (vector? coll) ["[" "]" (seq coll)]
+                            (set? coll) ["#{" "}" (seq coll)]
+                            :else ["(" ")" (seq coll)]))
+        [open close leaves] (open-close-char elem)]
     (concat [(str white open)]
-            (interpose (str white " ") (seq elem))
+            (interpose (str white " ") leaves)
             [(str white close)])))
 
 (defn convert-parens-to-strings [edn-list]
   (->> edn-list
-       (map (fn [edn]
-                  (w/prewalk (fn [x]
-                               (if (coll? x)
-                                 (element-convert-parens x) x))
-                             edn)))
+       (map #(->> % (w/prewalk (fn [x]
+                                 (if (coll? x)
+                                   (element-convert-parens x) x)))))
        (interpose (str white " "))
        flatten))
 
 (defn expand-greens [strings]
-  (map (fn [s] (if (str/starts-with? s green)
-                 (->> (str/split (subs s (count green)) #" ")
-                      (map #(str green %))
-                      (interpose (str green " ")))
-                 s))
-       strings))
+  (->> strings
+       (mapcat (fn [s] (if (str/starts-with? s green)
+                         (->> (str/split (subs s (count green)) #" ")
+                              (map #(str green %))
+                              (interpose (str green " ")))
+                         [s])))))
 
-(defn detect-real-planks [code [tuple & r]]
-  (let [[firststr secondstr] (map #(subs % (count green)) tuple)
-        firstpos (+ (stringsearch code firststr) (count firststr))
-        secondpos (+ (stringsearch (subs code firstpos) secondstr) firstpos)
-        blanks (str clear (subs code firstpos secondpos))]
-    (if r
-      (if (= firstpos (+ (count code) (count firststr)))
-        (cons clear (detect-real-planks code r))
-        (cons blanks (detect-real-planks (subs code secondpos) r)))
-      (list blanks))))
+(comment
+  (expand-greens ["g-(1 2 3)" "y-4" "g-(5)"])
+;; => ("g-(1" "g- " "g-2" "g- " "g-3)" "y-4" "g-(5)")
+  :end)
 
 (defn replace-blanks-with-newline [code colorwords]
-  (let [words-no-blanks (remove #(= % (str white " ")) colorwords)]
-    (interleave words-no-blanks
-                (detect-real-planks code (partition-all 2 1 words-no-blanks)))))
+  (->> colorwords
+       (remove #{white (str white " ")})
+       (partition-all 2 1)
+       (reduce (fn [[shrinking-code new-colorwords] tuple]
+                 (let [[firststr secondstr] (map #(subs % (count green)) tuple)
+                       firstpos (+ (stringsearch shrinking-code firststr)
+                                   (count firststr))
+                       secondpos (+ (stringsearch (subs shrinking-code firstpos) secondstr)
+                                    firstpos)
+                       blanks (str clear (subs shrinking-code firstpos secondpos))]
+                   (if (= firstpos (+ (count shrinking-code) (count firststr))) ;;not found ->brute
+                     (do (println "error: coloring stopped as tuple not found " tuple)
+                         (reduced [shrinking-code (conj new-colorwords blanks)])) ;;exit, ->
+                     ;;results in rest not being colored as here the code is in 'blanks' variable
+                     [(subs shrinking-code secondpos) (conj new-colorwords (first tuple) blanks)])))
+               [code []])
+       peek))
 
 (defn generate-hiccup [strings]
   (letfn [(fgen [s bgc c] [:span {:style {:background-color bgc
@@ -142,13 +152,7 @@
           (fwhite [s] (fgen s "white" "black"))
           (fyellow [s] (fgen s "LightYellow" "black"))
           (fblack [s] (fgen s "black" "white"))
-          (fclear [s]
-            (into [:span]
-                  (map #(case %
-                          " " (gstring/unescapeEntities "&nbsp;")
-                          "\n" [:br]
-                          [:span %])
-                       (seq s))))
+          (fclear [s] [:span s])
           (col-dispatch [s] ((get {green  fgreen
                                    white  fwhite
                                    yellow  fyellow
@@ -163,7 +167,6 @@
   (->> (convert-to-color puzz sol)
        (convert-parens-to-strings)
        (expand-greens)
-       (flatten)
        (replace-blanks-with-newline code)
        (generate-hiccup)
        (into [:p {:style {:display "block" :font-family "monospace"
