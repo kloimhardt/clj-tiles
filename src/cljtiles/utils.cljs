@@ -83,24 +83,24 @@
 
 ;; need to be all the same atringlength
 (def white "w-")
-(def green "g-")
-(def black "b-")
-(def yellow "y-")
-(def clear "c-")
+(def green "-g")
+(def black "-b")
+(def yellow "-y")
+(def clear "-c")
 (def col-postfix-len 2)
 (assert (= (count clear) (count green) (count white) (count black) (count yellow) col-postfix-len))
 
 (defn get-color-type [s]
-  (subs s 0 col-postfix-len))
+  (subs s (- (count s) col-postfix-len)))
 
 (defn is-color? [s c]
   (= (get-color-type s) c))
 
 (defn get-color-data [s]
-  (subs s col-postfix-len))
+  (subs s 0 (- (count s) col-postfix-len) ))
 
 (defn make-color [s c]
-  (str c s))
+  (str s c))
 
 (defn convert-to-sorted [puzzd-list]
   (->> puzzd-list
