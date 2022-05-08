@@ -87,7 +87,20 @@
 (def black "b-")
 (def yellow "y-")
 (def clear "c-")
-(assert (= (count clear) (count green) (count white) (count black) (count yellow)))
+(def col-postfix-len 2)
+(assert (= (count clear) (count green) (count white) (count black) (count yellow) col-postfix-len))
+
+(defn get-color-type [s]
+  (subs s 0 col-postfix-len))
+
+(defn is-color? [s c]
+  (= (get-color-type s) c))
+
+(defn get-color-data [s]
+  (subs s col-postfix-len))
+
+(defn make-color [s c]
+  (str c s))
 
 (defn convert-to-sorted [puzzd-list]
   (->> puzzd-list
@@ -107,12 +120,12 @@
                                    (map-entry? x) x
                                    (coll? x)
                                    (if found?
-                                     (str green s)
+                                     (make-color s green)
                                      x)
                                    :else
                                    (if found?
-                                     (str yellow s)
-                                     (str black s))))))))))
+                                     (make-color s yellow)
+                                     (make-color s black))))))))))
 
 (defn element-convert-parens [elem]
   (let [open-close-char (fn  [coll]
@@ -122,42 +135,42 @@
                             (set? coll) ["#{" "}" (seq coll)]
                             :else ["(" ")" (seq coll)]))
         [open close leaves] (open-close-char elem)]
-    (concat [(str white open)]
-            (interpose (str white " ") leaves)
-            [(str white close)])))
+    (concat [(make-color open white)]
+            (interpose (make-color " " white) leaves)
+            [(make-color close white)])))
 
 (defn convert-parens-to-strings [edn-list]
   (->> edn-list
        (map #(->> % (w/prewalk (fn [x]
                                  (if (coll? x)
                                    (element-convert-parens x) x)))))
-       (interpose (str white " "))
+       (interpose (make-color " " white))
        flatten))
 
 (defn expand-greens [strings]
   (->> strings
-       (mapcat (fn [s] (if (str/starts-with? s green)
-                         (->> (str/split (subs s (count green)) #" ")
-                              (map #(str green %))
-                              (interpose (str green " ")))
+       (mapcat (fn [s] (if (is-color? s green)
+                         (->> (str/split (get-color-data s) #" ")
+                              (map #(make-color % green))
+                              (interpose (make-color " " green)))
                          [s])))))
 
 (comment
   (expand-greens ["g-(1 2 3)" "y-4" "g-(5)"])
-;; => ("g-(1" "g- " "g-2" "g- " "g-3)" "y-4" "g-(5)")
+;;= ("g-(1" "g- " "g-2" "g- " "g-3)" "y-4" "g-(5)")
   :end)
 
 (defn replace-blanks-with-newline [code colorwords]
   (->> colorwords
-       (remove #{white (str white " ")})
+       (remove #{white (make-color " " white)})
        (partition-all 2 1)
        (reduce (fn [[shrinking-code new-colorwords] tuple]
-                 (let [[firststr secondstr] (map #(subs % (count green)) tuple)
+                 (let [[firststr secondstr] (map #(get-color-data %) tuple)
                        firstpos (+ (stringsearch shrinking-code firststr)
                                    (count firststr))
                        secondpos (+ (stringsearch (subs shrinking-code firstpos) secondstr)
                                     firstpos)
-                       blanks (str clear (subs shrinking-code firstpos secondpos))]
+                       blanks (make-color (subs shrinking-code firstpos secondpos) clear)]
                    (if (= firstpos (+ (count shrinking-code) (count firststr))) ;;not found ->brute
                      (do (println "error: coloring stopped as tuple not found " tuple)
                          (reduced [shrinking-code (conj new-colorwords blanks)])) ;;exit, ->
@@ -180,8 +193,8 @@
                                    yellow  fyellow
                                    black  fblack
                                    clear fclear}
-                                  (subs s 0 (count green)))
-                             (subs s (count green))))]
+                                  (get-color-type s))
+                             (get-color-data s)))]
     (map col-dispatch strings)))
 
 (defn convert-to-symbol [sol]
@@ -205,15 +218,13 @@
                        x)))))
 
 (defn replace-first-green-blank [xs]
-  (let [el-type #(subs % 0 (count green))
-        greenblank? #(= % (str green " "))
-        someclear? #(= (el-type %) clear)]
+  (let [greenblank? #(and (is-color? % green) (= (get-color-data %) " "))]
     (->> xs
          (remove #{clear})
          (partition 2 1 xs)
-         (map (fn [[g c]] (if (and (greenblank? g) (someclear? c))
-                              (str clear " ")
-                              g))))))
+         (map (fn [[g c]] (if (and (greenblank? g) (is-color? c clear))
+                            (make-color " " clear)
+                            g))))))
 
 (def output-width 41)
 
