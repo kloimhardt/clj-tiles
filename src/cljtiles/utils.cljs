@@ -97,23 +97,22 @@
                                    (set? x) (into (sorted-set) x)
                                    :else x)))))))
 
-(defn convert-to-color [puzzd-list sold]
-  (let [solds (tree-seq coll? seq sold)]
-    (->> puzzd-list
-         (map #(->> %
-                    (w/prewalk (fn [x]
-                                 (let [s (pr-str x)
-                                       found? (some #{x} solds)]
-                                   (cond
-                                     (map-entry? x) x
-                                     (coll? x)
-                                     (if found?
-                                       (str green s)
-                                       x)
-                                     :else
-                                     (if found?
-                                       (str yellow s)
-                                       (str black s)))))))))))
+(defn convert-to-color [puzzd-list tree-seq-sold]
+  (->> puzzd-list
+       (map #(->> %
+                  (w/prewalk (fn [x]
+                               (let [s (pr-str x)
+                                     found? (some #{x} tree-seq-sold)]
+                                 (cond
+                                   (map-entry? x) x
+                                   (coll? x)
+                                   (if found?
+                                     (str green s)
+                                     x)
+                                   :else
+                                   (if found?
+                                     (str yellow s)
+                                     (str black s))))))))))
 
 (defn element-convert-parens [elem]
   (let [open-close-char (fn  [coll]
@@ -192,6 +191,19 @@
                        (symbol (str x))
                        x)))))
 
+(defn convert-to-string [sol]
+  (->> sol
+       (w/prewalk (fn [x]
+                     (cond
+                       (some identity ((juxt keyword? number? symbol?) x))
+                       (str x)
+
+                       (string? x)
+                       (pr-str x)
+
+                       :else
+                       x)))))
+
 (defn replace-first-green-blank [xs]
   (let [el-type #(subs % 0 (count green))
         greenblank? #(= % (str green " "))
@@ -213,12 +225,11 @@
 
 (defn render-colored [puzz sol]
   ;;puzz is always a vector of code: => ["Hello, World!"]
-  ;;(def code code)
-  ;;(def puzz puzz)
-  ;;(def sol sol)
-  (let [massaged-solution (convert-to-sorted (convert-to-symbol sol))
+  (def puzz puzz)
+  (def sol sol)
+  (let [tree-seq-solution (tree-seq coll? seq (convert-to-symbol sol))
         massaged-puzzle (convert-to-sorted puzz)]
-    (->> (convert-to-color massaged-puzzle massaged-solution)
+    (->> (convert-to-color massaged-puzzle tree-seq-solution)
          (convert-parens-to-strings)
          (expand-greens)
          (replace-blanks-with-newline (code->break-str massaged-puzzle))
@@ -226,8 +237,3 @@
          (generate-hiccup)
          (into [:p {:style {:display "block" :font-family "monospace"
                             :white-space "pre" :margin ["1em" 0]}}]))))
-
-(comment
-  (def massaged-solution (convert-to-sorted (convert-to-symbol sol)))
-  (def massaged-puzzle (convert-to-sorted puzz)))
-

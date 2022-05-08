@@ -42,13 +42,13 @@
         (assoc :xml-solution (apply gb/rpg nil (:solution page))))))
 
 (def content
-  (let [tuts [t-ac/content
+  (let [tuts [t-adv1/content
+              t-ac/content
               t-0/content t-k/content
               t-l/content
               t-s2/content
               t-s/content t-s3/content
-              t-ax/content
-              t-adv1/content]
+              t-ax/content]
         f (fn [ks v]
             (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
     (-> (f [:tutorials :chapnames :chaps]
@@ -522,7 +522,7 @@
        (when-not (:no-code-display (nth tutorials tutorial-no))
          [:div flex50
           [:h3 "Code"]
-          ;;[utils/render-colored edn-code (or (:solution tut) (:code tut))] ;;TODO klm needs to be activated
+          [utils/render-colored edn-code (or (:solution tut) (:code tut))] ;;TODO klm needs to be activated
           [:pre code]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
