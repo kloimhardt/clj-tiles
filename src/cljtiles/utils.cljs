@@ -1,6 +1,7 @@
 (ns cljtiles.utils
   (:require [clojure.string :as str]
             [clojure.walk :as w]
+            [zprint.core :as zp]
             [goog.string :as gstring]))
 
 (defn find-biggest-in-str [sol puzz]
@@ -88,16 +89,28 @@
 (def clear "c-")
 (assert (= (count clear) (count green) (count white) (count black) (count yellow)))
 
+(defn convert-to-sorted [puzzd-list]
+  (->> puzzd-list
+       (map #(->> % (w/prewalk (fn [x]
+                                 (cond
+                                   (map? x) (into (sorted-map) x)
+                                   (set? x) (into (sorted-set) x)
+                                   :else x)))))))
+
 (defn convert-to-color [puzzd-list sold]
   (let [solds (tree-seq coll? seq sold)]
     (->> puzzd-list
-         (map #(->> % (w/prewalk (fn [x]
+         (map #(->> %
+                    (w/prewalk (fn [x]
                                  (let [s (pr-str x)
                                        found? (some #{x} solds)]
-                                   (if (coll? x)
+                                   (cond
+                                     (map-entry? x) x
+                                     (coll? x)
                                      (if found?
                                        (str green s)
                                        x)
+                                     :else
                                      (if found?
                                        (str yellow s)
                                        (str black s)))))))))))
@@ -172,12 +185,49 @@
                              (subs s (count green))))]
     (map col-dispatch strings)))
 
-(defn render-colored [code puzz sol]
+(defn convert-to-symbol [sol]
+  (->> sol
+       (w/postwalk (fn [x]
+                     (if (some identity ((juxt keyword? number?) x))
+                       (symbol (str x))
+                       x)))))
+
+(defn replace-first-green-blank [xs]
+  (let [el-type #(subs % 0 (count green))
+        greenblank? #(= % (str green " "))
+        someclear? #(= (el-type %) clear)]
+    (->> xs
+         (remove #{clear})
+         (partition 2 1 xs)
+         (map (fn [[g c]] (if (and (greenblank? g) (someclear? c))
+                              (str clear " ")
+                              g))))))
+
+(def output-width 41)
+
+(defn code-break-primitive [edn-code]
+  (map #(zp/zprint-str % output-width) edn-code))
+
+(defn code->break-str [edn-code]
+  (apply str (interpose "\n" (code-break-primitive edn-code))))
+
+(defn render-colored [puzz sol]
   ;;puzz is always a vector of code: => ["Hello, World!"]
-  (->> (convert-to-color puzz sol)
-       (convert-parens-to-strings)
-       (expand-greens)
-       (replace-blanks-with-newline code)
-       (generate-hiccup)
-       (into [:p {:style {:display "block" :font-family "monospace"
-                          :white-space "pre" :margin ["1em" 0]}}])))
+  ;;(def code code)
+  ;;(def puzz puzz)
+  ;;(def sol sol)
+  (let [massaged-solution (convert-to-sorted (convert-to-symbol sol))
+        massaged-puzzle (convert-to-sorted puzz)]
+    (->> (convert-to-color massaged-puzzle massaged-solution)
+         (convert-parens-to-strings)
+         (expand-greens)
+         (replace-blanks-with-newline (code->break-str massaged-puzzle))
+         (replace-first-green-blank)
+         (generate-hiccup)
+         (into [:p {:style {:display "block" :font-family "monospace"
+                            :white-space "pre" :margin ["1em" 0]}}]))))
+
+(comment
+  (def massaged-solution (convert-to-sorted (convert-to-symbol sol)))
+  (def massaged-puzzle (convert-to-sorted puzz)))
+

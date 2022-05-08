@@ -16,12 +16,12 @@
    [cljtiles.tutorials-sicm :as t-s]
    [cljtiles.tutorials-sicm3 :as t-s3]
    [cljtiles.tutorials-appen :as t-ax]
+   [cljtiles.tutorials-advent1 :as t-adv1]
    [cljs.reader :as edn]
    [clojure.walk :as w]
    [tubax.core :as sax]
    [reagent.core :as rc]
    [reagent.dom :as rd]
-   [zprint.core :as zp]
    [cljtiles.sicm :as sicm]
    [cljtiles.blockly :as workspace!]
    [cljtiles.code-analysis :as ca]
@@ -48,7 +48,7 @@
               t-s2/content
               t-s/content t-s3/content
               t-ax/content
-              ]
+              t-adv1/content]
         f (fn [ks v]
             (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
     (-> (f [:tutorials :chapnames :chaps]
@@ -176,10 +176,7 @@
                 :else 0)]
       (goto-page! idx))))
 
-(def output-width 41)
-
-(defn code->break-str [edn-code]
-  (apply str (interpose "\n" (map #(zp/zprint-str % output-width) edn-code))))
+(def output-width utils/output-width)
 
 (defn part-str [width s]
   (apply str
@@ -305,7 +302,7 @@
         sci-eval (fn [code-str env errs]
                    (try (sci/eval-string code-str {:bindings bindings :env env})
                         (catch js/Error e (swap! errs conj e) :sci-error)))
-        cbr (map #(zp/zprint-str % output-width) edn-code)
+        cbr (utils/code-break-primitive edn-code)
         _results (doall (map #(sci-eval % the-env the-errs) cbr))
         err-msgs (map #(.-message %) @the-errs)
         ;; cbr-noflines (map (fn [y] (inc (count (filter (fn [x] (= "\n" x)) y)))) cbr)
@@ -334,7 +331,7 @@
 
 (defn cljtiles-eval [edn-code bindings]
   (let [the-err-msg (atom nil)
-        cbr (code->break-str edn-code)
+        cbr (utils/code->break-str edn-code)
         erg (try (sci/eval-string cbr {:bindings bindings})
                  (catch js/Error e
                    (reset! the-err-msg {:message (.-message e)
@@ -525,7 +522,7 @@
        (when-not (:no-code-display (nth tutorials tutorial-no))
          [:div flex50
           [:h3 "Code"]
-          [utils/render-colored code edn-code (:solution tut)]
+          ;;[utils/render-colored edn-code (or (:solution tut) (:code tut))] ;;TODO klm needs to be activated
           [:pre code]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
