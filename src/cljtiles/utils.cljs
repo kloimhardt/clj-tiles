@@ -37,13 +37,23 @@
 
 (defn fullsplit-no-tail-recursion [ss s]
   (let [[eins zwo] (twosplit ss s)]
-    (if zwo (cons eins (fullsplit-no-tail-recursion zwo s)) (list eins))))
+    (if zwo
+      (cons eins (fullsplit-no-tail-recursion zwo s))
+      (list eins))))
+
+(defn fullsplit-tail-recur [ss s]
+  (loop [result []
+         [eins zwo] (twosplit ss s)]
+    (let [new-result (conj result eins)]
+      (if zwo (recur new-result (twosplit zwo s)) new-result))))
 
 (defn fullsplit [ss s]
-  (loop [ss ss result []]
-    (let [[eins zwo] (twosplit ss s)
-          new-result (conj result eins)]
-      (if zwo (recur zwo new-result) new-result))))
+  (->> [[] (twosplit ss s)]
+       (iterate (fn [[result [eins zwo]]]
+                  [(conj result eins) (twosplit zwo s)]))
+       (drop-while (fn [[_ [_ zwo]]] zwo))
+       first
+       (apply concat)))
 
 (defn twosplit-word [ss s]
   ;; splittet nur wenn der String s als Wort gefunden wird
