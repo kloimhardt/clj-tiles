@@ -83,7 +83,7 @@
   :end)
 
 ;; need to be all the same atringlength
-(def white "w-")
+(def white "-w")
 (def green "-g")
 (def black "-b")
 (def yellow "-y")
@@ -112,30 +112,27 @@
                                    :else x)))))))
 
 (defn make-coll-green [xs]
-  (into (empty xs)
-        (map (fn [x]
-               (if (map-entry? x)
-                 [(make-color (str (key x)) green)
-                  (make-color (str (val x)) green)]
-                 (make-color (str x) green))))
-        xs))
+  (cond->> (map (fn [x]
+                  (if (map-entry? x)
+                    [(make-color (str (key x)) green)
+                     (make-color (str (val x)) green)]
+                    (make-color (str x) green))) xs)
+    (some identity ((juxt map? vector? set?) xs)) (into (empty xs))))
 
 (defn convert-to-color [puzzd-list tree-seq-sold]
   (->> puzzd-list
-       (map #(->> %
-                  (w/prewalk (fn [x]
-                               (let [s (pr-str x)
-                                     found? (some #{x} tree-seq-sold)]
-                                 (cond
-                                   (map-entry? x) x
-                                   (coll? x)
-                                   (if found?
-                                     (make-color s green)
-                                     x)
-                                   :else
-                                   (if found?
-                                     (make-color s yellow)
-                                     (make-color s black))))))))))
+       (w/prewalk (fn [x]
+                    (let [s (pr-str x)
+                          found? (some #{x} tree-seq-sold)]
+                      (cond
+                        (map-entry? x) x
+                        (coll? x)
+                        (if found?
+                          (make-coll-green x)
+                          x)
+                        (and (string? x) (is-color? x green)) x
+                        found? (make-color s yellow)
+                        :else (make-color s black)))))))
 
 (defn element-convert-parens [elem]
   (let [open-close-char (fn  [coll]
@@ -251,6 +248,3 @@
             (into [:p {:style {:display "block" :font-family "monospace"
                                :white-space "pre" :margin ["1em" 0]}}])))
      [:pre code])])
-
-
-
