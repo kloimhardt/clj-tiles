@@ -37,11 +37,17 @@
 (defn generate-xml [page]
   (if (:xml-code page)
     page
-    (-> page
-        (assoc :xml-code (apply gb/rpg (:blockpos page) (:code page)))
-        (update :solution-blockpos (fnil identity (:blockpos page)))
-        (as-> $ (assoc $ :xml-solution (apply gb/rpg (:solution-blockpos $)
-                                              (or (:solution page) (:code page)))))))) ;;klm TODO remove :code page
+    (letfn [(switch-yx [yx-list]
+              (when yx-list
+                (map (fn [[y x]] [x y]) yx-list)))]
+      (-> page
+          (assoc :xml-code (apply gb/rpg (or (switch-yx (:blockpos-yx page))
+                                             (:blockpos page))
+                                  (:code page)))
+          (update :solpos-yx (fnil identity (or (:blockpos-yx page)
+                                                (switch-yx (:blockpos page)))))
+          (as-> $ (assoc $ :xml-solution (apply gb/rpg (switch-yx (:solpos-yx $))
+                                                (or (:solution page) (:code page))))))))) ;;klm TODO remove :code page
 
 (def content
   (let [tuts [t-adv1/content
