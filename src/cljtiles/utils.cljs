@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [clojure.walk :as w]
             [cljtiles.xmlparse-2 :as edn->code]
+            [reagent.core :as rc]
             [tubax.core :as sax]
             [zprint.core :as zp]))
 
@@ -224,27 +225,47 @@
 (defn get-edn-code [xml-str]
   (edn->code/parse (sax/xml->clj xml-str) nil))
 
-(defn render-colored [code puzz xml-sol state-colored-code fn-set-colored-code]
+(defn error-boundary [_comp reset-state-fn set-state-fn kw val]
+  (let [error (rc/atom nil)]
+    (rc/create-class
+     {:component-did-catch (fn [_this _e _info] nil)
+      :get-derived-state-from-error (fn [e]
+                                      (reset! error e)
+                                      #js {})
+      :reagent-render (fn [comp]
+                        (if @error
+                          (do
+                            (reset-state-fn nil)
+                            (set-state-fn kw val)
+                            (reset! error nil)
+                            nil)
+                          comp))})))
+
+(defn render-colored-comp [puzz xml-sol]
+  (let [tree-seq-solution (tree-seq coll? seq (get-edn-code xml-sol))
+        massaged-puzzle (convert-to-sorted puzz)]
+    (->> (convert-to-color massaged-puzzle tree-seq-solution)
+         (convert-parens-to-strings)
+         (expand-greens)
+         (replace-blanks-with-newline (code->break-str massaged-puzzle))
+         (replace-first-green-blank)
+         (generate-hiccup)
+         (into [:p {:style {:display "block" :font-family "monospace"
+                            :white-space "pre" :margin ["1em" 0]}}]))))
+
+(defn render-colored [code puzz xml-sol state-colored-code fn-set-state-field]
   ;;puzz is always a vector of code: => ["Hello, World!"]
-  (def puzz puzz)
-  (def sol sol)
-  (def xml-sol xml-sol)
+  ;;(def puzz puzz)
+  ;;(def xml-sol xml-sol)
   [:div
    [:h3 "Code "
-    (when fn-set-colored-code
-      [:button {:on-mouse-down #(fn-set-colored-code true)
-                :on-mouse-up #(fn-set-colored-code false)
-                :on-mouse-leave #(fn-set-colored-code false)}
+    (when (and fn-set-state-field xml-sol)
+      [:button {:on-mouse-down #(fn-set-state-field :colored-code true)
+                :on-mouse-up #(fn-set-state-field :colored-code false)
+                :on-mouse-leave #(fn-set-state-field :colored-code false)}
        "Color"])]
-   (if state-colored-code
-     (let [tree-seq-solution (tree-seq coll? seq (get-edn-code xml-sol))
-           massaged-puzzle (convert-to-sorted puzz)]
-       (->> (convert-to-color massaged-puzzle tree-seq-solution)
-            (convert-parens-to-strings)
-            (expand-greens)
-            (replace-blanks-with-newline (code->break-str massaged-puzzle))
-            (replace-first-green-blank)
-            (generate-hiccup)
-            (into [:p {:style {:display "block" :font-family "monospace"
-                               :white-space "pre" :margin ["1em" 0]}}])))
+   (if (and state-colored-code fn-set-state-field xml-sol)
+     [error-boundary
+      [render-colored-comp puzz xml-sol]
+      identity fn-set-state-field :colored-code false]
      [:pre code])])

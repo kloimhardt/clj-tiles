@@ -126,8 +126,8 @@
 
 (defonce app-state (rc/atom nil))
 
-(defn set-colored-code [bool]
-  (swap! state assoc :colored-code bool))
+(defn set-state-field [kw value]
+  (swap! state assoc kw value))
 
 (defn set-scrollbar [x y]
   (when x
@@ -463,7 +463,9 @@
     " "
     [:button {:on-click (tutorial-fu inc)} ">"]
     " "
-    [radios]
+    (if (:xml-solution (nth tutorials tutorial-no))
+        [radios]
+        [:span "Solution not known"])
     " "
     (when run-button
       (if (get-inspect-form edn-code)
@@ -511,7 +513,7 @@
      [:div flex50
       [utils/render-colored code edn-code
        (:xml-solution (nth tutorials tutorial-no))
-       colored-code set-colored-code]]]))
+       colored-code set-state-field]]]))
 
 (defn result-comp [{:keys [result-raw edn-code edn-code-orig code
                            tutorial-no colored-code]}]
@@ -526,7 +528,7 @@
        (when-not (:no-code-display (nth tutorials tutorial-no))
          [:div flex50
           [utils/render-colored code edn-code (:xml-solution tut)
-           colored-code set-colored-code]])])))
+           colored-code set-state-field]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc result-raw edn-code-orig code] :as the-state}]
@@ -577,28 +579,16 @@
            [:div {:style {:column-count 2}}
             [tex-comp desc]])]))))
 
-(defn error-boundary [comp]
-  (let [error (rc/atom nil)]
-    (rc/create-class
-      {:component-did-catch (fn [this e info] nil)
-       :get-derived-state-from-error (fn [e]
-                                       (reset! error e)
-                                       #js {})
-       :reagent-render (fn [comp]
-                         (if @error
-                           (do
-                             (reset-state nil)
-                             (swap! state assoc :stdout ["Something went wrong rendering the result"])
-                             (reset! error nil)
-                             nil)
-                           comp))})))
+
 
 (defn theview []
   [:div
    [modal-comp @state]
    [tutorials-comp @state]
-   [error-boundary
-    [output-comp @state]]])
+   [utils/error-boundary
+    [output-comp @state]
+    reset-state
+    set-state-field :stdout ["Something went wrong rendering the result"]]])
 
 (defn ^{:dev/after-load true} render []
   ;;(when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
@@ -624,3 +614,4 @@
           dec
           goto-page!)))
   (render))
+
