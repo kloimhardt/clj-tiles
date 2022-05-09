@@ -39,7 +39,9 @@
     page
     (-> page
         (assoc :xml-code (apply gb/rpg (:blockpos page) (:code page)))
-        (assoc :xml-solution (apply gb/rpg nil (or (:solution page) (:code page))))))) ;;klm TODO remove :code page
+        (update :solution-blockpos (fnil identity (:blockpos page)))
+        (as-> $ (assoc $ :xml-solution (apply gb/rpg (:solution-blockpos $)
+                                              (or (:solution page) (:code page)))))))) ;;klm TODO remove :code page
 
 (def content
   (let [tuts [t-adv1/content
@@ -102,6 +104,7 @@
               :sci-error nil
               :sci-error-full nil
               :result-raw nil
+              :show-result-raw true
               :code nil
               :edn-code nil
               :edn-code-orig nil
@@ -531,7 +534,8 @@
            colored-code set-state-field]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
-                           desc result-raw edn-code-orig code] :as the-state}]
+                           desc result-raw edn-code-orig code show-result-raw]
+                    :as the-state}]
   (let [tut (nth tutorials tutorial-no)]
     (if-let [ifo (get-inspect-form edn-code)]
       [:<>
@@ -552,8 +556,7 @@
           [error-comp-inspect the-state (last ifo)]]
          (= (last ifo) :start-interactive)
          [tex-comp ((:message-fn tut) the-state ifo goto-lable-page!)]
-         :else (str "Expression " (last ifo) " was never called.")
-         )]
+         :else (str "Expression " (last ifo) " was never called."))]
       (let [custom-comp (and (:comp-fn tut) ((:comp-fn tut) the-state))]
         [:<>
          (when-not custom-comp
@@ -570,8 +573,11 @@
             (cond
               custom-comp
               [custom-comp]
-              (start-with-div? (last edn-code-orig))
-              [result-raw]
+              (and show-result-raw (start-with-div? (last edn-code-orig)))
+              [:div
+               [result-raw]
+               [:p [:button {:on-click #(set-state-field :show-result-raw false)}
+                    "Show source-code"]]]
               :else
               [result-comp the-state])
             (when desc [:p [desc-button]])]
