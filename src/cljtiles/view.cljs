@@ -39,7 +39,7 @@
     page
     (-> page
         (assoc :xml-code (apply gb/rpg (:blockpos page) (:code page)))
-        (assoc :xml-solution (apply gb/rpg nil (:solution page))))))
+        (assoc :xml-solution (apply gb/rpg nil (or (:solution page) (:code page))))))) ;;klm TODO remove :code page
 
 (def content
   (let [tuts [t-adv1/content
@@ -109,7 +109,8 @@
               :run-button true
               :tutorial-no tn
               :desc ds
-              :solution-no sn}
+              :solution-no sn
+              :colored-code true} ;;klm needs to be false
         check (or (not @state) (= (into (hash-set) (keys init))
                                   (into (hash-set) (keys @state))))]
     (reset! state (merge init
@@ -124,6 +125,9 @@
       (swap! state assoc :stdout [(str "state is not in best state, pls. report. " (keys @state))]))))
 
 (defonce app-state (rc/atom nil))
+
+(defn set-colored-code [bool]
+  (swap! state assoc :colored-code bool))
 
 (defn set-scrollbar [x y]
   (when x
@@ -489,16 +493,15 @@
         [:<>
          [:pre (my-str-brk (str "The expression " ifo " could not be displayed due to one of the following reasons:"))]
          (map-indexed (fn [idx msg] ^{:key idx} [:pre (my-str-brk (str (inc idx) ". " (modify-error msg)))])
-                      (:err-msgs sci-error-full) )]
+                      (:err-msgs sci-error-full))]
         [:<>
          [:pre (my-str-brk (str "The expression " ifo " could not be displayed  because"))]
-         [:pre (str (my-str-brk (modify-error (first (:err-msgs sci-error-full)))))]]
-        )]
+         [:pre (str (my-str-brk (modify-error (first (:err-msgs sci-error-full)))))]])]
      [:div flex50
-      [:h3 "Code"]
-      [:pre code]]]))
+      [utils/render-colored code nil nil false nil]]]))
 
-(defn error-comp [{:keys [sci-error-full sci-error code]}]
+(defn error-comp [{:keys [sci-error-full sci-error code
+                          edn-code tutorial-no colored-code]}]
   (let [flex50 {:style {:flex "50%"}}]
     [:div {:style {:display "flex"}}
      [:div flex50
@@ -506,11 +509,12 @@
       [:pre (my-str-brk (modify-error sci-error))]
       [:pre (str "line " (:line sci-error-full) " column " (:column sci-error-full))]]
      [:div flex50
-      [:h3 "Code"]
-      [:pre code]]]))
+      [utils/render-colored code edn-code
+       (:xml-solution (nth tutorials tutorial-no))
+       colored-code set-colored-code]]]))
 
 (defn result-comp [{:keys [result-raw edn-code edn-code-orig code
-                           tutorial-no]}]
+                           tutorial-no colored-code]}]
   (if (= edn-code edn-code-orig :showcode) ;;never true, remove :showcode to supress code display.
     [:pre (my-str result-raw)]
     (let [flex50 {:style {:flex "50%"}}
@@ -521,9 +525,8 @@
         [:pre (my-str-brk result-raw)]]
        (when-not (:no-code-display (nth tutorials tutorial-no))
          [:div flex50
-          [:h3 "Code"]
-          [utils/render-colored edn-code (or (:solution tut) (:code tut))] ;;TODO klm needs to be activated
-          [:pre code]])])))
+          [utils/render-colored code edn-code (:xml-solution tut)
+           colored-code set-colored-code]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc result-raw edn-code-orig code] :as the-state}]

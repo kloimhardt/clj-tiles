@@ -1,8 +1,9 @@
 (ns cljtiles.utils
   (:require [clojure.string :as str]
             [clojure.walk :as w]
-            [zprint.core :as zp]
-            [goog.string :as gstring]))
+            [cljtiles.xmlparse-2 :as edn->code]
+            [tubax.core :as sax]
+            [zprint.core :as zp]))
 
 (defn find-biggest-in-str [sol puzz]
   ;; sucht grössten gemeinsamen String via LCSubStr
@@ -110,6 +111,15 @@
                                    (set? x) (into (sorted-set) x)
                                    :else x)))))))
 
+(defn make-coll-green [xs]
+  (into (empty xs)
+        (map (fn [x]
+               (if (map-entry? x)
+                 [(make-color (str (key x)) green)
+                  (make-color (str (val x)) green)]
+                 (make-color (str x) green))))
+        xs))
+
 (defn convert-to-color [puzzd-list tree-seq-sold]
   (->> puzzd-list
        (map #(->> %
@@ -197,26 +207,6 @@
                              (get-color-data s)))]
     (map col-dispatch strings)))
 
-(defn convert-to-symbol [sol]
-  (->> sol
-       (w/postwalk (fn [x]
-                     (if (some identity ((juxt keyword? number?) x))
-                       (symbol (str x))
-                       x)))))
-
-(defn convert-to-string [sol]
-  (->> sol
-       (w/prewalk (fn [x]
-                     (cond
-                       (some identity ((juxt keyword? number? symbol?) x))
-                       (str x)
-
-                       (string? x)
-                       (pr-str x)
-
-                       :else
-                       x)))))
-
 (defn replace-first-green-blank [xs]
   (let [greenblank? #(and (is-color? % green) (= (get-color-data %) " "))]
     (->> xs
@@ -234,17 +224,33 @@
 (defn code->break-str [edn-code]
   (apply str (interpose "\n" (code-break-primitive edn-code))))
 
-(defn render-colored [puzz sol]
+(defn get-edn-code [xml-str]
+  (edn->code/parse (sax/xml->clj xml-str) nil))
+
+(defn render-colored [code puzz xml-sol state-colored-code fn-set-colored-code]
   ;;puzz is always a vector of code: => ["Hello, World!"]
   (def puzz puzz)
   (def sol sol)
-  (let [tree-seq-solution (tree-seq coll? seq (convert-to-symbol sol))
-        massaged-puzzle (convert-to-sorted puzz)]
-    (->> (convert-to-color massaged-puzzle tree-seq-solution)
-         (convert-parens-to-strings)
-         (expand-greens)
-         (replace-blanks-with-newline (code->break-str massaged-puzzle))
-         (replace-first-green-blank)
-         (generate-hiccup)
-         (into [:p {:style {:display "block" :font-family "monospace"
-                            :white-space "pre" :margin ["1em" 0]}}]))))
+  (def xml-sol xml-sol)
+  [:div
+   [:h3 "Code "
+    (when fn-set-colored-code
+      [:button {:on-mouse-down #(fn-set-colored-code true)
+                :on-mouse-up #(fn-set-colored-code false)
+                :on-mouse-leave #(fn-set-colored-code false)}
+       "Color"])]
+   (if state-colored-code
+     (let [tree-seq-solution (tree-seq coll? seq (get-edn-code xml-sol))
+           massaged-puzzle (convert-to-sorted puzz)]
+       (->> (convert-to-color massaged-puzzle tree-seq-solution)
+            (convert-parens-to-strings)
+            (expand-greens)
+            (replace-blanks-with-newline (code->break-str massaged-puzzle))
+            (replace-first-green-blank)
+            (generate-hiccup)
+            (into [:p {:style {:display "block" :font-family "monospace"
+                               :white-space "pre" :margin ["1em" 0]}}])))
+     [:pre code])])
+
+
+
