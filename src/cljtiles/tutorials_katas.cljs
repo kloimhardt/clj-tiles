@@ -25,7 +25,7 @@
       '(call-that-with-3 :tiles/slot)]
      :solpos-yx [[0 0] [150 0]]
      :solution ['(defn call-that-with-3
-                   [some-function]
+                   some-function
                    (some-function 3))
                 '(call-that-with-3 inc)]}
     {:blockpos [[0 0] [150 50] [250 50] [400 50] [150 100] [350 100] [150 250] [250 250] [0 300]]

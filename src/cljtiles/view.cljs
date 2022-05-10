@@ -112,7 +112,9 @@
         ds (:desc @state)
         sn (:solution-no @state)
         st (or (:solved-tutorials @state)
-               (into #{} (map dec (conj (butlast (reductions + chaps)) 0))))
+               (into #{} (map dec (conj (butlast (reductions + chaps)) 0)))
+               ;;(into #{} (range -1 300)) ;;to unlock all solutions
+               #_:end)
         init {:stdout []
               :inspect []
               :sci-error nil

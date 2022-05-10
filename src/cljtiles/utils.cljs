@@ -106,11 +106,11 @@
 
 (defn convert-to-sorted [puzzd-list]
   (->> puzzd-list
-       (map #(->> % (w/prewalk (fn [x]
-                                 (cond
-                                   (map? x) (into (sorted-map) x)
-                                   (set? x) (into (sorted-set) x)
-                                   :else x)))))))
+       (w/prewalk (fn [x]
+                    (cond
+                      (map? x) (into (sorted-map) x)
+                      (set? x) (into (sorted-set) x)
+                      :else x)))))
 
 (defn make-coll-green [xs]
   (cond->> (map (fn [x]
@@ -124,15 +124,16 @@
   (->> puzzd-list
        (w/prewalk (fn [x]
                     (let [s (pr-str x)
-                          found? (some #{x} tree-seq-sold)]
+                          jx (juxt identity map? vector? set?)
+                          found (some #{(jx x)} (map jx tree-seq-sold))]
                       (cond
                         (map-entry? x) x
                         (coll? x)
-                        (if found?
+                        (if found
                           (make-coll-green x)
                           x)
                         (and (string? x) (is-color? x green)) x
-                        found? (make-color s yellow)
+                        found (make-color s yellow)
                         :else (make-color s black)))))))
 
 (defn element-convert-parens [elem]
