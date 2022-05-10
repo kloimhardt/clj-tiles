@@ -222,7 +222,7 @@
 (defn code->break-str [edn-code]
   (apply str (interpose "\n" (code-break-primitive edn-code))))
 
-(defn get-edn-code [xml-str]
+(defn get-edn-code-simpl [xml-str]
   (edn->code/parse (sax/xml->clj xml-str) nil))
 
 (defn error-boundary [_comp reset-state-fn set-state-fn kw val]
@@ -241,9 +241,9 @@
                             nil)
                           comp))})))
 
-(defn render-colored-comp [puzz xml-sol]
-  (let [tree-seq-solution (tree-seq coll? seq (get-edn-code xml-sol))
-        massaged-puzzle (convert-to-sorted puzz)]
+(defn render-colored-comp [edn-code edn-sol]
+  (let [tree-seq-solution (tree-seq coll? seq edn-sol)
+        massaged-puzzle (convert-to-sorted edn-code)]
     (->> (convert-to-color massaged-puzzle tree-seq-solution)
          (convert-parens-to-strings)
          (expand-greens)
@@ -253,19 +253,34 @@
          (into [:p {:style {:display "block" :font-family "monospace"
                             :white-space "pre" :margin ["1em" 0]}}]))))
 
-(defn render-colored [code puzz xml-sol state-colored-code fn-set-state-field]
+(defn render-colored [code edn-code xml-sol xml-puzzle
+                      state-colored-code tutorial-number
+                      solved-tutorials
+                      fn-update-state-field]
   ;;puzz is always a vector of code: => ["Hello, World!"]
   ;;(def puzz puzz)
   ;;(def xml-sol xml-sol)
-  [:div
-   [:h3 "Code "
-    (when (and fn-set-state-field xml-sol)
-      [:button {:on-mouse-down #(fn-set-state-field :colored-code true)
-                :on-mouse-up #(fn-set-state-field :colored-code false)
-                :on-mouse-leave #(fn-set-state-field :colored-code false)}
-       "Color"])]
-   (if (and state-colored-code fn-set-state-field xml-sol)
-     [error-boundary
-      [render-colored-comp puzz xml-sol]
-      identity fn-set-state-field :colored-code false]
-     [:pre code])])
+  (let [show-color-button (and fn-update-state-field xml-sol
+                               (contains? solved-tutorials (dec tutorial-number)))]
+    [:div
+     [:h3 "Code "
+      (when show-color-button
+        (letfn [(set-state-field [kw val] (fn-update-state-field kw (constantly val)))]
+          [:button {:on-mouse-down #(set-state-field :colored-code true)
+                    :on-mouse-up #(set-state-field :colored-code false)
+                    :on-mouse-leave #(set-state-field :colored-code false)}
+           "Color"]))]
+     (if (and state-colored-code show-color-button)
+
+       (letfn [(set-state-field [kw val] (fn-update-state-field kw (constantly val)))]
+         (let [edn-sol (get-edn-code-simpl xml-sol)
+               edn-puzz (get-edn-code-simpl xml-puzzle)
+               _ (if (= edn-sol edn-puzz)
+                   (do
+                     (fn-update-state-field :solved-tutorials #(conj % tutorial-number))
+                     (set-state-field :forward-button-green true))
+                   (set-state-field :forward-button-green false))]
+           [error-boundary
+            [render-colored-comp edn-code edn-sol]
+            identity set-state-field :colored-code false]))
+       [:pre code])]))

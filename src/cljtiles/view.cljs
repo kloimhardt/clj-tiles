@@ -46,11 +46,12 @@
                                   (:code page)))
           (update :solpos-yx (fnil identity (or (:blockpos-yx page)
                                                 (switch-yx (:blockpos page)))))
-          (as-> $ (assoc $ :xml-solution (apply gb/rpg (switch-yx (:solpos-yx $))
-                                                (or (:solution page) (:code page))))))))) ;;klm TODO remove :code page
+          (as-> $ (assoc $ :xml-solution (when (:solution page)
+                                           (apply gb/rpg (switch-yx (:solpos-yx $))
+                                                                       (:solution page)))))))))
 
 (def content
-  (let [tuts [t-adv1/content
+  (let [tuts [t-adv1/content ;;klm TODO adv1 seems not to be addable to end of tuts
               t-ac/content
               t-0/content t-k/content
               t-l/content
@@ -101,10 +102,17 @@
 
 (def saved-workspace-xml (atom nil))
 
+(defn get-workspace-xml-str []
+  (->> (.-mainWorkspace blockly)
+       (.workspaceToDom blockly/Xml)
+       (.domToPrettyText blockly/Xml)))
+
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
         ds (:desc @state)
         sn (:solution-no @state)
+        st (or (:solved-tutorials @state)
+               (into #{} (map dec (conj (butlast (reductions + chaps)) 0))))
         init {:stdout []
               :inspect []
               :sci-error nil
@@ -117,11 +125,15 @@
               :modal-style-display "none"
               :run-button true
               :tutorial-no tn
+              :solved-tutorials st
               :desc ds
               :solution-no sn
-              :colored-code true} ;;klm needs to be false
+              :colored-code true ;;klm needs to be false
+              :forward-button-green false}
         check (or (not @state) (= (into (hash-set) (keys init))
                                   (into (hash-set) (keys @state))))]
+    (when (and (not tutorial-no) (= -1 sn))
+      (swap! saved-workspace-xml assoc :xml-code (get-workspace-xml-str)))
     (reset! state (merge init
                          (when tutorial-no
                            (reset! saved-workspace-xml {:xml-code (:xml-code (nth tutorials tutorial-no))
@@ -138,14 +150,12 @@
 (defn set-state-field [kw value]
   (swap! state assoc kw value))
 
+(defn update-state-field [kw fun]
+  (swap! state update kw fun))
+
 (defn set-scrollbar [x y]
   (when x
     (.. blockly -mainWorkspace (scroll x y))))
-
-(defn get-workspace-xml-str []
-  (->> (.-mainWorkspace blockly)
-       (.workspaceToDom blockly/Xml)
-       (.domToPrettyText blockly/Xml)))
 
 (defn swap-workspace []
   (if (= (:solution-no @state) -1)
@@ -377,8 +387,7 @@
 (defn get-edn-code [xml-str inspect-id inspect-fn]
   (let [edn-xml (sax/xml->clj xml-str)
         eci (edn->code/parse edn-xml {:id inspect-id :fun inspect-fn})
-        inspect-fn-name (when inspect-fn (first (inspect-fn 0)))
-        ]
+        inspect-fn-name (when inspect-fn (first (inspect-fn 0)))]
     (ca/prepare-fns eci inspect-fn-name)))
 
 (defn ^:export startsci [{:keys [inspect-fn] :as context}]
@@ -446,15 +455,15 @@
    (-> (fn [[idx name]]
          ^{:key name}
          [:label {:style {:font-size "80%" :font-family "courier"}}
-          [:input {:type :radio :name "solution-radio1"
+          [:input {:type :radio :name "solution-radio"
                    :on-change swap-workspace
                    :checked (= idx (:solution-no @state))}]
 
           name])
-       (map [[0 "Solution"] [-1 "Puzzle"]])
+       (map [[-1 "Puzzle"] [0 "Solution"]])
        doall)])
 
-(defn tutorials-comp [{:keys [run-button tutorial-no edn-code]}]
+(defn tutorials-comp [{:keys [run-button tutorial-no edn-code solved-tutorials forward-button-green]}]
   [:div
    [:span
     [:select {:value (page->chapter tutorial-no)
@@ -470,16 +479,20 @@
     [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
              :value (str (inc tutorial-no) "/" (count tutorials))}]
     " "
-    [:button {:on-click (tutorial-fu inc)} ">"]
-    " "
-    (if (:xml-solution (nth tutorials tutorial-no))
-        [radios]
-        [:span "Solution not known"])
+    [:button {:on-click (tutorial-fu inc)
+              :style (when forward-button-green {:color "white"
+                                                 :background-color "green"})}
+     ">"]
     " "
     (when run-button
       (if (get-inspect-form edn-code)
         [desc-button]
-        [:button {:on-click #(startsci nil)} "Run"]))]])
+        [:button {:on-click #(startsci nil)} "Run"]))
+    " "
+    (when (:xml-solution (nth tutorials tutorial-no))
+      (if (contains? solved-tutorials (dec tutorial-no))
+        [radios]
+        [:span "Solution not shown"]))]])
 
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
@@ -509,10 +522,11 @@
          [:pre (my-str-brk (str "The expression " ifo " could not be displayed  because"))]
          [:pre (str (my-str-brk (modify-error (first (:err-msgs sci-error-full)))))]])]
      [:div flex50
-      [utils/render-colored code nil nil false nil]]]))
+      [utils/render-colored code nil nil nil false nil nil nil]]]))
 
 (defn error-comp [{:keys [sci-error-full sci-error code
-                          edn-code tutorial-no colored-code]}]
+                          edn-code tutorial-no colored-code
+                          solved-tutorials]}]
   (let [flex50 {:style {:flex "50%"}}]
     [:div {:style {:display "flex"}}
      [:div flex50
@@ -522,10 +536,11 @@
      [:div flex50
       [utils/render-colored code edn-code
        (:xml-solution (nth tutorials tutorial-no))
-       colored-code set-state-field]]]))
+       (:xml-code @saved-workspace-xml)
+       colored-code tutorial-no solved-tutorials update-state-field]]]))
 
 (defn result-comp [{:keys [result-raw edn-code edn-code-orig code
-                           tutorial-no colored-code]}]
+                           tutorial-no colored-code solved-tutorials]}]
   (if (= edn-code edn-code-orig :showcode) ;;never true, remove :showcode to supress code display.
     [:pre (my-str result-raw)]
     (let [flex50 {:style {:flex "50%"}}
@@ -534,10 +549,12 @@
        [:div flex50
         [:h3 "Result"]
         [:pre (my-str-brk result-raw)]]
-       (when-not (:no-code-display (nth tutorials tutorial-no))
+       (when-not (:no-code-display tut)
          [:div flex50
-          [utils/render-colored code edn-code (:xml-solution tut)
-           colored-code set-state-field]])])))
+          [utils/render-colored code edn-code
+           (:xml-solution tut)
+           (:xml-code @saved-workspace-xml)
+           colored-code tutorial-no solved-tutorials update-state-field]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc result-raw edn-code-orig code show-result-raw]
