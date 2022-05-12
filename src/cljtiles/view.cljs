@@ -68,11 +68,11 @@
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
 
-(def dev false) ;;!! also disable spec!!
+(def dev true) ;;!! also disable spec!!
 
 (when dev
   ;;(fsa/connect)
-  (print (tst/test-pure))
+  ;;(print (tst/test-pure))
   (if-not (= (count tutorials) (reduce + chaps))
     (print "Sum of chaps not number tutorials")
     (print "sum chaps ok"))
@@ -494,7 +494,7 @@
     (when (:xml-solution (nth tutorials tutorial-no))
       (if (contains? solved-tutorials (dec tutorial-no))
         [radios]
-        [:span "Solution not shown"]))]])
+        [:span "Solve previous puzzle for solution"]))]])
 
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
@@ -622,7 +622,7 @@
     set-state-field :stdout ["Something went wrong rendering the result"]]])
 
 (defn ^{:dev/after-load true} render []
-  ;;(when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
+  (when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []

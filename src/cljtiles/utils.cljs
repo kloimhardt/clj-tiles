@@ -112,13 +112,19 @@
                       (set? x) (into (sorted-set) x)
                       :else x)))))
 
+(defn list-into-same-coll [orig data]
+  (if (some identity ((juxt map? vector? set?) orig))
+    (into (empty orig) data)
+    data))
+
 (defn make-coll-green [xs]
-  (cond->> (map (fn [x]
-                  (if (map-entry? x)
-                    [(make-color (str (key x)) green)
-                     (make-color (str (val x)) green)]
-                    (make-color (str x) green))) xs)
-    (some identity ((juxt map? vector? set?) xs)) (into (empty xs))))
+  (->> xs
+       (map (fn [x]
+              (if (map-entry? x)
+                [(make-color (str (key x)) green)
+                 (make-color (str (val x)) green)]
+                (make-color (str x) green))))
+       (list-into-same-coll xs)))
 
 (defn convert-to-color [puzzd-list tree-seq-sold]
   (->> puzzd-list
