@@ -45,13 +45,16 @@
        empty-colls
        remove-functions-and-keys))
 
-(defn graphical-coll-length [c]
-  (cond
-    (map? c) (+ (* 10 (count (apply str (keys c))))
-                (* 40 (int (/ (count c) 2))))
-    (vector? c) (* 35 (count c))
-    :else (+ (* 10 (count (str (first c))))
-             (* 35 (count (rest c))))))
+(defn graphical-length [c]
+  (let [char-len 10
+        slot-len 35]
+    (cond
+      (map? c) (+ (* char-len (count (apply str (keys c))))
+                  (* (+ 5 slot-len) (int (/ (count c) 2))))
+      (vector? c) (* slot-len (count c))
+      (coll? c) (+ (* char-len (count (str (first c))))
+                   (* slot-len (count (rest c))))
+      :else (* char-len (count (str c))))))
 
 (defn detect-offset [exprn next-exprn]
   [(cond-> 0
@@ -59,9 +62,7 @@
      (and (coll? exprn) (#{'defn} (first exprn))) (+ 45)
      (coll? next-exprn) (+ 50))
    (when-not (coll? next-exprn)
-     (cond-> 50
-       (coll? exprn) (+ (graphical-coll-length exprn))
-       (not (coll? exprn)) (+ (* 10 (count (str exprn))))))])
+     (+ 50 (graphical-length exprn)))])
 
 (def blockpos-yx
   (->> (partition-all 2 1 code)
@@ -71,26 +72,12 @@
                    (conj coords [(+ y y-offset) (if x-offset (+ x x-offset) 0)])))
                [[0 0]])))
 
-;;(def code [(list (-> sol first first) :tiles/slot :tiles/slot)])
-
-(comment
-  (def x (-> ts first (nth 2)))
-  (utils/list-into-same-coll x (repeat (count x) :tiles/slot))
-  (def code sol)
-
-  (utils/list-into-same-coll x)
-
-  (into {} (repeat (count x) [1 2]))
-  (type (into {} (repeat (count x) [:tiles/slot :tiles/slot])))
-
-  :end)
-
 (def e-vect
   [{:blockpos-yx blockpos-yx
     :code code
     :solution sol}])
 
-(def chapnames ["Adevent"])
+(def chapnames ["Advent"])
 (def chaps [(count e-vect)])
 
 (def content {:tutorials e-vect :chapnames chapnames :chaps chaps})
