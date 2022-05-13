@@ -26,29 +26,38 @@
    [cljtiles.blockly :as workspace!]
    [cljtiles.code-analysis :as ca]
    [cljtiles.components :as cmpnts]
+   [cljtiles.codeexplode :as explode]
    [cljtiles.utils :as utils]
-
    [cljtiles.tests :as tst]
    ;;[flow-storm.api :as fsa]
    ;;[sc.api]
    ;;[cljtiles.sc]
    ))
 
-(defn generate-xml [page]
+(def dev true) ;;!! also disable spec!!
+
+(defn generate-xml [_tutorial-no page] ;;tutorial-no is to debug explode
   (if (:xml-code page)
     page
     (letfn [(switch-yx [yx-list]
               (when yx-list
                 (map (fn [[y x]] [x y]) yx-list)))]
-      (-> page
-          (assoc :xml-code (apply gb/rpg (or (switch-yx (:blockpos-yx page))
-                                             (:blockpos page))
-                                  (:code page)))
-          (update :solpos-yx (fnil identity (or (:blockpos-yx page)
-                                                (switch-yx (:blockpos page)))))
-          (as-> $ (assoc $ :xml-solution (when (:solution page)
-                                           (apply gb/rpg (switch-yx (:solpos-yx $))
-                                                                       (:solution page)))))))))
+      (let [page (if (and dev #_(< 84 _tutorial-no 120) (:code page)) ;;this if is only to debug explode
+                   (do
+                     ;;(explode/store-dbg-info page)
+                     ;;(merge page (explode/explode (:code page)))
+                     page
+                     #_:end)
+                   page)]
+        (-> page
+            (assoc :xml-code (apply gb/rpg (or (switch-yx (:blockpos-yx page))
+                                               (:blockpos page))
+                                    (:code page)))
+            (update :solpos-yx (fnil identity (or (:blockpos-yx page)
+                                                  (switch-yx (:blockpos page)))))
+            (as-> $ (assoc $ :xml-solution (when (:solution page)
+                                             (apply gb/rpg (switch-yx (:solpos-yx $))
+                                                    (:solution page))))))))))
 
 (def content
   (let [tuts [t-adv1/content ;;klm TODO adv1 seems not to be addable to end of tuts
@@ -62,13 +71,11 @@
             (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
     (-> (f [:tutorials :chapnames :chaps]
            tuts)
-        (update :tutorials #(map generate-xml %)))))
+        (update :tutorials #(map-indexed generate-xml %)))))
 
 (def tutorials (:tutorials content))
 (def chaps (:chaps content))
 (def chapnames (:chapnames content))
-
-(def dev true) ;;!! also disable spec!!
 
 (when dev
   ;;(fsa/connect)
@@ -111,10 +118,12 @@
   (let [tn (:tutorial-no @state)
         ds (:desc @state)
         sn (:solution-no @state)
+        st-first-of-chapters (into #{} (map dec (conj (butlast (reductions + chaps)) 0)))
         st (or (:solved-tutorials @state)
-               (into #{} (map dec (conj (butlast (reductions + chaps)) 0)))
-               ;;(into #{} (range -1 300)) ;;to unlock all solutions
-               #_:end)
+               (if dev
+                 ;;(into #{} (range -1 300)) ;;to unlock all solutions
+                 st-first-of-chapters
+                 st-first-of-chapters))
         init {:stdout []
               :inspect []
               :sci-error nil
@@ -409,7 +418,7 @@
           (let [a (edn/read-string (str "[" e "]"))
                 b (first a)]
             (if (and (map? b) (:code b))
-              (:xml-code (generate-xml b))
+              (:xml-code (generate-xml nil b))
               (map #(gb/rpg [] %) a))))
         run-parser
         (fn []
