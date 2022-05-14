@@ -269,7 +269,9 @@
   ;;(def puzz puzz)
   ;;(def xml-sol xml-sol)
   (let [show-color-button (and fn-update-state-field xml-sol
-                               (contains? solved-tutorials (dec tutorial-number)))]
+                               #_(contains? solved-tutorials (dec tutorial-number))
+                               ;;disables code-coloring for solution-locked tutorials
+                               )]
     [:div
      [:h3 "Code "
       (when show-color-button
