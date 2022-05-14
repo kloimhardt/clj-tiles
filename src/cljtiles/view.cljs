@@ -114,18 +114,29 @@
        (.workspaceToDom blockly/Xml)
        (.domToPrettyText blockly/Xml)))
 
+(defn swap-workspace []
+  (if (= (:solution-no @state) -1)
+    (do
+      (swap! saved-workspace-xml assoc :xml-code (get-workspace-xml-str))
+      (swap! state assoc :solution-no 0)
+      (load-workspace (:xml-solution @saved-workspace-xml)))
+    (do
+      (swap! saved-workspace-xml assoc :xml-solution (get-workspace-xml-str))
+      (swap! state assoc :solution-no -1)
+      (load-workspace (:xml-code @saved-workspace-xml)))))
+
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
         ds (:desc @state)
         sn (:solution-no @state)
-        first-of-chapters (into #{} (conj (butlast (reductions + chaps)) 0))
+        first-of-chapters (conj (butlast (reductions + chaps)) 0)
         last-of-chapters (into #{} (map dec first-of-chapters))
-        st (or (:solved-tutorials @state)
+        st (or (:solved-tutorials @state) ;;not initialized down below when tutorial-no not= nil, so done here
                (if dev
                  ;;(into #{} (range -1 300)) ;;to unlock all solutions
                  last-of-chapters
                  last-of-chapters))
-        at (or (:accepted-tutorials @state) #{})
+        ac (:accepted? @state)
         init {:stdout []
               :inspect []
               :sci-error nil
@@ -139,15 +150,13 @@
               :run-button true
               :tutorial-no tn
               :solved-tutorials st
-              :accepted-tutorials at
+              :accepted? ac
               :desc ds
               :solution-no sn
               :colored-code true ;;klm needs to be false
               :forward-button-green false}
         check (or (not @state) (= (into (hash-set) (keys init))
                                   (into (hash-set) (keys @state))))]
-    (when (and (not tutorial-no) (= -1 sn))
-      (swap! saved-workspace-xml assoc :xml-code (get-workspace-xml-str)))
     (reset! state (merge init
                          (when tutorial-no
                            (reset! saved-workspace-xml {:xml-code (:xml-code (nth tutorials tutorial-no))
@@ -155,7 +164,18 @@
                            {:tutorial-no tutorial-no
                             :desc (:description (nth tutorials tutorial-no))
                             :solution-no -1 ;; -1 means "Puzzle" loaded in workspace
-                            })))
+                            :accepted? false})))
+
+    (when (and tutorial-no
+               (:xml-solution (nth tutorials tutorial-no))
+               (contains? st (dec tutorial-no)))
+      (swap-workspace)
+      )
+
+    ;;do not know why the following was (or still is?) necessary anymore
+    #_(when (and (not tutorial-no) (= -1 sn))
+        (swap! saved-workspace-xml assoc :xml-code (get-workspace-xml-str)))
+
     (when-not check
       (swap! state assoc :stdout [(str "state is not in best state, pls. report. " (keys @state))]))))
 
@@ -171,25 +191,12 @@
   (when x
     (.. blockly -mainWorkspace (scroll x y))))
 
-(defn swap-workspace []
-  (if (= (:solution-no @state) -1)
-    (do
-      (swap! saved-workspace-xml assoc :xml-code (get-workspace-xml-str))
-      (swap! state assoc :solution-no 0)
-      (load-workspace (:xml-solution @saved-workspace-xml)))
-    (do
-      (swap! saved-workspace-xml assoc :xml-solution (get-workspace-xml-str))
-      (swap! state assoc :solution-no -1)
-      (load-workspace (:xml-code @saved-workspace-xml)))))
-
 (defn goto-page! [page-no]
   (load-workspace (:xml-code (nth tutorials page-no)))
   (apply set-scrollbar (:scroll (nth tutorials page-no)))
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset-state page-no)
   (reset! app-state 0)
-  (when (and (:xml-solution (nth tutorials page-no)) (contains? (:solved-tutorials @state) (dec page-no)))
-    (swap-workspace))
   page-no)
 
 (defn goto-lable-page!-1 [lable]
@@ -480,7 +487,7 @@
        doall)])
 
 (defn tutorials-comp [{:keys [run-button tutorial-no edn-code solved-tutorials forward-button-green
-                              solution-no accepted-tutorials]}]
+                              solution-no accepted?]}]
   [:div
    [:span
     [:select {:value (page->chapter tutorial-no)
@@ -508,13 +515,17 @@
     " "
     (when (:xml-solution (nth tutorials tutorial-no))
       (if (contains? solved-tutorials (dec tutorial-no))
-        (if (contains? accepted-tutorials tutorial-no)
+        (if accepted?
           [radios]
-          [:button {:on-click (fn []
-                                (update-state-field :accepted-tutorials #(conj % tutorial-no))
-                                (swap-workspace))}
-           "Solve the puzzle"])
-        [:span "Solve puzzle to see the solution of the next and previous tutorials"]))]])
+          [:span " the above code, it is the solution to this "
+           [:button {:on-click (fn []
+                                 (set-state-field :accepted? true)
+                                 (when (not= -1 solution-no)
+                                  ;; this when is a safety measure, should always trigger here
+                                  ;; solution should always be loaded when this button appears
+                                   (swap-workspace)))}
+            "Puzzle"]])
+        [:span "A solution is available. Solving the previous puzzle unlocks it (and all before)."]))]])
 
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
