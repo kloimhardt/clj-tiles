@@ -230,7 +230,8 @@
   (apply str (interpose "\n" (code-break-primitive edn-code))))
 
 (defn get-edn-code-simpl [xml-str]
-  (edn->code/parse (sax/xml->clj xml-str) nil))
+  (when xml-str
+    (edn->code/parse (sax/xml->clj xml-str) nil)))
 
 (defn error-boundary [_comp reset-state-fn set-state-fn kw val]
   (let [error (rc/atom nil)]
@@ -260,7 +261,7 @@
          (into [:p {:style {:display "block" :font-family "monospace"
                             :white-space "pre" :margin ["1em" 0]}}]))))
 
-(defn render-colored [code edn-code xml-sol xml-puzzle
+(defn render-colored [code edn-code xml-sol _xml-puzzle ;;klm TODO remove xml-puzzle
                       state-colored-code tutorial-number
                       solved-tutorials
                       fn-update-state-field]
@@ -278,15 +279,8 @@
                     :on-mouse-leave #(set-state-field :colored-code false)}
            "Color"]))]
      (if (and state-colored-code show-color-button)
-
        (letfn [(set-state-field [kw val] (fn-update-state-field kw (constantly val)))]
-         (let [edn-sol (get-edn-code-simpl xml-sol)
-               edn-puzz (get-edn-code-simpl xml-puzzle)
-               _ (if (= edn-sol edn-puzz)
-                   (do
-                     (fn-update-state-field :solved-tutorials #(conj % tutorial-number))
-                     (set-state-field :forward-button-green true))
-                   (set-state-field :forward-button-green false))]
+         (let [edn-sol (get-edn-code-simpl xml-sol)]
            [error-boundary
             [render-colored-comp edn-code edn-sol]
             identity set-state-field :colored-code false]))

@@ -153,7 +153,7 @@
               :accepted? ac
               :desc ds
               :solution-no sn
-              :colored-code true ;;klm needs to be false
+              :colored-code false
               :forward-button-green false}
         check (or (not @state) (= (into (hash-set) (keys init))
                                   (into (hash-set) (keys @state))))]
@@ -166,15 +166,10 @@
                             :solution-no -1 ;; -1 means "Puzzle" loaded in workspace
                             :accepted? false})))
 
-    (when (and tutorial-no
-               (:xml-solution (nth tutorials tutorial-no))
-               (contains? st (dec tutorial-no)))
-      (swap-workspace)
-      )
-
-    ;;do not know why the following was (or still is?) necessary anymore
-    #_(when (and (not tutorial-no) (= -1 sn))
-        (swap! saved-workspace-xml assoc :xml-code (get-workspace-xml-str)))
+    (when tutorial-no
+      (when (and (:xml-solution (nth tutorials tutorial-no))
+                 (contains? st (dec tutorial-no)))
+        (swap-workspace)))
 
     (when-not check
       (swap! state assoc :stdout [(str "state is not in best state, pls. report. " (keys @state))]))))
@@ -479,7 +474,7 @@
          ^{:key name}
          [:label {:style {:font-size "80%" :font-family "courier"}}
           [:input {:type :radio :name "solution-radio"
-                   :on-change swap-workspace
+                   :on-change #(do (reset-state nil) (swap-workspace))
                    :checked (= idx (:solution-no @state))}]
 
           name])
@@ -503,7 +498,10 @@
     [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
              :value (str (inc tutorial-no) "/" (count tutorials))}]
     " "
-    [:button {:on-click (tutorial-fu inc)
+    [:button {:on-click (fn []
+                          (when forward-button-green
+                            (update-state-field :solved-tutorials #(conj % tutorial-no)))
+                          ((tutorial-fu inc)))
               :style (when forward-button-green {:color "white"
                                                  :background-color "green"})}
      ">"]
@@ -511,21 +509,33 @@
     (when run-button
       (if (get-inspect-form edn-code)
         [desc-button]
-        [:button {:on-click #(startsci nil)} "Run"]))
+        [:button {:on-click (fn []
+                              (startsci nil)
+                              (when-let [xml-sol (:xml-solution (nth tutorials tutorial-no))]
+                                (when (= -1 solution-no)
+                                  (let [edn-sol (utils/get-edn-code-simpl xml-sol)
+                                        edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
+                                    (if (= edn-sol edn-puzz)
+                                      (set-state-field :forward-button-green true)
+                                      (set-state-field :forward-button-green false))))))}
+
+         "Run"]))
     " "
     (when (:xml-solution (nth tutorials tutorial-no))
       (if (contains? solved-tutorials (dec tutorial-no))
         (if accepted?
           [radios]
-          [:span " the above code, it is the solution to this "
+          [:span
+           " "
            [:button {:on-click (fn []
                                  (set-state-field :accepted? true)
                                  (when (not= -1 solution-no)
                                   ;; this when is a safety measure, should always trigger here
                                   ;; solution should always be loaded when this button appears
                                    (swap-workspace)))}
-            "Puzzle"]])
-        [:span "A solution is available. Solving the previous puzzle unlocks it (and all before)."]))]])
+            "Get the Puzzle"]
+           " to the abve solution."])
+        [:span "A solution is available. Solve and run the previous puzzle. The green arrow unlocks all solutions up to this point."]))]])
 
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
