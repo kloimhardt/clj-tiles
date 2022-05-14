@@ -10,7 +10,10 @@
 
 (def e-vect
   [(assoc (explode/explode sol)
-          :code sol
+          :solpos-yx [[0 0] [100 0] [200 0]]
+          :solution sol)
+   (assoc (explode/explode sol)
+          :solpos-yx [[0 0] [100 0] [200 0]]
           :solution sol)])
 
 (def chapnames ["Advent"])

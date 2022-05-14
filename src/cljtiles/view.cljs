@@ -118,12 +118,14 @@
   (let [tn (:tutorial-no @state)
         ds (:desc @state)
         sn (:solution-no @state)
-        st-first-of-chapters (into #{} (map dec (conj (butlast (reductions + chaps)) 0)))
+        first-of-chapters (into #{} (conj (butlast (reductions + chaps)) 0))
+        last-of-chapters (into #{} (map dec first-of-chapters))
         st (or (:solved-tutorials @state)
                (if dev
                  ;;(into #{} (range -1 300)) ;;to unlock all solutions
-                 st-first-of-chapters
-                 st-first-of-chapters))
+                 last-of-chapters
+                 last-of-chapters))
+        at (or (:accepted-tutorials @state) #{})
         init {:stdout []
               :inspect []
               :sci-error nil
@@ -137,6 +139,7 @@
               :run-button true
               :tutorial-no tn
               :solved-tutorials st
+              :accepted-tutorials at
               :desc ds
               :solution-no sn
               :colored-code true ;;klm needs to be false
@@ -185,6 +188,8 @@
   (gforms/setValue (gdom/getElement "tutorial_no") page-no)
   (reset-state page-no)
   (reset! app-state 0)
+  (when (and (:xml-solution (nth tutorials page-no)) (contains? (:solved-tutorials @state) (dec page-no)))
+    (swap-workspace))
   page-no)
 
 (defn goto-lable-page!-1 [lable]
@@ -474,7 +479,8 @@
        (map [[-1 "Puzzle"] [0 "Solution"]])
        doall)])
 
-(defn tutorials-comp [{:keys [run-button tutorial-no edn-code solved-tutorials forward-button-green]}]
+(defn tutorials-comp [{:keys [run-button tutorial-no edn-code solved-tutorials forward-button-green
+                              solution-no accepted-tutorials]}]
   [:div
    [:span
     [:select {:value (page->chapter tutorial-no)
@@ -502,8 +508,13 @@
     " "
     (when (:xml-solution (nth tutorials tutorial-no))
       (if (contains? solved-tutorials (dec tutorial-no))
-        [radios]
-        [:span "Solve previous puzzle for solution"]))]])
+        (if (contains? accepted-tutorials tutorial-no)
+          [radios]
+          [:button {:on-click (fn []
+                                (update-state-field :accepted-tutorials #(conj % tutorial-no))
+                                (swap-workspace))}
+           "Solve the puzzle"])
+        [:span "Solve puzzle to see the solution of the next and previous tutorials"]))]])
 
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))

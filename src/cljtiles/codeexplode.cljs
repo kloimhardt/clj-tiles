@@ -80,27 +80,3 @@
     {:blockpos-yx (blockpos-yx code)
      :code code}))
 
-(def c (:code (deref dbg)))
-(explode c)
-
-(def d (->> (rest (tree-seq coll? seq c)) (drop 22) (take 6)))
-
-[d
- (empty-colls d)]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
