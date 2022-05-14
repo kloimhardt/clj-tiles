@@ -261,9 +261,9 @@
          (into [:p {:style {:display "block" :font-family "monospace"
                             :white-space "pre" :margin ["1em" 0]}}]))))
 
-(defn render-colored [code edn-code xml-sol _xml-puzzle ;;klm TODO remove xml-puzzle
-                      state-colored-code tutorial-number
-                      solved-tutorials
+(defn render-colored [code edn-code xml-sol
+                      state-colored-code
+                      _tutorial-number _solved-tutorials ;;those two, see comment below
                       fn-update-state-field]
   ;;puzz is always a vector of code: => ["Hello, World!"]
   ;;(def puzz puzz)

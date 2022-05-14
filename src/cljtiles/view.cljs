@@ -125,11 +125,12 @@
       (swap! state assoc :solution-no -1)
       (load-workspace (:xml-code @saved-workspace-xml)))))
 
+(def first-of-chapters (conj (butlast (reductions + chaps)) 0))
+
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
         ds (:desc @state)
         sn (:solution-no @state)
-        first-of-chapters (conj (butlast (reductions + chaps)) 0)
         last-of-chapters (into #{} (map dec first-of-chapters))
         st (or (:solved-tutorials @state) ;;not initialized down below when tutorial-no not= nil, so done here
                (if dev
@@ -481,6 +482,9 @@
        (map [[-1 "Puzzle"] [0 "Solution"]])
        doall)])
 
+(defn chapter-range [n]
+  (range (apply max (take-while (partial >= n) first-of-chapters)) (inc n)))
+
 (defn tutorials-comp [{:keys [run-button tutorial-no edn-code solved-tutorials forward-button-green
                               solution-no accepted?]}]
   [:div
@@ -500,7 +504,8 @@
     " "
     [:button {:on-click (fn []
                           (when forward-button-green
-                            (update-state-field :solved-tutorials #(conj % tutorial-no)))
+                            (update-state-field :solved-tutorials
+                                                #(apply conj % (chapter-range tutorial-no))))
                           ((tutorial-fu inc)))
               :style (when forward-button-green {:color "white"
                                                  :background-color "green"})}
@@ -565,7 +570,7 @@
          [:pre (my-str-brk (str "The expression " ifo " could not be displayed  because"))]
          [:pre (str (my-str-brk (modify-error (first (:err-msgs sci-error-full)))))]])]
      [:div flex50
-      [utils/render-colored code nil nil nil false nil nil nil]]]))
+      [utils/render-colored code nil nil false nil nil nil]]]))
 
 (defn error-comp [{:keys [sci-error-full sci-error code
                           edn-code tutorial-no colored-code
@@ -579,7 +584,6 @@
      [:div flex50
       [utils/render-colored code edn-code
        (:xml-solution (nth tutorials tutorial-no))
-       (:xml-code @saved-workspace-xml)
        colored-code tutorial-no solved-tutorials update-state-field]]]))
 
 (defn result-comp [{:keys [result-raw edn-code edn-code-orig code
@@ -596,7 +600,6 @@
          [:div flex50
           [utils/render-colored code edn-code
            (:xml-solution tut)
-           (:xml-code @saved-workspace-xml)
            colored-code tutorial-no solved-tutorials update-state-field]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
