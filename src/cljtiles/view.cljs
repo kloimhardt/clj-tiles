@@ -107,19 +107,34 @@
 
 ;;(when dev (fsa/trace-ref state))
 
-(defonce non-reactive-state
-  (atom {:saved-workspace-xml nil
+(def first-of-chapters (conj (butlast (reductions + chaps)) 0))
 
-         }))
+(defonce data-store
+  (let [last-of-chapters (into #{} (map dec first-of-chapters))]
+    (atom {:saved-workspace-xml nil
+           :solved-tutorials
+           (if dev
+             ;;(into #{} (range -1 300)) ;;to unlock all solutions
+             last-of-chapters
+             last-of-chapters)})))
+
+(defn get-data-store-field [kw]
+  (get @data-store kw))
+
+(defn set-data-store-field [kw value]
+  (swap! data-store assoc kw value))
+
+(defn update-data-store-field [kw fun]
+  (swap! data-store update kw fun))
 
 (defn get-saved-workspace-xml [key]
-  (get-in @non-reactive-state [:saved-workspace-xml key]))
+  (get-in @data-store [:saved-workspace-xml key]))
 
 (defn set-saved-workspace-xml [data]
-  (swap! non-reactive-state assoc :saved-workspace-xml data))
+  (swap! data-store assoc :saved-workspace-xml data))
 
 (defn update-saved-workspace-xml [fun]
-  (swap! non-reactive-state update :saved-workspace-xml fun))
+  (swap! data-store update :saved-workspace-xml fun))
 
 (defn get-workspace-xml-str []
   (->> (.-mainWorkspace blockly)
@@ -137,16 +152,8 @@
       (swap! state assoc :solution-no -1)
       (load-workspace (get-saved-workspace-xml :xml-code)))))
 
-(def first-of-chapters (conj (butlast (reductions + chaps)) 0))
-
 (defn reset-state [tutorial-no]
-  (let [last-of-chapters (into #{} (map dec first-of-chapters))
-        st (or (:solved-tutorials @state) ;;not initialized down below when tutorial-no not= nil, so done here
-               (if dev
-                 ;;(into #{} (range -1 300)) ;;to unlock all solutions
-                 last-of-chapters
-                 last-of-chapters))
-        tn (:tutorial-no @state)
+  (let [tn (:tutorial-no @state)
         ds (:desc @state)
         sn (:solution-no @state)
         ac (:accepted? @state)
@@ -162,7 +169,6 @@
               :modal-style-display "none"
               :run-button true
               :tutorial-no tn
-              :solved-tutorials st
               :accepted? ac
               :desc ds
               :solution-no sn
@@ -181,7 +187,7 @@
 
     (when tutorial-no
       (when (and (:xml-solution (nth tutorials tutorial-no))
-                 (contains? st (dec tutorial-no)))
+                 (contains? (get-data-store-field :solved-tutorials) (dec tutorial-no)))
         (swap-workspace)))
 
     (when-not check
@@ -498,7 +504,7 @@
 (defn chapter-range [n]
   (range (apply max (take-while (partial >= n) first-of-chapters)) (inc n)))
 
-(defn tutorials-comp [{:keys [run-button tutorial-no edn-code solved-tutorials forward-button-green
+(defn tutorials-comp [{:keys [run-button tutorial-no edn-code forward-button-green
                               solution-no accepted?]}]
   [:div
    [:span
@@ -517,8 +523,8 @@
     " "
     [:button {:on-click (fn []
                           (when forward-button-green
-                            (update-state-field :solved-tutorials
-                                                #(apply conj % (chapter-range tutorial-no))))
+                            (update-data-store-field :solved-tutorials
+                                                     #(apply conj % (chapter-range tutorial-no))))
                           ((tutorial-fu inc)))
               :style (when forward-button-green {:color "white"
                                                  :background-color "green"})}
@@ -540,7 +546,7 @@
          "Run"]))
     " "
     (when (:xml-solution (nth tutorials tutorial-no))
-      (if (contains? solved-tutorials (dec tutorial-no))
+      (if (contains? (get-data-store-field :solved-tutorials) (dec tutorial-no))
         (if accepted?
           [radios]
           [:span
@@ -553,7 +559,7 @@
                                    (swap-workspace)))}
             "Get the Puzzle"]
            " to the abve solution."])
-        [:span "A solution is available. Solve and run the previous puzzle. The green arrow unlocks all solutions up to this point."]))]])
+        [:span "The solution is available but not shown. Maybe you want to go back. If you solve this puzzle, the green arrow will unlock all solutions up to the next page."]))]])
 
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
@@ -586,8 +592,7 @@
       [utils/render-colored code nil nil false nil nil nil]]]))
 
 (defn error-comp [{:keys [sci-error-full sci-error code
-                          edn-code tutorial-no colored-code
-                          solved-tutorials]}]
+                          edn-code tutorial-no colored-code]}]
   (let [flex50 {:style {:flex "50%"}}]
     [:div {:style {:display "flex"}}
      [:div flex50
@@ -597,10 +602,12 @@
      [:div flex50
       [utils/render-colored code edn-code
        (:xml-solution (nth tutorials tutorial-no))
-       colored-code tutorial-no solved-tutorials update-state-field]]]))
+       colored-code tutorial-no
+       (get-data-store-field :solved-tutorials)
+       update-state-field]]]))
 
 (defn result-comp [{:keys [result-raw edn-code edn-code-orig code
-                           tutorial-no colored-code solved-tutorials]}]
+                           tutorial-no colored-code]}]
   (if (= edn-code edn-code-orig :showcode) ;;never true, remove :showcode to supress code display.
     [:pre (my-str result-raw)]
     (let [flex50 {:style {:flex "50%"}}
@@ -613,7 +620,9 @@
          [:div flex50
           [utils/render-colored code edn-code
            (:xml-solution tut)
-           colored-code tutorial-no solved-tutorials update-state-field]])])))
+           colored-code tutorial-no
+           (get-data-store-field :solved-tutorials)
+           update-state-field]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc result-raw edn-code-orig code show-result-raw]
