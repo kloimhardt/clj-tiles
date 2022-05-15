@@ -504,6 +504,19 @@
 (defn chapter-range [n]
   (range (apply max (take-while (partial >= n) first-of-chapters)) (inc n)))
 
+(defn run-button-comp [tutorial-no solution-no]
+  [:button {:on-click (fn []
+                        (startsci nil)
+                        (when-let [xml-sol (:xml-solution (nth tutorials tutorial-no))]
+                          (when (= -1 solution-no)
+                            (let [edn-sol (utils/get-edn-code-simpl xml-sol)
+                                  edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
+                              (if (= edn-sol edn-puzz)
+                                (set-state-field :forward-button-green true)
+                                (set-state-field :forward-button-green false))))))}
+
+   "Run"])
+
 (defn tutorials-comp [{:keys [run-button tutorial-no edn-code forward-button-green
                               solution-no accepted?]}]
   [:div
@@ -531,35 +544,31 @@
      ">"]
     " "
     (when run-button
-      (if (get-inspect-form edn-code)
+      (cond
+        (get-inspect-form edn-code)
         [desc-button]
-        [:button {:on-click (fn []
-                              (startsci nil)
-                              (when-let [xml-sol (:xml-solution (nth tutorials tutorial-no))]
-                                (when (= -1 solution-no)
-                                  (let [edn-sol (utils/get-edn-code-simpl xml-sol)
-                                        edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
-                                    (if (= edn-sol edn-puzz)
-                                      (set-state-field :forward-button-green true)
-                                      (set-state-field :forward-button-green false))))))}
-
-         "Run"]))
-    " "
-    (when (:xml-solution (nth tutorials tutorial-no))
-      (if (contains? (get-data-store-field :solved-tutorials) (dec tutorial-no))
-        (if accepted?
-          [radios]
-          [:span
-           " "
-           [:button {:on-click (fn []
-                                 (set-state-field :accepted? true)
-                                 (when (not= -1 solution-no)
+        (:xml-solution (nth tutorials tutorial-no))
+        (if (contains? (get-data-store-field :solved-tutorials) (dec tutorial-no))
+          (if accepted?
+            [:span
+             [run-button-comp tutorial-no solution-no]
+             " "
+             [radios]]
+            [:button {:on-click (fn []
+                                  (set-state-field :accepted? true)
+                                  (when (not= -1 solution-no)
                                   ;; this when is a safety measure, should always trigger here
                                   ;; solution should always be loaded when this button appears
-                                   (swap-workspace)))}
-            "Get the Puzzle"]
-           " to the abve solution."])
-        [:span "The solution is available but not shown. Maybe you want to go back. If you solve this puzzle, the green arrow will unlock all solutions up to the next page."]))]])
+                                    (swap-workspace)))}
+             "Get the Puzzle"])
+          [:span
+           [run-button-comp tutorial-no solution-no]
+           " The solution is not shown because the previous puzzle is not solved yet. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock all solutions up to the next page."])
+        :else
+        [:span
+         [run-button-comp tutorial-no solution-no]
+         " "
+         [radios]]))]])
 
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
