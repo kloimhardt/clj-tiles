@@ -128,15 +128,15 @@
 (def first-of-chapters (conj (butlast (reductions + chaps)) 0))
 
 (defn reset-state [tutorial-no]
-  (let [tn (:tutorial-no @state)
-        ds (:desc @state)
-        sn (:solution-no @state)
-        last-of-chapters (into #{} (map dec first-of-chapters))
+  (let [last-of-chapters (into #{} (map dec first-of-chapters))
         st (or (:solved-tutorials @state) ;;not initialized down below when tutorial-no not= nil, so done here
                (if dev
                  ;;(into #{} (range -1 300)) ;;to unlock all solutions
                  last-of-chapters
                  last-of-chapters))
+        tn (:tutorial-no @state)
+        ds (:desc @state)
+        sn (:solution-no @state)
         ac (:accepted? @state)
         init {:stdout []
               :inspect []
@@ -338,7 +338,7 @@
 ;; along with an error after pressing the run button.
 ;; So: the thing is very useful for inspect, so it is used there
 ;; and there only the errors are important, no results needed.
-(defn cljtiles-eval-one-by-one [edn-code bindings]
+(defn cljtiles-eval-one-by-one [edn-code {:keys [bindings]}]
   (let [the-errs (atom [])
         the-env (atom nil)
         sci-eval (fn [code-str env errs]
@@ -362,8 +362,8 @@
         ;;good-result (last good-results)
         ]
     {:result nil #_{:expression good-result
-              :number (dec (count good-results))
-              :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
+                    :number (dec (count good-results))
+                    :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
      :err {:message (first err-msgs)
            :line nil ;;(:line err-correct-line)
            :column nil ;;(:column err-correct-line)
@@ -371,7 +371,7 @@
      :str-expressions cbr
      :str-code (apply str (interpose "\n" cbr))}))
 
-(defn cljtiles-eval [edn-code bindings]
+(defn cljtiles-eval [edn-code {:keys [bindings]}]
   (let [the-err-msg (atom nil)
         cbr (utils/code->break-str edn-code)
         erg (try (sci/eval-string cbr {:bindings bindings})
@@ -384,16 +384,17 @@
      :err @the-err-msg
      :str-code cbr}))
 
-(defn run-code [edn-code inspect-fn]
+(defn run-code [edn-code {:keys [inspect-fn] :as context}]
   (let [aug-edn-code (augment-code edn-code inspect-fn)
         new-println
         (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
         tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
         bindings2 (bindings new-println tex-inspect)
+        context2 (assoc context :bindings bindings2)
         _ (reset-state nil)
         erg (if inspect-fn
-              (cljtiles-eval-one-by-one aug-edn-code bindings2)
-              (cljtiles-eval aug-edn-code bindings2))]
+              (cljtiles-eval-one-by-one aug-edn-code context2)
+              (cljtiles-eval aug-edn-code context2))]
     (swap! state merge
            (let [{:keys [result err str-code]} erg]
              {:sci-error (:message err)
@@ -414,7 +415,7 @@
         edn-code (get-edn-code xml-str
                                (when context (.-id (get context "block")))
                                inspect-fn)]
-    (run-code edn-code inspect-fn)))
+    (run-code edn-code context)))
 
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
@@ -690,3 +691,20 @@
           goto-page!)))
   (render))
 
+(comment
+
+  (def st (atom nil))
+  (sci/eval-string "
+
+(identity *ns*)
+(in-ns 'hun)
+(def a 1)
+" {:env st})
+
+  (sci/eval-string "
+
+(identity *ns*)
+hun/a
+" {:env nil})
+
+  :end)
