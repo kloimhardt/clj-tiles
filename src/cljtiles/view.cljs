@@ -403,24 +403,20 @@
      :str-code cbr}))
 
 (defn run-code [edn-code {:keys [inspect-fn] :as context}]
-  (let [aug-edn-code (augment-code edn-code inspect-fn)
-        new-println
+  (let [new-println
         (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
         tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
         bindings2 (bindings new-println tex-inspect)
         context2 (assoc context :bindings bindings2)
-        _ (reset-state nil)
         erg (if inspect-fn
-              (cljtiles-eval-one-by-one aug-edn-code context2)
-              (cljtiles-eval aug-edn-code context2))]
+              (cljtiles-eval-one-by-one edn-code context2)
+              (cljtiles-eval edn-code context2))]
     (swap! state merge
            (let [{:keys [result err str-code]} erg]
              {:sci-error (:message err)
               :sci-error-full err
               :result-raw (:expression result)
-              :code str-code
-              :edn-code aug-edn-code
-              :edn-code-orig edn-code}))))
+              :code str-code}))))
 
 (defn get-edn-code [xml-str inspect-id inspect-fn]
   (let [edn-xml (sax/xml->clj xml-str)
@@ -428,18 +424,22 @@
         inspect-fn-name (when inspect-fn (first (inspect-fn 0)))]
     (ca/prepare-fns eci inspect-fn-name)))
 
-(defn startcodegen [{:keys [inspect-fn] :as context}] ;;klm TODO wire up to codeview-button-comp
+(defn gen-code [{:keys [inspect-fn] :as context}]
   (let [xml-str (get-workspace-xml-str)
         edn-code (get-edn-code xml-str
                                (when context (.-id (get context "block")))
-                               inspect-fn)]
-    (run-code edn-code context)))
+                               inspect-fn)
+        aug-edn-code (augment-code edn-code inspect-fn)
+        str-code (utils/code->break-str edn-code)]
+    (reset-state nil)
+    (swap! state merge
+           {:code str-code ;;might be overridden by cljtiles-eval-one-by-one
+            :result-raw "no code executed" ;;definitely overridden by (run-code)
+            :edn-code aug-edn-code
+            :edn-code-orig edn-code})))
 
-(defn ^:export startsci [{:keys [inspect-fn] :as context}]
-  (let [xml-str (get-workspace-xml-str)
-        edn-code (get-edn-code xml-str
-                               (when context (.-id (get context "block")))
-                               inspect-fn)]
+(defn ^:export startsci [context]
+  (let [{:keys [edn-code]} (gen-code context)]
     (run-code edn-code context)))
 
 (defn open-modal []
@@ -526,11 +526,11 @@
                         (set-forward-button-green tutorial-no solution-no))}
    "Run"])
 
-(defn codeview-button-comp [tutorial-no solution-no] ;;klm TODO wire this up to span the solution is not shown
+(defn codeview-button-comp [tutorial-no solution-no]
   [:button {:on-click (fn []
-                        (startsci nil)
+                        (gen-code nil)
                         (set-forward-button-green tutorial-no solution-no))}
-   "View Code"])
+   "Generate Code"])
 
 (defn tutorials-comp [{:keys [run-button tutorial-no edn-code forward-button-green
                               solution-no accepted?]}]
@@ -568,7 +568,7 @@
             [:span
              [run-button-comp tutorial-no solution-no]
              " "
-             [radios]]
+             (when dev nil #_[radios])]
             [:button {:on-click (fn []
                                   (set-state-field :accepted? true)
                                   (when (not= -1 solution-no)
@@ -577,8 +577,8 @@
                                     (swap-workspace)))}
              "Get the Puzzle"])
           [:span
-           [run-button-comp tutorial-no solution-no]
-           " A solution will be shown if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock all solutions up to the next page."])
+           [codeview-button-comp tutorial-no solution-no]
+           [:p "The \"Run\" button will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."]])
         :else
         [run-button-comp tutorial-no solution-no]))]])
 
