@@ -428,6 +428,13 @@
         inspect-fn-name (when inspect-fn (first (inspect-fn 0)))]
     (ca/prepare-fns eci inspect-fn-name)))
 
+(defn startcodegen [{:keys [inspect-fn] :as context}] ;;klm TODO wire up to codeview-button-comp
+  (let [xml-str (get-workspace-xml-str)
+        edn-code (get-edn-code xml-str
+                               (when context (.-id (get context "block")))
+                               inspect-fn)]
+    (run-code edn-code context)))
+
 (defn ^:export startsci [{:keys [inspect-fn] :as context}]
   (let [xml-str (get-workspace-xml-str)
         edn-code (get-edn-code xml-str
@@ -504,18 +511,26 @@
 (defn chapter-range [n]
   (range (apply max (take-while (partial >= n) first-of-chapters)) (inc n)))
 
+(defn set-forward-button-green [tutorial-no solution-no]
+  (when-let [xml-sol (:xml-solution (nth tutorials tutorial-no))]
+    (when (= -1 solution-no)
+      (let [edn-sol (utils/get-edn-code-simpl xml-sol)
+            edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
+        (if (= edn-sol edn-puzz)
+          (set-state-field :forward-button-green true)
+          (set-state-field :forward-button-green false))))))
+
 (defn run-button-comp [tutorial-no solution-no]
   [:button {:on-click (fn []
                         (startsci nil)
-                        (when-let [xml-sol (:xml-solution (nth tutorials tutorial-no))]
-                          (when (= -1 solution-no)
-                            (let [edn-sol (utils/get-edn-code-simpl xml-sol)
-                                  edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
-                              (if (= edn-sol edn-puzz)
-                                (set-state-field :forward-button-green true)
-                                (set-state-field :forward-button-green false))))))}
-
+                        (set-forward-button-green tutorial-no solution-no))}
    "Run"])
+
+(defn codeview-button-comp [tutorial-no solution-no] ;;klm TODO wire this up to span the solution is not shown
+  [:button {:on-click (fn []
+                        (startsci nil)
+                        (set-forward-button-green tutorial-no solution-no))}
+   "View Code"])
 
 (defn tutorials-comp [{:keys [run-button tutorial-no edn-code forward-button-green
                               solution-no accepted?]}]
@@ -563,12 +578,9 @@
              "Get the Puzzle"])
           [:span
            [run-button-comp tutorial-no solution-no]
-           " The solution is not shown because the previous puzzle is not solved yet. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock all solutions up to the next page."])
+           " A solution will be shown if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock all solutions up to the next page."])
         :else
-        [:span
-         [run-button-comp tutorial-no solution-no]
-         " "
-         [radios]]))]])
+        [run-button-comp tutorial-no solution-no]))]])
 
 (defn my-str [x]
   (if (nil? x) "nil" (str x)))
