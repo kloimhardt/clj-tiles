@@ -107,7 +107,19 @@
 
 ;;(when dev (fsa/trace-ref state))
 
-(def saved-workspace-xml (atom nil))
+(defonce non-reactive-state
+  (atom {:saved-workspace-xml nil
+
+         }))
+
+(defn get-saved-workspace-xml [key]
+  (get-in @non-reactive-state [:saved-workspace-xml key]))
+
+(defn set-saved-workspace-xml [data]
+  (swap! non-reactive-state assoc :saved-workspace-xml data))
+
+(defn update-saved-workspace-xml [fun]
+  (swap! non-reactive-state update :saved-workspace-xml fun))
 
 (defn get-workspace-xml-str []
   (->> (.-mainWorkspace blockly)
@@ -117,13 +129,13 @@
 (defn swap-workspace []
   (if (= (:solution-no @state) -1)
     (do
-      (swap! saved-workspace-xml assoc :xml-code (get-workspace-xml-str))
+      (update-saved-workspace-xml #(assoc % :xml-code (get-workspace-xml-str)))
       (swap! state assoc :solution-no 0)
-      (load-workspace (:xml-solution @saved-workspace-xml)))
+      (load-workspace (get-saved-workspace-xml :xml-solution)))
     (do
-      (swap! saved-workspace-xml assoc :xml-solution (get-workspace-xml-str))
+      (update-saved-workspace-xml #(assoc % :xml-solution (get-workspace-xml-str)))
       (swap! state assoc :solution-no -1)
-      (load-workspace (:xml-code @saved-workspace-xml)))))
+      (load-workspace (get-saved-workspace-xml :xml-code)))))
 
 (def first-of-chapters (conj (butlast (reductions + chaps)) 0))
 
@@ -160,8 +172,8 @@
                                   (into (hash-set) (keys @state))))]
     (reset! state (merge init
                          (when tutorial-no
-                           (reset! saved-workspace-xml {:xml-code (:xml-code (nth tutorials tutorial-no))
-                                                        :xml-solution (:xml-solution (nth tutorials tutorial-no))})
+                           (set-saved-workspace-xml {:xml-code (:xml-code (nth tutorials tutorial-no))
+                                                     :xml-solution (:xml-solution (nth tutorials tutorial-no))})
                            {:tutorial-no tutorial-no
                             :desc (:description (nth tutorials tutorial-no))
                             :solution-no -1 ;; -1 means "Puzzle" loaded in workspace
