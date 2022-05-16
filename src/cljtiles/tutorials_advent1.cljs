@@ -1,20 +1,21 @@
 (ns cljtiles.tutorials-advent1
   (:require [cljtiles.codeexplode :as explode]))
 
-(def sol ['(def book
+(def sol1 ['(def book
              {:title "Getting Clojure",
               :author "Russ Olson",
-              :published 2018})
-          [1 2 3 4 5]
+              :published 2018})])
+
+(def sol2 [
           '(:published book)])
 
 (def e-vect
-  [(assoc (explode/explode sol)
+  [(assoc (explode/explode sol1)
           :solpos-yx [[0 0] [100 0] [200 0]]
-          :solution sol)
-   (assoc (explode/explode sol)
+          :solution sol1)
+   (assoc (explode/explode sol2)
           :solpos-yx [[0 0] [100 0] [200 0]]
-          :solution sol)])
+          :solution sol2)])
 
 (def chapnames ["Advent"])
 (def chaps [(count e-vect)])

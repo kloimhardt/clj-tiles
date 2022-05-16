@@ -116,7 +116,8 @@
            (if dev
              ;;(into #{} (range -1 300)) ;;to unlock all solutions
              last-of-chapters
-             last-of-chapters)})))
+             last-of-chapters)
+           :sci-env (atom nil)})))
 
 (defn get-data-store-field [kw]
   (get @data-store kw))
@@ -356,9 +357,9 @@
 ;; along with an error after pressing the run button.
 ;; So: the thing is very useful for inspect, so it is used there
 ;; and there only the errors are important, no results needed.
-(defn cljtiles-eval-one-by-one [edn-code {:keys [bindings]}]
+(defn cljtiles-eval-one-by-one [edn-code {:keys [bindings sci-env]}]
   (let [the-errs (atom [])
-        the-env (atom nil)
+        the-env (atom @sci-env)
         sci-eval (fn [code-str env errs]
                    (try (sci/eval-string code-str {:bindings bindings :env env})
                         (catch js/Error e (swap! errs conj e) :sci-error)))
@@ -389,10 +390,10 @@
      :str-expressions cbr
      :str-code (apply str (interpose "\n" cbr))}))
 
-(defn cljtiles-eval [edn-code {:keys [bindings]}]
+(defn cljtiles-eval [edn-code {:keys [bindings sci-env]}]
   (let [the-err-msg (atom nil)
         cbr (utils/code->break-str edn-code)
-        erg (try (sci/eval-string cbr {:bindings bindings})
+        erg (try (sci/eval-string cbr {:bindings bindings :env sci-env})
                  (catch js/Error e
                    (reset! the-err-msg {:message (.-message e)
                                         :line (:line (.-data e))
@@ -427,7 +428,7 @@
 (defn gen-code [{:keys [inspect-fn] :as context}]
   (let [xml-str (get-workspace-xml-str)
         edn-code (get-edn-code xml-str
-                               (when context (.-id (get context "block")))
+                               (some-> (get context "block") (.-id))
                                inspect-fn)
         aug-edn-code (augment-code edn-code inspect-fn)
         str-code (utils/code->break-str edn-code)]
@@ -438,9 +439,12 @@
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
-(defn ^:export startsci [context]
-  (let [{:keys [edn-code]} (gen-code context)]
-    (run-code edn-code context)))
+(defn ^:export startsci [{:keys [store-env?] :as context}]
+  (let [{:keys [edn-code]} (gen-code context)
+        sci-env (get-data-store-field :sci-env)]
+    (run-code edn-code (if store-env?
+                         (assoc context :sci-env sci-env)
+                         (assoc context :sci-env (atom @sci-env))))))
 
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
@@ -551,8 +555,23 @@
     " "
     [:button {:on-click (fn []
                           (when forward-button-green
-                            (update-data-store-field :solved-tutorials
-                                                     #(apply conj % (chapter-range tutorial-no))))
+                            (let [new-tuts-unlocked
+                                  (-> (get-data-store-field :solved-tutorials)
+                                      complement
+                                      (filter (chapter-range tutorial-no))
+                                      (concat [tutorial-no])) ;;make sure last element is current page
+                                  ]
+                              (run! #(when (:xml-solution (nth tutorials %))
+                                       (goto-page! %)
+                                       (when (= -1 (:solution-no @state)) ;; is the puzzle loaded?
+                                         ;;it is important to access (:solution-no @state) here
+                                         ;; the variable solution-no will not do
+                                         ;; it is colosed over and therefore wrong here
+                                         (swap-workspace))
+                                       (startsci {:store-env? true}))
+                                    new-tuts-unlocked)
+                              (update-data-store-field :solved-tutorials
+                                                       #(apply conj % new-tuts-unlocked))))
                           ((tutorial-fu inc)))
               :style (when forward-button-green {:color "white"
                                                  :background-color "green"})}
@@ -574,6 +593,7 @@
                                   (when (not= -1 solution-no)
                                   ;; this when is a safety measure, should always trigger here
                                   ;; solution should always be loaded when this button appears
+                                  ;; and we want to switch to the puzzle
                                     (swap-workspace)))}
              "Get the Puzzle"])
           [:span
@@ -696,8 +716,6 @@
            desc
            [:div {:style {:column-count 2}}
             [tex-comp desc]])]))))
-
-
 
 (defn theview []
   [:div
