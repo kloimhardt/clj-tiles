@@ -56,8 +56,9 @@
       (string? c) (+ 40 (* char-len (count c)))
       :else (* char-len (count (str c))))))
 
-(defn detect-offset [exprn next-exprn]
-  (let [newline (and (coll? next-exprn) (not (#{'quote} (first next-exprn))))]
+(defn detect-offset [exprn _next-exprn] ;;next-exprn only needed when coll should be in first place
+  (let [newline (and (coll? exprn) (not (#{'quote} (first exprn))))
+        #_(and (coll? next-exprn) (not (#{'quote} (first next-exprn))))]
     [(cond-> 0
        (and (coll? exprn) (#{'def} (first exprn))) (+ 30)
        (and (coll? exprn) (#{'defn} (first exprn))) (+ 45)
@@ -74,7 +75,8 @@
                [[0 0]])))
 
 (defn explode [solution]
-  (let [code (->> (rest (tree-seq coll? seq solution))
+  (let [code (->> (rest (tree-seq coll? seq (reverse solution)))
+                  reverse
                   empty-colls
                   remove-functions-and-keys)]
     {:blockpos-yx (blockpos-yx code)
