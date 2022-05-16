@@ -130,6 +130,13 @@
       (string? v) (text v)
       :else (num v))))
 
+(defn infix-sensible? [lst]
+  (when (and (list? lst) (= (count lst) 3))
+    (let [[f s t] lst]
+      (and  (#{"/" "+" "*" "-"} (str f))
+            (or (symbol? s) (number? s) (infix-sensible? s))
+            (or (symbol? t) (number? t) (infix-sensible? t))))))
+
 (defn parse [l]
   (cond
     (list? l)
@@ -141,7 +148,7 @@
         (= ":tiles/num" erst) (num (second l))
         (= "clojure.core/deref" erst) (tiles-deref (second l))
         (= "quote" erst) (num (str "'" (second l)))
-        (and (= (count l) 3) (#{"/" "+" "*" "-"} erst)) (appl fun-infi)
+        (infix-sensible? l) (appl fun-infi)
         (#{"def" "defn" "do"} erst) (assoc (appl fun) :inline? false)
         :else (appl fun)))
     (vector? l)
