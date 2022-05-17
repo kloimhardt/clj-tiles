@@ -2,7 +2,7 @@
 
 (def content
   {:chapnames ["Appendix"]
-   :chaps [6] #_(count (:tutorials content))
+   :chaps [4] #_(count (:tutorials content))
    :tutorials
    [{:blockpos [[0 0] [0 150] [100 150] [200 150] [0 250] [0 300] [0 350]]
      :code ['(defn make-η

@@ -59,19 +59,25 @@
                                              (apply gb/rpg (switch-yx (:solpos-yx $))
                                                     (:solution page))))))))))
 
-(def content
-  (let [tuts [t-adv1/content ;;klm TODO adv1 seems not to be addable to end of tuts
-              t-ac/content
-              t-0/content t-k/content
-              t-l/content
-              t-s2/content
-              t-s/content t-s3/content
-              t-ax/content]
-        f (fn [ks v]
+(defn make-content [tuts]
+  (let [f (fn [ks v]
             (reduce #(assoc %1 %2 (mapcat %2 v)) {} ks))]
+    (when dev
+      (run!
+       #(let [count-tut (count (:tutorials %))
+             sum-chaps (reduce + (:chaps %))]
+         (println "tutorial check " (= count-tut sum-chaps) " " count-tut " " sum-chaps))
+       tuts))
     (-> (f [:tutorials :chapnames :chaps]
            tuts)
         (update :tutorials #(map-indexed generate-xml %)))))
+
+(def content (make-content [t-ac/content
+                            t-0/content t-k/content
+                            t-l/content
+                            t-s2/content
+                            t-s/content t-s3/content
+                            t-ax/content]))
 
 (def tutorials (:tutorials content))
 (def chaps (:chaps content))
@@ -107,10 +113,13 @@
 
 ;;(when dev (fsa/trace-ref state))
 
-(def first-of-chapters (conj (butlast (reductions + chaps)) 0))
+(defn make-first-chapters [the-chaps]
+  (conj (butlast (reductions + the-chaps)) 0))
 
-(defonce data-store
-  (let [last-of-chapters (into #{} (map dec first-of-chapters))]
+(def first-of-chapters (make-first-chapters chaps))
+
+(defn make-data-store [the-firsts]
+  (let [last-of-chapters (into #{} (map dec the-firsts))]
     (atom {:saved-workspace-xml nil
            :solved-tutorials
            (if dev
@@ -118,6 +127,8 @@
              last-of-chapters
              last-of-chapters)
            :sci-env (atom nil)})))
+
+(defonce data-store (make-data-store first-of-chapters))
 
 (defn get-data-store-field [kw]
   (get @data-store kw))
@@ -213,6 +224,14 @@
   (reset-state page-no)
   (reset! app-state 0)
   page-no)
+
+(defn reset-tutorials! [content]
+  (let [foc (make-first-chapters (:chaps content))]
+    (set! tutorials (:tutorials content))
+    (set! chaps (:chaps content))
+    (set! chapnames (:chapnames content))
+    (set! first-of-chapters foc)
+    (set! data-store (make-data-store foc))))
 
 (defn goto-lable-page!-1 [lable]
   (let [cnt (count (take-while false? (map #(= lable (:lable %)) tutorials)))]
@@ -726,8 +745,20 @@
     reset-state
     set-state-field :stdout ["Something went wrong rendering the result"]]])
 
+(defn some-development-stuff []
+  ;;((tutorial-fu identity)) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
+  #_(do
+    (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
+    (t-adv1/init-advent #(do
+                           (reset-tutorials! (make-content (conj % t-ac/content)))
+                         ;; the conj is to make sure that more than one tutorial is therefore
+                         ;; so that the above (goto-page! 1) does not fail
+                           (goto-page! 0))))
+  :end)
+
+
 (defn ^{:dev/after-load true} render []
-  (when dev ((tutorial-fu identity))) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
+  (when dev (some-development-stuff))
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
