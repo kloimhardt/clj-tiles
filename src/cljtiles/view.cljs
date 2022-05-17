@@ -747,7 +747,7 @@
 
 (defn some-development-stuff []
   ;;((tutorial-fu identity)) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
-  #_(do
+  (do
     (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
     (t-adv1/init-advent #(do
                            (reset-tutorials! (make-content (conj % t-ac/content)))
