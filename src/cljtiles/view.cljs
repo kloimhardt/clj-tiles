@@ -36,18 +36,25 @@
 
 (def dev true) ;;!! also disable spec!!
 
-(defn generate-xml [_tutorial-no page] ;;tutorial-no is to debug explode
+(defn generate-xml [_tutorial-no page {:keys [shuffle?]}] ;;tutorial-no is to debug explode
   (if (:xml-code page)
     page
     (letfn [(switch-yx [yx-list]
               (when yx-list
                 (map (fn [[y x]] [x y]) yx-list)))]
-      (let [page (if (and dev #_(< 84 _tutorial-no 120) (:code page)) ;;this if is only to debug explode
+      (let [page (cond
+                   ;;this branch is only to debug explode
+                   (and false dev #_(< 84 _tutorial-no 120) (:code page))
                    (do
                      ;;(explode/store-dbg-info page)
                      ;;(merge page (explode/explode (:code page)))
                      page
                      #_:end)
+
+                   shuffle?
+                   (merge page (explode/explode (shuffle (:code page))))
+
+                   :else
                    page)]
         (-> page
             (assoc :xml-code (apply gb/rpg (or (switch-yx (:blockpos-yx page))
@@ -65,12 +72,14 @@
     (when dev
       (run!
        #(let [count-tut (count (:tutorials %))
-             sum-chaps (reduce + (:chaps %))]
-         (println "tutorial check " (= count-tut sum-chaps) " " count-tut " " sum-chaps))
+              sum-chaps (reduce + (:chaps %))]
+          (println "tutorial check " (= count-tut sum-chaps) " " count-tut " " sum-chaps))
        tuts))
     (-> (f [:tutorials :chapnames :chaps]
            tuts)
-        (update :tutorials #(map-indexed generate-xml %)))))
+        (update :tutorials #(map-indexed (fn [tut-no page]
+                                           (generate-xml tut-no page {:shuffle? false}))
+                                         %)))))
 
 (def content (make-content [t-ac/content
                             t-0/content t-k/content
@@ -475,7 +484,7 @@
           (let [a (edn/read-string (str "[" e "]"))
                 b (first a)]
             (if (and (map? b) (:code b))
-              (:xml-code (generate-xml nil b))
+              (:xml-code (generate-xml nil b {}))
               (map #(gb/rpg [] %) a))))
         run-parser
         (fn []

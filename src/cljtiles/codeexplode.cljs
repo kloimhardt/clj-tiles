@@ -6,19 +6,20 @@
 (defn store-dbg-info [data] (reset! dbg data))
 
 (defn remove-functions-and-keys [exprns]
-  (let [idxs (->> (map first exprns)
-                  (reduce (fn [acc symbols]
-                            (concat acc symbols))
-                          [])
-                  frequencies)]
-    (->> (map last exprns)
-         (reduce (fn [[idxs acc] el]
-                   (if ((fnil pos? false) (get idxs el))
-                     [(update idxs el dec) acc]
-                     [idxs (conj acc el)]))
-                 [idxs []])
-         last)))
-
+  (->>  exprns
+        (reduce (fn [[idxs acc] [symbs el]]
+                  (let [new-idxs (->> symbs
+                                      (reduce (fn [new-idxs symb]
+                                                (update new-idxs symb inc))
+                                              idxs))]
+                    (if ((fnil pos? false) (get new-idxs el))
+                      [(update new-idxs el dec) acc]
+                      [new-idxs (conj acc el)])))
+                [{} []])
+        (#(do (when (seq (filter (fn [x] (not= 0 x)) (vals (first %))))
+                (prn "error: first of the result must be a map where all values are zero"))
+              %))
+        last))
 
 (defn empty-colls [exprns]
   (->> exprns
@@ -26,20 +27,28 @@
                (cond
                  (and (list? x) (#{:tiles/vert} (first x)))
                  nil
+
                  (#{:tiles/vert :tiles/slot} x)
                  nil
+
                  (map-entry? x)
                  nil
+
                  (and (list? x) (= 'quote (first x)))
                  [x x]
+
                  (and (list? x) (not (coll? (first x))))
                  [[(first x)] (cons (first x) (repeat (dec (count x)) :tiles/slot))]
+
                  (and (list? x) (list? (first x)))
                  [[] (list :tiles/slot :tiles/slot)]
+
                  (map? x)
                  [(keys x) (into {} (map (fn [[k _]] [k :tiles/slot])) x)]
+
                  (coll? x)
                  [[] (utils/list-into-same-coll x (repeat (count x) :tiles/slot))]
+
                  :else
                  [[] x])))
        (filter identity)))
@@ -76,9 +85,11 @@
 
 (defn explode [solution]
   (let [code (->> (rest (tree-seq coll? seq (reverse solution)))
-                  reverse
                   empty-colls
-                  remove-functions-and-keys)]
+                  remove-functions-and-keys
+                  reverse
+                  ;;klm reverse needs to be in last position,
+                  ;;klm otherwise remove-functions-and-keys does not work correctly
+                  )]
     {:blockpos-yx (blockpos-yx code)
      :code code}))
-
