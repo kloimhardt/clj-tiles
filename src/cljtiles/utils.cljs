@@ -264,7 +264,7 @@
 (defn render-colored [code edn-code xml-sol
                       state-colored-code
                       _tutorial-number _solved-tutorials ;;those two, see comment below
-                      fn-update-state-field]
+                      fn-update-state-field gen-code]
   ;;puzz is always a vector of code: => ["Hello, World!"]
   ;;(def puzz puzz)
   ;;(def xml-sol xml-sol)
@@ -276,7 +276,8 @@
      [:h3 "Code "
       (when show-color-button
         (letfn [(set-state-field [kw val] (fn-update-state-field kw (constantly val)))]
-          [:button {:on-mouse-down #(set-state-field :colored-code true)
+          [:button {:on-mouse-down #(do (when (and gen-code (not state-colored-code)) (gen-code nil))
+                                        (set-state-field :colored-code true))
                     :on-mouse-up #(set-state-field :colored-code false)
                     :on-mouse-leave #(set-state-field :colored-code false)}
            "Color"]))]

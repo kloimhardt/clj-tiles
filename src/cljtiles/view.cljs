@@ -37,7 +37,7 @@
 (def dev true) ;;!! also disable spec!!
 
 (defn generate-xml [_tutorial-no page {:keys [shuffle?]}] ;;tutorial-no is to debug explode
-  (if (:xml-code page)
+  (if (and (:xml-code page) (not (and shuffle? (:code page))))
     page
     (letfn [(switch-yx [yx-list]
               (when yx-list
@@ -463,7 +463,7 @@
     (reset-state nil)
     (swap! state merge
            {:code str-code ;;might be overridden by cljtiles-eval-one-by-one
-            :result-raw "no code executed" ;;definitely overridden by (run-code)
+            :result-raw "press run button" ;;definitely overridden by (run-code)
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
@@ -611,19 +611,26 @@
         [desc-button]
         (:xml-solution (nth tutorials tutorial-no))
         (if (contains? (get-data-store-field :solved-tutorials) (dec tutorial-no))
-          (if accepted?
-            [:span
-             [run-button-comp tutorial-no solution-no]
-             " "
-             (when dev nil #_[radios])]
-            [:button {:on-click (fn []
-                                  (set-state-field :accepted? true)
-                                  (when (not= -1 solution-no)
+          [:span
+           " "
+           [run-button-comp tutorial-no solution-no]
+           " "
+           (when dev nil #_[radios])
+           (if accepted?
+             [:button {:on-click (fn []
+                                   (load-workspace (:xml-code (generate-xml tutorial-no
+                                                                            (nth tutorials tutorial-no)
+                                                                            {:shuffle? true}))))}
+              "Shuffle"]
+             [:button {:on-click (fn []
+                                   (set-state-field :accepted? true)
+                                   (when (not= -1 solution-no)
                                   ;; this when is a safety measure, should always trigger here
                                   ;; solution should always be loaded when this button appears
                                   ;; and we want to switch to the puzzle
-                                    (swap-workspace)))}
-             "Get the Puzzle"])
+                                     (swap-workspace))
+                                   (gen-code nil))}
+              "Get the Puzzle"])]
           [:span
            [codeview-button-comp tutorial-no solution-no]
            [:p "The \"Run\" button will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."]])
@@ -658,10 +665,15 @@
          [:pre (my-str-brk (str "The expression " ifo " could not be displayed  because"))]
          [:pre (str (my-str-brk (modify-error (first (:err-msgs sci-error-full)))))]])]
      [:div flex50
-      [utils/render-colored code nil nil false nil nil nil]]]))
+      [utils/render-colored code nil nil false nil nil nil nil]]]))
+
+(defn extended-gen-code [tutorial-no solution-no]
+  (fn [x]
+    (gen-code x)
+    (set-forward-button-green tutorial-no solution-no)))
 
 (defn error-comp [{:keys [sci-error-full sci-error code
-                          edn-code tutorial-no colored-code]}]
+                          edn-code tutorial-no solution-no colored-code]}]
   (let [flex50 {:style {:flex "50%"}}]
     [:div {:style {:display "flex"}}
      [:div flex50
@@ -673,10 +685,11 @@
        (:xml-solution (nth tutorials tutorial-no))
        colored-code tutorial-no
        (get-data-store-field :solved-tutorials)
-       update-state-field]]]))
+       update-state-field
+       (extended-gen-code tutorial-no solution-no)]]]))
 
 (defn result-comp [{:keys [result-raw edn-code edn-code-orig code
-                           tutorial-no colored-code]}]
+                           tutorial-no solution-no colored-code]}]
   (if (= edn-code edn-code-orig :showcode) ;;never true, remove :showcode to supress code display.
     [:pre (my-str result-raw)]
     (let [flex50 {:style {:flex "50%"}}
@@ -691,7 +704,8 @@
            (:xml-solution tut)
            colored-code tutorial-no
            (get-data-store-field :solved-tutorials)
-           update-state-field]])])))
+           update-state-field
+           (extended-gen-code tutorial-no solution-no)]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
                            desc result-raw edn-code-orig code show-result-raw]

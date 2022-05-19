@@ -19,12 +19,6 @@
 
 ;; insert tiles/vert after reading the string
 
-;; reload the code when you press the color button
-
-;; show code immediately when puzzle is shown via show Code
-
-;; in curated puzzle, replace run button with "shuffle the puzzle" random puzzle generatior button, only show green run button when solved (shuffle? in generate xml already implemented)
-
 ;;------------
 
 ;; include load file in context menu (with input field and a default box with urls from Sam's fdg)
@@ -47,19 +41,19 @@
    "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org")
 
 (defn generate-content-and-call [txt init-fn]
-  (let [tutno 2
+  (let [tutno 4
         tuts
         (->> (str/split txt #"\#\+end_src")
              (map #(last (str/split % #"\#\+begin_src clojure")))
              (map #(utils/twosplit % "\n"))
              (filter (complement #(str/ends-with? (first %) ":exports none")))
              (map second))
-        a (nth tuts tutno)
-        b (edn/read-string a)
-        c (assoc (explode/explode [b])
-                 :solpos-yx [[0 0]]
-                 :solution [b])
-        content {:tutorials [c] :chapnames ["Advent"] :chaps [(count [c])]}]
+        a (take tutno tuts)
+        b (map #(edn/read-string %) a)
+        c (map #(assoc (explode/explode [%])
+                       :solpos-yx [[0 0]]
+                       :solution [%]) b)
+        content {:tutorials c :chapnames ["Advent"] :chaps [(count c)]}]
     (init-fn [content])))
 
 (defn init-advent [init-fn]
