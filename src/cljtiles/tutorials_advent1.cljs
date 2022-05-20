@@ -40,48 +40,19 @@
 
  (def url
    "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org")
-(def on-newline 'on-newline)
-
-(defn insert-newline [s-next]
-  (let [[b1 b2] (map #(re-find #"^\s*\(" %) s-next)
-        t (str/trim (first s-next))]
-    (if (and b1 b2 (not= b1 b2))
-      (apply str "(" on-newline " " (rest t))
-      t)))
-
-(defn insert-tiles-vert [code]
-  (walk/postwalk
-    (fn [x]
-      (if (and (coll? x) (seq x) (= (first x) on-newline))
-        (list :tiles/vert (rest x))
-        x))
-    code))
-
-(defn concat-strings [xs]
-  (str "[" (apply str (interpose " " xs)) "]"))
 
 (defn extended-read-string [s]
-  (->> (str/split s #"\n")
-       (remove #(re-find #"^\s*;" %))
-       (partition-all 2 1)
-       (map insert-newline)
-       (concat-strings)
-       (edn/read-string)
-       (insert-tiles-vert)))
-
-(defn ers [s]
-  (let [nl #{:n1 :n2}
+  (let [nl #{:n1956214 :n2176543} ;;some random keywords used as marker
         nls (str " " (apply str (interpose " " nl)) " ")
         a (str/replace s #";.*?\n" "") ;;remove comment lines
-        b (str/replace a #"\n" " :n1 :n2 ")
+        b (str/replace a #"\n" nls)
         c (edn/read-string (str "[" b "]"))]
-    (->> (into [] (remove #{:n1 :n2}  c)) ;;remove last newline
+    (->> (into [] (remove nl c)) ;;remove last newline
          (walk/postwalk (fn [x]
-                          (if (and (coll? x) (some #{:n1} x))
+                          (if (and (coll? x) (some nl x))
                             (list :tiles/vert
-                                  (utils/list-into-same-coll
-                                   x
-                                   (remove #{:n1 :n2} x)))
+                                  (utils/list-into-same-coll x
+                                   (remove nl x)))
                             x))))))
 
 (defn generate-content-and-call [txt init-fn]
@@ -95,8 +66,7 @@
         nof-read-tuts 20 ;;(dec (count tuts))
         a (take nof-read-tuts (drop tuts-start tuts))
         ;; b (map #(edn/read-string (str "[" % "]")) a) ;;version without :tiles/vert
-        ;; b (map extended-read-string a)
-        b (map ers a)
+        b (map extended-read-string a)
         c (map #(assoc (explode/explode %)
                        :solpos-yx [[0 0]]
                        :solution %) b)
