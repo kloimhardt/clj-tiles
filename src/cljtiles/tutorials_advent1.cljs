@@ -40,56 +40,17 @@
 
  (def url
    "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org")
-
-(defn generate-content-and-call [txt init-fn]
-  (let [nof-read-tuts 4
-        tuts
-        (->> (str/split txt #"\#\+end_src")
-             (map #(last (str/split % #"\#\+begin_src clojure")))
-             (map #(utils/twosplit % "\n"))
-             (filter (complement #(str/ends-with? (first %) ":exports none")))
-             (map second))
-        a (take nof-read-tuts tuts)
-        b (map #(edn/read-string (str "[" % "]")) a)
-        c (map #(assoc (explode/explode %)
-                       :solpos-yx [[0 0]]
-                       :solution %) b)
-        content {:tutorials c :chapnames ["Advent"] :chaps [(count c)]}]
-    (def t tuts)
-    (init-fn [content])))
-
-(def a (->> #"\n"
-            (str/split (first t))
-            (map str/trim)))
-
 (def on-newline 'on-newline)
-
-(defn insert-newline2 [s]
-  (if (#{"("} (first s)) (apply str "(" on-newline " " (rest s)) s))
 
 (defn insert-newline [s-next]
   (let [[b1 b2] (map #(re-find #"^\s*\(" %) s-next)
         t (str/trim (first s-next))]
-    (def b1 b1)
-    (def b2 b2)
     (if (and b1 b2 (not= b1 b2))
       (apply str "(" on-newline " " (rest t))
-      t))
-
-  #_:end)
-
-
-(def u (str/split (second t) #"\n"))
-(def v (remove #(re-find #"^\s*;" %) u))
-(map insert-newline (partition-all 2 1 v))
-
-(def b (map insert-newline2 a))
-(def c (edn/read-string (str "[" (apply str (interpose " " b)) "]")))
+      t)))
 
 (defn insert-tiles-vert [code]
   (walk/postwalk (fn [x] (if (and (coll? x) (seq x) (= (first x) on-newline)) (list :tiles/vert (rest x)) x)) code))
-
-(insert-tiles-vert c)
 
 (defn concat-strings [xs]
   (str "[" (apply str (interpose " " xs)) "]"))
@@ -103,14 +64,24 @@
        (edn/read-string)
        (insert-tiles-vert)))
 
-(extended-read-string (second t))
+(defn generate-content-and-call [txt init-fn]
+  (let [nof-read-tuts 7
+        tuts
+        (->> (str/split txt #"\#\+end_src")
+             (map #(last (str/split % #"\#\+begin_src clojure")))
+             (map #(utils/twosplit % "\n"))
+             (filter (complement #(str/ends-with? (first %) ":exports none")))
+             (map second))
+        a (take nof-read-tuts tuts)
+        ;;b (map #(edn/read-string (str "[" % "]")) a) ;;version without :tiles/vert
+        b (map extended-read-string a)
+        c (map #(assoc (explode/explode %)
+                       :solpos-yx [[0 0]]
+                       :solution %) b)
+        content {:tutorials c :chapnames ["Advent"] :chaps [(count c)]}]
+    (init-fn [content])))
 
 (defn init-advent [init-fn]
   (-> (js/fetch url)
       (.then #(.text %))
       (.then #(generate-content-and-call % init-fn))))
-
-(re-find #"^\s+" "   133")
-(re-find #"^\s+\(" "   (133")
-
-(re-find #"1"    "   133")
