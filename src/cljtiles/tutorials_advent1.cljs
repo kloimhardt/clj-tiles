@@ -65,14 +65,15 @@
        (insert-tiles-vert)))
 
 (defn generate-content-and-call [txt init-fn]
-  (let [nof-read-tuts 7
+  (let [tuts-start 7
+        nof-read-tuts 1
         tuts
         (->> (str/split txt #"\#\+end_src")
              (map #(last (str/split % #"\#\+begin_src clojure")))
              (map #(utils/twosplit % "\n"))
              (filter (complement #(str/ends-with? (first %) ":exports none")))
              (map second))
-        a (take nof-read-tuts tuts)
+        a (take nof-read-tuts (drop tuts-start tuts))
         ;;b (map #(edn/read-string (str "[" % "]")) a) ;;version without :tiles/vert
         b (map extended-read-string a)
         c (map #(assoc (explode/explode %)
