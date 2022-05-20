@@ -50,7 +50,12 @@
       t)))
 
 (defn insert-tiles-vert [code]
-  (walk/postwalk (fn [x] (if (and (coll? x) (seq x) (= (first x) on-newline)) (list :tiles/vert (rest x)) x)) code))
+  (walk/postwalk
+    (fn [x]
+      (if (and (coll? x) (seq x) (= (first x) on-newline))
+        (list :tiles/vert (rest x))
+        x))
+    code))
 
 (defn concat-strings [xs]
   (str "[" (apply str (interpose " " xs)) "]"))
@@ -64,18 +69,34 @@
        (edn/read-string)
        (insert-tiles-vert)))
 
+(defn ers [s]
+  (let [nl #{:n1 :n2}
+        nls (str " " (apply str (interpose " " nl)) " ")
+        a (str/replace s #";.*?\n" "") ;;remove comment lines
+        b (str/replace a #"\n" " :n1 :n2 ")
+        c (edn/read-string (str "[" b "]"))]
+    (->> (into [] (remove #{:n1 :n2}  c)) ;;remove last newline
+         (walk/postwalk (fn [x]
+                          (if (and (coll? x) (some #{:n1} x))
+                            (list :tiles/vert
+                                  (utils/list-into-same-coll
+                                   x
+                                   (remove #{:n1 :n2} x)))
+                            x))))))
+
 (defn generate-content-and-call [txt init-fn]
-  (let [tuts-start 7
-        nof-read-tuts 1
-        tuts
+  (let [tuts
         (->> (str/split txt #"\#\+end_src")
              (map #(last (str/split % #"\#\+begin_src clojure")))
              (map #(utils/twosplit % "\n"))
              (filter (complement #(str/ends-with? (first %) ":exports none")))
              (map second))
+        tuts-start 0
+        nof-read-tuts 20 ;;(dec (count tuts))
         a (take nof-read-tuts (drop tuts-start tuts))
-        ;;b (map #(edn/read-string (str "[" % "]")) a) ;;version without :tiles/vert
-        b (map extended-read-string a)
+        ;; b (map #(edn/read-string (str "[" % "]")) a) ;;version without :tiles/vert
+        ;; b (map extended-read-string a)
+        b (map ers a)
         c (map #(assoc (explode/explode %)
                        :solpos-yx [[0 0]]
                        :solution %) b)

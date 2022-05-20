@@ -115,7 +115,7 @@
 (defn list-into-same-coll [orig data]
   (if (some identity ((juxt map? vector? set?) orig))
     (into (empty orig) data)
-    data))
+    (apply list data)))
 
 (defn make-coll-green [xs]
   (->> xs

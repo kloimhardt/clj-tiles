@@ -108,17 +108,25 @@
 (defn chapter->page [chap-no]
   (if (pos? chap-no) (nth (reductions + chaps) (dec chap-no)) 0))
 
+(defonce state (rc/atom nil))
+
+(defn set-state-field [kw value]
+  (swap! state assoc kw value))
+
+(defn update-state-field [kw fun]
+  (swap! state update kw fun))
+
 (defn load-workspace [xml-text]
-  (.. blockly/Xml
-      (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-text))
-                                    (.getMainWorkspace blockly))))
+  (try (.. blockly/Xml
+           (clearWorkspaceAndLoadFromXml (.. blockly/Xml (textToDom xml-text))
+                                         (.getMainWorkspace blockly)))
+       (catch js/Error e (set-state-field :stdout [(str (.-message e))]))))
 
 (defn append-to-workspace [xml-text]
-  (.. blockly/Xml
-      (appendDomToWorkspace (.. blockly/Xml (textToDom xml-text))
-                            (.getMainWorkspace blockly))))
-
-(defonce state (rc/atom nil))
+  (try (.. blockly/Xml
+           (appendDomToWorkspace (.. blockly/Xml (textToDom xml-text))
+                                 (.getMainWorkspace blockly)))
+       (catch js/Error e (set-state-field :stdout [(str (.-message e))]))))
 
 ;;(when dev (fsa/trace-ref state))
 
@@ -132,8 +140,8 @@
     (atom {:saved-workspace-xml nil
            :solved-tutorials
            (if dev
-             ;;(into #{} (range -1 300)) ;;to unlock all solutions
-             last-of-chapters
+             (into #{} (range -1 300)) ;;to unlock all solutions ;;klm
+             ;;last-of-chapters
              last-of-chapters)
            :sci-env (atom nil)})))
 
@@ -215,12 +223,6 @@
       (swap! state assoc :stdout [(str "state is not in best state, pls. report. " (keys @state))]))))
 
 (defonce app-state (rc/atom nil))
-
-(defn set-state-field [kw value]
-  (swap! state assoc kw value))
-
-(defn update-state-field [kw fun]
-  (swap! state update kw fun))
 
 (defn set-scrollbar [x y]
   (when x
@@ -770,7 +772,7 @@
 
 (defn some-development-stuff []
   ;;((tutorial-fu identity)) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
-  #_(do
+  (do
     (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
     (t-adv1/init-advent #(do
                            (reset-tutorials! (make-content (conj % t-ac/content)))
