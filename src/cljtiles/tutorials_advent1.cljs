@@ -2,7 +2,8 @@
   (:require [cljtiles.codeexplode :as explode]
             [clojure.string :as str]
             [cljtiles.utils :as utils]
-            [cljs.reader :as edn]))
+            [cljs.reader :as edn]
+            [clojure.walk :as walk]))
 
 ;; load exports none, e.g. Cartan is needed, read also crashing #17
 ;;#+begin_src clojure :noweb yes
@@ -54,9 +55,62 @@
                        :solpos-yx [[0 0]]
                        :solution %) b)
         content {:tutorials c :chapnames ["Advent"] :chaps [(count c)]}]
+    (def t tuts)
     (init-fn [content])))
+
+(def a (->> #"\n"
+            (str/split (first t))
+            (map str/trim)))
+
+(def on-newline 'on-newline)
+
+(defn insert-newline2 [s]
+  (if (#{"("} (first s)) (apply str "(" on-newline " " (rest s)) s))
+
+(defn insert-newline [s-next]
+  (let [[b1 b2] (map #(re-find #"^\s*\(" %) s-next)
+        t (str/trim (first s-next))]
+    (def b1 b1)
+    (def b2 b2)
+    (if (and b1 b2 (not= b1 b2))
+      (apply str "(" on-newline " " (rest t))
+      t))
+
+  #_:end)
+
+
+(def u (str/split (second t) #"\n"))
+(def v (remove #(re-find #"^\s*;" %) u))
+(map insert-newline (partition-all 2 1 v))
+
+(def b (map insert-newline2 a))
+(def c (edn/read-string (str "[" (apply str (interpose " " b)) "]")))
+
+(defn insert-tiles-vert [code]
+  (walk/postwalk (fn [x] (if (and (coll? x) (seq x) (= (first x) on-newline)) (list :tiles/vert (rest x)) x)) code))
+
+(insert-tiles-vert c)
+
+(defn concat-strings [xs]
+  (str "[" (apply str (interpose " " xs)) "]"))
+
+(defn extended-read-string [s]
+  (->> (str/split s #"\n")
+       (remove #(re-find #"^\s*;" %))
+       (partition-all 2 1)
+       (map insert-newline)
+       (concat-strings)
+       (edn/read-string)
+       (insert-tiles-vert)))
+
+(extended-read-string (second t))
 
 (defn init-advent [init-fn]
   (-> (js/fetch url)
       (.then #(.text %))
       (.then #(generate-content-and-call % init-fn))))
+
+(re-find #"^\s+" "   133")
+(re-find #"^\s+\(" "   (133")
+
+(re-find #"1"    "   133")
