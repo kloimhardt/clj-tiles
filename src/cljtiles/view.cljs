@@ -463,7 +463,7 @@
     (reset-state nil)
     (swap! state merge
            {:code str-code ;;might be overridden by cljtiles-eval-one-by-one
-            :result-raw "press run button" ;;definitely overridden by (run-code)
+            :result-raw "nothing computed yet" ;;nil will be displayed as nil, definitely overridden by (run-code)
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
@@ -770,7 +770,7 @@
 
 (defn some-development-stuff []
   ;;((tutorial-fu identity)) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
-  (do
+  #_(do
     (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
     (t-adv1/init-advent #(do
                            (reset-tutorials! (make-content (conj % t-ac/content)))
@@ -778,7 +778,6 @@
                          ;; so that the above (goto-page! 1) does not fail
                            (goto-page! 0))))
   :end)
-
 
 (defn ^{:dev/after-load true} render []
   (when dev (some-development-stuff))

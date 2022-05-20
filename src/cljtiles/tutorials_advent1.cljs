@@ -41,18 +41,18 @@
    "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org")
 
 (defn generate-content-and-call [txt init-fn]
-  (let [tutno 4
+  (let [nof-read-tuts 4
         tuts
         (->> (str/split txt #"\#\+end_src")
              (map #(last (str/split % #"\#\+begin_src clojure")))
              (map #(utils/twosplit % "\n"))
              (filter (complement #(str/ends-with? (first %) ":exports none")))
              (map second))
-        a (take tutno tuts)
-        b (map #(edn/read-string %) a)
-        c (map #(assoc (explode/explode [%])
+        a (take nof-read-tuts tuts)
+        b (map #(edn/read-string (str "[" % "]")) a)
+        c (map #(assoc (explode/explode %)
                        :solpos-yx [[0 0]]
-                       :solution [%]) b)
+                       :solution %) b)
         content {:tutorials c :chapnames ["Advent"] :chaps [(count c)]}]
     (init-fn [content])))
 
