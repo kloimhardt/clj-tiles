@@ -87,7 +87,7 @@
              (let [last (peek acc)
                    vcoll (pop acc)]
                (if (str/ends-with? header ":exports none")
-                 (conj vcoll (assoc last :shadow (normal-read-string src)))
+                 (conj vcoll (update last :shadow (fnil conj []) src))
                  (-> vcoll
                      (conj (merge last tut))
                      (conj {})))))
@@ -99,11 +99,11 @@
             (assoc :solution (:code %))
             (dissoc :name)
             (dissoc :header)
-            (dissoc :src)
             (merge (explode/explode (:code %))))
        tuts-mapvec))
 
 (defn generate-content-and-call [txt init-fn]
+  (def txt txt) ;;klm
   (let [tuts (->> txt
                   (read-tuts)
                   (tuts-edn)
@@ -117,3 +117,7 @@
   (-> (js/fetch url)
       (.then #(.text %))
       (.then #(generate-content-and-call % init-fn))))
+
+(comment
+  (type ((fnil conj []) nil 3))
+  :end)
