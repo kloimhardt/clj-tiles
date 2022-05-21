@@ -420,10 +420,9 @@
      :str-expressions cbr
      :str-code (apply str (interpose "\n" cbr))}))
 
-(defn cljtiles-eval [edn-code {:keys [bindings sci-env]}]
+(defn cljtiles-eval [code-break-str {:keys [bindings sci-env]}]
   (let [the-err-msg (atom nil)
-        cbr (utils/code->break-str edn-code)
-        erg (try (sci/eval-string cbr {:bindings bindings :env sci-env})
+        erg (try (sci/eval-string code-break-str {:bindings bindings :env sci-env})
                  (catch js/Error e
                    (reset! the-err-msg {:message (.-message e)
                                         :line (:line (.-data e))
@@ -431,7 +430,7 @@
                    nil))]
     {:result {:expression erg}
      :err @the-err-msg
-     :str-code cbr}))
+     :str-code code-break-str}))
 
 (defn run-code [edn-code {:keys [inspect-fn] :as context}]
   (let [new-println
@@ -439,15 +438,10 @@
         tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
         bindings2 (bindings new-println tex-inspect)
         context2 (assoc context :bindings bindings2)
-        erg (if inspect-fn
-              (cljtiles-eval-one-by-one edn-code context2)
-              (cljtiles-eval edn-code context2))]
-    (swap! state merge
-           (let [{:keys [result err str-code]} erg]
-             {:sci-error (:message err)
-              :sci-error-full err
-              :result-raw (:expression result)
-              :code str-code}))))
+        cbr (utils/code->break-str edn-code)]
+    (if inspect-fn
+      (cljtiles-eval-one-by-one edn-code context2)
+      (cljtiles-eval cbr context2))))
 
 (defn get-edn-code [xml-str inspect-id inspect-fn]
   (let [edn-xml (sax/xml->clj xml-str)
@@ -469,12 +463,23 @@
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
+(defn run-raw-code [code-str]
+  (.log js/console
+        (cljtiles-eval code-str {:sci-env (get-data-store-field :sci-env)
+                                 :bindings bindings})))
+
 (defn ^:export startsci [{:keys [store-env?] :as context}]
   (let [{:keys [edn-code]} (gen-code context)
-        sci-env (get-data-store-field :sci-env)]
-    (run-code edn-code (if store-env?
-                         (assoc context :sci-env sci-env)
-                         (assoc context :sci-env (atom @sci-env))))))
+        sci-env (get-data-store-field :sci-env)
+        erg (run-code edn-code (if store-env?
+                                 (assoc context :sci-env sci-env)
+                                 (assoc context :sci-env (atom @sci-env))))]
+    (swap! state merge
+           (let [{:keys [result err str-code]} erg]
+             {:sci-error (:message err)
+              :sci-error-full err
+              :result-raw (:expression result)
+              :code str-code}))))
 
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
