@@ -485,6 +485,14 @@
               :result-raw (:expression result)
               :code str-code}))))
 
+(defn init-url [url]
+  (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
+  (t-adv1/init url #(do
+                      (reset-tutorials! (make-content (conj % t-ac/content)))
+                         ;; the conj is to make sure that more than one tutorial is therefore
+                         ;; so that the above (goto-page! 1) does not fail
+                      (goto-page! 0))))
+
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
 
@@ -499,10 +507,13 @@
               (map #(gb/rpg [] %) a))))
         run-parser
         (fn []
-          (let [xml (parse (.-value @textarea-element))]
-            (if (seq? xml)
-              (run! (fn [c] (append-to-workspace c)) xml)
-              (load-workspace xml))))
+          (let [txt (.-value @textarea-element)]
+            (if (string/starts-with? txt "https://")
+              (init-url txt)
+              (let [xml (parse txt)]
+                (if (seq? xml)
+                  (run! (fn [c] (append-to-workspace c)) xml)
+                  (load-workspace xml))))))
         close-modal
         (fn []
           (set! (.-value @textarea-element) "")
@@ -530,7 +541,10 @@
                   :on-click (fn []
                               (set! (.-value @textarea-element)
                                     "\"For more information go to:\"\n\"https://github.com/kloimhardt/clj-tiles\""))}
-         "About"]]])))
+         "About"]
+        [:div
+         [:pre
+          "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"]]]])))
 
 (defn desc-button []
   [:button {:on-click #(reset-state nil)} "Clear output"])
@@ -779,13 +793,10 @@
 
 (defn some-development-stuff []
   ;;((tutorial-fu identity)) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
-  (do
-    (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
-    (t-adv1/init-advent #(do
-                           (reset-tutorials! (make-content (conj % t-ac/content)))
-                         ;; the conj is to make sure that more than one tutorial is therefore
-                         ;; so that the above (goto-page! 1) does not fail
-                           (goto-page! 0))))
+  #_(let [url
+        "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"]
+    (init-url url)
+    )
   :end)
 
 (defn ^{:dev/after-load true} render []

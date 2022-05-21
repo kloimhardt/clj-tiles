@@ -30,9 +30,6 @@
 
 ;; make inline of only one slot possible in UI context menu (maybe upgrade blockly)
 
-(def url
-  "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org")
-
 (defn read-tuts [txt]
   (let [src-split (map #(str/split % #"\#\+begin_src clojure")
                        (str/split txt #"\#\+end_src"))
@@ -110,7 +107,7 @@
         content {:tutorials tuts :chapnames ["Advent"] :chaps [(count tuts)]}]
     (init-fn [content])))
 
-(defn init-advent [init-fn]
+(defn init [url init-fn]
   (-> (js/fetch url)
       (.then #(.text %))
       (.then #(generate-content-and-call % init-fn))))
