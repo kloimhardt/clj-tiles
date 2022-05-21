@@ -5,10 +5,8 @@
             [cljs.reader :as edn]
             [clojure.walk :as walk]))
 
-;; load exports none, e.g. Cartan is needed, read also crashing #17
-;;#+begin_src clojure :noweb yes
-;;<<Cartan>>
-;;#+end_src
+;;#16
+;;could not resolve symbol d:dt
 
 ;;#19
 ;;No method in multimethod 'sicmutils.gener
@@ -103,7 +101,6 @@
        tuts-mapvec))
 
 (defn generate-content-and-call [txt init-fn]
-  (def txt txt) ;;klm
   (let [tuts (->> txt
                   (read-tuts)
                   (tuts-edn)

@@ -2,6 +2,7 @@
   (:require
    [goog.dom :as gdom]
    [goog.string :as gstring]
+   [clojure.string :as string]
    [goog.dom.forms :as gforms]
    [sci.core :as sci]
    [sicmutils.env.sci :as es]
@@ -140,8 +141,8 @@
     (atom {:saved-workspace-xml nil
            :solved-tutorials
            (if dev
-             (into #{} (range -1 300)) ;;to unlock all solutions ;;klm
-             ;;last-of-chapters
+             ;;(into #{} (range -1 300)) ;;to unlock all solutions ;;klm
+             last-of-chapters
              last-of-chapters)
            :sci-env (atom nil)})))
 
@@ -464,9 +465,12 @@
             :edn-code-orig edn-code})))
 
 (defn run-raw-code [code-str]
-  (.log js/console
-        (cljtiles-eval code-str {:sci-env (get-data-store-field :sci-env)
-                                 :bindings bindings})))
+  (let [erg (cljtiles-eval code-str {:sci-env (get-data-store-field :sci-env)
+                                     :bindings (bindings nil nil)})]
+    (if (:err erg)
+      (println "code execution error")
+      (println "code executed sucessfully"))
+    (.log js/console erg)))
 
 (defn ^:export startsci [{:keys [store-env?] :as context}]
   (let [{:keys [edn-code]} (gen-code context)
@@ -590,23 +594,21 @@
     " "
     [:button {:on-click (fn []
                           (when forward-button-green
-                            (let [new-tuts-unlocked
-                                  (-> (get-data-store-field :solved-tutorials)
-                                      complement
-                                      (filter (chapter-range tutorial-no))
-                                      (concat [tutorial-no])) ;;make sure last element is current page
-                                  ]
-                              (run! #(when (:xml-solution (nth tutorials %))
-                                       (goto-page! %)
-                                       (when (= -1 (:solution-no @state)) ;; is the puzzle loaded?
-                                         ;;it is important to access (:solution-no @state) here
-                                         ;; the variable solution-no will not do
-                                         ;; it is colosed over and therefore wrong here
-                                         (swap-workspace))
-                                       (startsci {:store-env? true}))
+                            (let [new-tutnos-unlocked
+                                  (->> (chapter-range tutorial-no)
+                                       (remove (get-data-store-field :solved-tutorials)))
+                                  new-tuts-unlocked
+                                  (->> new-tutnos-unlocked
+                                       (map #(nth tutorials %))
+                                       (filter :xml-solution))]
+                              (run! (fn [tut]
+                                      (run! run-raw-code
+                                            (remove #(string/starts-with? (string/trim %) "(ns")
+                                                    (:shadow tut)))
+                                      (run-raw-code (:src tut)))
                                     new-tuts-unlocked)
                               (update-data-store-field :solved-tutorials
-                                                       #(apply conj % new-tuts-unlocked))))
+                                                       #(apply conj % new-tutnos-unlocked))))
                           ((tutorial-fu inc)))
               :style (when forward-button-green {:color "white"
                                                  :background-color "green"})}
