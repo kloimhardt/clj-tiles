@@ -35,6 +35,20 @@
 (def url
   "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org")
 
+(defn read-tuts [txt]
+  (let [src-split (map #(str/split % #"\#\+begin_src clojure")
+                       (str/split txt #"\#\+end_src"))
+        names (->> src-split
+                   (map first)
+                   (map #(some-> (second (str/split % #"\#\+name: ")) str/trim)))
+        headers-code (->> src-split
+                          (map last)
+                          (map #(utils/twosplit % "\n"))
+                          (butlast))]
+    (map (fn [name [header src]]
+           {:name name :header header :src src})
+         names headers-code)))
+
 (defn normal-read-string [s]
   (edn/read-string (str "[" s "]")))
 
@@ -51,20 +65,6 @@
                                   (utils/list-into-same-coll x
                                                              (remove nl x)))
                             x))))))
-
-(defn read-tuts [txt]
-  (let [src-split (map #(str/split % #"\#\+begin_src clojure")
-                       (str/split txt #"\#\+end_src"))
-        names (->> src-split
-                   (map first)
-                   (map #(some-> (second (str/split % #"\#\+name: ")) str/trim)))
-        headers-code (->> src-split
-                          (map last)
-                          (map #(utils/twosplit % "\n"))
-                          (butlast))]
-    (map (fn [name [header src]]
-           {:name name :header header :src src})
-         names headers-code)))
 
 (defn tuts-edn [tuts-txt]
   (map #(assoc % :code (extended-read-string (:src %))) tuts-txt))
@@ -103,81 +103,13 @@
             (merge (explode/explode (:code %))))
        tuts-mapvec))
 
-(comment
-  (->> t
-       (read-tuts)
-       (tuts-edn)
-       (replace-reference)
-       (smuggle-shadow)
-       (explode-all))
-
-  (def uu (replace-reference (tuts-edn (read-tuts t))))
-  (smuggle-shadow uu)
-  (reduce (fn [acc {:keys [header src] :as tut}]
-            (let [last (peek acc)
-                  vcoll (pop acc)]
-              (if (str/ends-with? header ":exports none")
-                (conj vcoll (assoc last :shadow (normal-read-string src)))
-                (-> vcoll
-                    (conj (merge last tut))
-                    (conj {})))))
-          [{}] uu)
-
-  (def z (str/split t #"\#\+end_src"))
-  (def y (map #(str/split % #"\#\+begin_src clojure") z))
-
-  (def x (map first y))
-  (def names (map #(some-> (second (str/split % #"\#\+name: ")) str/trim) x))
-
-  (def a (map last y))
-  (def b (butlast (map #(utils/twosplit % "\n") a)))
-
-  (def d (map conj b names))
-  (def c (map (fn [[head txt name]]
-                [head (extended-read-string txt) name])
-              d))
-
-  (reduce (fn [acc [head edn name]]
-            (let [last (peek acc)
-                  vcoll (pop acc)]
-              (if (str/ends-with? head ":exports none")
-                (conj vcoll (assoc last :shadow
-                                   {:code edn :name name}))
-                (-> vcoll
-                    (conj (merge (assoc last :code edn)
-                                 (when name {:name name})))
-                    (conj {})))))
-          [{}] c)
-
-  :end)
-
-(defn generate-content-and-call1 [txt init-fn]
-  (def t txt)
-  (let [tuts
-        (->> (str/split txt #"\#\+end_src")
-             (map #(last (str/split % #"\#\+begin_src clojure")))
-             (map #(utils/twosplit % "\n"))
-             (filter (complement #(str/ends-with? (first %) ":exports none")))
-             (map second))
-        tuts-start 0
-        nof-read-tuts 20 ;;(dec (count tuts))
-        a (take nof-read-tuts (drop tuts-start tuts))
-        ;; b (map #(edn/read-string (str "[" % "]")) a) ;;version without :tiles/vert
-        b (map extended-read-string a)
-        c (map #(assoc (explode/explode %)
-                       :solpos-yx [[0 0]]
-                       :solution %) b)
-        content {:tutorials c :chapnames ["Advent"] :chaps [(count c)]}]
-    (init-fn [content])))
-
 (defn generate-content-and-call [txt init-fn]
-  (let [tuts
-        (->> txt
-             (read-tuts)
-             (tuts-edn)
-             (replace-reference)
-             (smuggle-shadow)
-             (explode-all))
+  (let [tuts (->> txt
+                  (read-tuts)
+                  (tuts-edn)
+                  (replace-reference)
+                  (smuggle-shadow)
+                  (explode-all))
         content {:tutorials tuts :chapnames ["Advent"] :chaps [(count tuts)]}]
     (init-fn [content])))
 
