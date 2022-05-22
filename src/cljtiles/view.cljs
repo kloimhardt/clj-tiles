@@ -285,6 +285,10 @@
   (and (vector? last-edn-code)
        (= ":div" (subs (str (first last-edn-code)) 0 4))))
 
+(defn start-with-tex-equation? [last-edn-code]
+  (and (list? last-edn-code)
+       (= '->tex-equation (first last-edn-code))))
+
 (defn tex-comp [txt]
   [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
                                     #js ["Typeset" (.-Hub js/MathJax) el])
@@ -295,7 +299,8 @@
   [tex-comp (sicm/tex e)])
 
 (def reagent-component-bindings
-  {'tex html-tex-comp
+  {'->tex-equation html-tex-comp
+   'tex html-tex-comp
    'verse-rotate cmpnts/html-verse-rotate-comp
    'verse-fade-in cmpnts/html-verse-fade-in-comp
    'verse-fade-out cmpnts/html-verse-fade-out-comp})
@@ -318,6 +323,17 @@
             'cljtiles-reagent-component)
       edn-code)))
 
+(defn augment-code-tex-equation [edn-code inspect-fn]
+  (let [l (last edn-code)]
+    (if (and (not inspect-fn) (start-with-tex-equation? l))
+      (conj (into [] (butlast edn-code))
+            (list 'defn 'cljtiles-reagent-component
+                  "added by clj-tiles parser"
+                  []
+                  (into [] l))
+            'cljtiles-reagent-component)
+      edn-code)))
+
 (defn augment-code [edn-code inspect-fn]
   (let [s1 "(L-free-particle 'm)"
         s2 "(L-free-particle m)"
@@ -330,8 +346,7 @@
              (w/postwalk #(if (and (list? %) (= s3 (str %))) s3 %))
              (w/postwalk #(if (and (list? %) (= s4 (str %))) s4 %))
              (w/postwalk #(if (map? %) (vec %) %))
-             flatten
-             )]
+             flatten)]
     (-> edn-code
         (augment-code-fu flat-code
                          '(defn vec-rest "added by clj-tiles parser" [x]
@@ -340,19 +355,20 @@
                          '(defn vec-cons "added by clj-tiles parser" [x coll]
                             (let [c (cons x coll)] (if (seq? c) (vec c) c))))
         #_(augment-code-fu flat-code
-                         '(defn L-free-particle "added by clj-tiles parser" [x]
-                            (comp sicmutils-double (L-free-particle-sicm x))))
+                           '(defn L-free-particle "added by clj-tiles parser" [x]
+                              (comp sicmutils-double (L-free-particle-sicm x))))
         ;; above line changed for next line, see sicm issue #271; not needed since sicmutils 0.21.1
         #_(augment-code-fu flat-code
-                         '(defn Lagrangian-action
-                            "added by clj-tiles parser"
-                            [& opts]
-                            (apply Lagrangian-action-sicm (concat opts [{:compile? true}]))))
+                           '(defn Lagrangian-action
+                              "added by clj-tiles parser"
+                              [& opts]
+                              (apply Lagrangian-action-sicm (concat opts [{:compile? true}]))))
         (augment-code-fu flat-code
                          '(def Lagrangian-signature '(-> (UP Real Real Real) Real)))
         (augment-code-fu flat-code
                          '(defn printlns [& lines] (run! println lines)))
-        (augment-code-div inspect-fn))))
+        (augment-code-div inspect-fn)
+        (augment-code-tex-equation inspect-fn))))
 
 (defn start-timer [fu ms max msg]
   (let [timer (atom nil)
@@ -456,11 +472,12 @@
                                (some-> (get context "block") (.-id))
                                inspect-fn)
         aug-edn-code (augment-code edn-code inspect-fn)
-        str-code (utils/code->break-str edn-code)]
+        str-code (utils/code->break-str edn-code)
+        result-raw (:result-raw @state)]
     (reset-state nil)
     (swap! state merge
-           {:code str-code ;;might be overridden by cljtiles-eval-one-by-one
-            :result-raw "nothing computed yet" ;;nil will be displayed as nil, definitely overridden by (run-code)
+           {:code str-code ;;is overridden by startsci with (str aug-edn-code)
+            :result-raw result-raw ;;is overridden by startsci
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
@@ -480,10 +497,10 @@
                                  (assoc context :sci-env (atom @sci-env))))]
     (swap! state merge
            (let [{:keys [result err str-code]} erg]
-             {:sci-error (:message err)
-              :sci-error-full err
+             {:code str-code
               :result-raw (:expression result)
-              :code str-code}))))
+              :sci-error (:message err)
+              :sci-error-full err}))))
 
 (defn init-url [url]
   (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
@@ -770,7 +787,8 @@
             (cond
               custom-comp
               [custom-comp]
-              (and show-result-raw (start-with-div? (last edn-code-orig)))
+              (and show-result-raw (or (start-with-div? (last edn-code-orig))
+                                       (start-with-tex-equation? (last edn-code-orig))))
               [:div
                [result-raw]
                [:p [:button {:on-click #(set-state-field :show-result-raw false)}
@@ -793,7 +811,7 @@
 
 (defn some-development-stuff []
   ;;((tutorial-fu identity)) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
-  #_(let [url
+  (let [url
         "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"]
     (init-url url)
     )

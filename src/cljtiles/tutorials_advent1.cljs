@@ -72,7 +72,10 @@
         middle (fn [s] (subs (subs s 2) 0 (- (count s) 4)))]
     (map #(let [frs (str (first (:code %)))]
             (if (str/starts-with? frs  "<<")
-              (assoc % :code (:code (get name-map (middle frs))))
+              (let [ref (get name-map (middle frs))]
+                (-> %
+                    (assoc :code (:code ref))
+                    (assoc :src (:src ref))))
               %))
          tuts-edn)))
 
