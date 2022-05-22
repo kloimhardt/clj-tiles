@@ -471,13 +471,11 @@
         edn-code (get-edn-code xml-str
                                (some-> (get context "block") (.-id))
                                inspect-fn)
-        aug-edn-code (augment-code edn-code inspect-fn)
         str-code (utils/code->break-str edn-code)
-        result-raw (:result-raw @state)]
-    (reset-state nil)
+        aug-edn-code (augment-code edn-code inspect-fn)]
+    (swap! state update :result-raw (fnil identity "nothing calculated"))
     (swap! state merge
            {:code str-code ;;is overridden by startsci with (str aug-edn-code)
-            :result-raw result-raw ;;is overridden by startsci
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
@@ -490,14 +488,17 @@
     (.log js/console erg)))
 
 (defn ^:export startsci [{:keys [store-env?] :as context}]
-  (let [{:keys [edn-code]} (gen-code context)
+  (let [{:keys [edn-code edn-code-orig]} (gen-code context)
         sci-env (get-data-store-field :sci-env)
         erg (run-code edn-code (if store-env?
                                  (assoc context :sci-env sci-env)
                                  (assoc context :sci-env (atom @sci-env))))]
+    (reset-state nil)
     (swap! state merge
            (let [{:keys [result err str-code]} erg]
              {:code str-code
+              :edn-code edn-code
+              :edn-code-orig edn-code-orig
               :result-raw (:expression result)
               :sci-error (:message err)
               :sci-error-full err}))))
@@ -660,7 +661,8 @@
              [:button {:on-click (fn []
                                    (load-workspace (:xml-code (generate-xml tutorial-no
                                                                             (nth tutorials tutorial-no)
-                                                                            {:shuffle? true}))))}
+                                                                            {:shuffle? true})))
+                                   (gen-code nil))}
               "Shuffle"]
              [:button {:on-click (fn []
                                    (set-state-field :accepted? true)
