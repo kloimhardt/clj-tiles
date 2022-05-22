@@ -12,13 +12,11 @@
 ;;No method in multimethod 'sicmutils.gener
 ;;ic/mul' for dispatch value: [:sicmutils.s
 
+;;#5
+;;pressing shuffle prints a console error
 ;;------------
 
 ;; include load file in context menu (with input field and a default box with urls from Sam's fdg)
-
-;; make sure sucmutils env is loaded so that all puzzles run
-
-;; make ->tex-equation work with TeX (tutorial 5)
 
 ;;------------
 

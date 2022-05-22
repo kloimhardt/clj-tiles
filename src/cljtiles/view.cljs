@@ -471,9 +471,10 @@
         edn-code (get-edn-code xml-str
                                (some-> (get context "block") (.-id))
                                inspect-fn)
-        str-code (utils/code->break-str edn-code)
-        aug-edn-code (augment-code edn-code inspect-fn)]
-    (swap! state update :result-raw (fnil identity "nothing calculated"))
+        aug-edn-code (augment-code edn-code inspect-fn)
+        str-code (utils/code->break-str aug-edn-code)]
+    (set-state-field :show-result-raw false)
+    (update-state-field :result-raw (fnil identity "nothing calculated"))
     (swap! state merge
            {:code str-code ;;is overridden by startsci with (str aug-edn-code)
             :edn-code aug-edn-code
