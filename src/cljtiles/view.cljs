@@ -826,18 +826,28 @@
 
 (comment
 
-  (def st (atom nil))
-  (sci/eval-string "
+(defn tuts-namespace-fn []
+  (some-> (some->> tutorials first :shadow first (re-find #"\(ns .+"))
+          (subs 4)))
 
-(identity *ns*)
-(in-ns 'hun)
-(def a 1)
-" {:env st})
+(defn add-ns-edn [edn-code]
+  (if-let [ns (get-data-store-field :tuts-ns)]
+    (if (and edn-code (seq edn-code))
+      (into []
+            (concat
+              [(edn/read-string (str "(in-ns '" ns ")"))]
+              edn-code))
+      edn-code)
+    edn-code))
 
-  (sci/eval-string "
+(defn add-ns-txt [txt]
+  (if-let [ns (get-data-store-field :tuts-ns)]
+    (if (and txt
+             (seq txt)
+             (not (string/starts-with? (string/trim txt) (str "(ns " ns))))
+      (str "(in-ns '" ns ") " txt)
+      txt)
+    txt))
 
-(identity *ns*)
-hun/a
-" {:env nil})
 
   :end)
