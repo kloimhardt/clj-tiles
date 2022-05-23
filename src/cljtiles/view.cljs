@@ -53,7 +53,7 @@
                      #_:end)
 
                    shuffle?
-                   (merge page (explode/explode (shuffle (:code page))))
+                   (merge page (explode/explode (:solution page) true))
 
                    :else
                    page)]

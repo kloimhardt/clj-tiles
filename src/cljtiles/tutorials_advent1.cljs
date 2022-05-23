@@ -12,11 +12,9 @@
 ;;No method in multimethod 'sicmutils.gener
 ;;ic/mul' for dispatch value: [:sicmutils.s
 
-;;#5
-;;pressing shuffle prints a console error
 ;;------------
 
-;; include load file in context menu (with input field and a default box with urls from Sam's fdg)
+;; in context->parser: with input field and a default box with urls from Sam's fdg
 
 ;;------------
 
@@ -95,7 +93,7 @@
             (assoc :solution (:code %))
             (dissoc :name)
             (dissoc :header)
-            (merge (explode/explode (:code %))))
+            (merge (explode/explode (:code %) nil)))
        tuts-mapvec))
 
 (defn generate-content-and-call [txt init-fn]

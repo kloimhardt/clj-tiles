@@ -83,13 +83,13 @@
                    (conj coords [(+ y y-offset) (if x-offset (+ x x-offset) 0)])))
                [[0 0]])))
 
-(defn explode [solution]
-  (let [code (->> (rest (tree-seq coll? seq (reverse solution)))
+(defn explode [solution shuffle?]
+  (let [code (-> (rest (tree-seq coll? seq (reverse solution)))
                   empty-colls
                   remove-functions-and-keys
                   reverse
-                  ;;klm reverse needs to be in last position,
-                  ;;klm otherwise remove-functions-and-keys does not work correctly
-                  )]
+                  ;;klm if reverse is before remove-functions-and-keys
+                  ;;klm it does not work correctly
+                  (cond-> shuffle? shuffle))]
     {:blockpos-yx (blockpos-yx code)
      :code code}))
