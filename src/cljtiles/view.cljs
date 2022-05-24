@@ -408,7 +408,7 @@
   (let [the-errs (atom [])
         the-env (atom @sci-env)
         sci-eval (fn [code-str env errs]
-                   (try (sci/eval-string code-str {:bindings bindings :env env})
+                   (try (sci/eval-string code-str {:bindings bindings :env env :namespaces es/namespaces})
                         (catch js/Error e (swap! errs conj e) :sci-error)))
         cbr (utils/code-break-primitive edn-code)
         _results (doall (map #(sci-eval % the-env the-errs) cbr))
@@ -439,7 +439,7 @@
 
 (defn cljtiles-eval [code-break-str {:keys [bindings sci-env]}]
   (let [the-err-msg (atom nil)
-        erg (try (sci/eval-string code-break-str {:bindings bindings :env sci-env})
+        erg (try (sci/eval-string code-break-str {:bindings bindings :env sci-env :namespaces es/namespaces})
                  (catch js/Error e
                    (reset! the-err-msg {:message (.-message e)
                                         :line (:line (.-data e))
@@ -635,9 +635,13 @@
                                        (map #(nth tutorials %))
                                        (filter :xml-solution))]
                               (run! (fn [tut]
-                                      (run! run-raw-code
-                                            (remove #(string/starts-with? (string/trim %) "(ns")
-                                                    (:shadow tut)))
+                                      (->> (:shadow tut)
+                                           (map #(if-let [t (some-> % (string/trim))]
+                                                   (if (string/starts-with? t "(ns")
+                                                     (str "(require '[sicmutils.env :as e]) #_(" (subs t 4))
+                                                     %)
+                                                   %))
+                                           (run! run-raw-code))
                                       (run-raw-code (:src tut)))
                                     new-tuts-unlocked)
                               (update-data-store-field :solved-tutorials

@@ -18,6 +18,8 @@
 
 ;;------------
 
+;; parse the :as e alias (str "(require '[sicmutils.env :as e]) #_(" (subs t 4)) out of org-file
+
 ;; move all the defs (chaps etc) into data-store and provide data-store as an atom to components
 
 ;; read 1/2 as 1/2 and not 0.5
