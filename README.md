@@ -73,7 +73,7 @@ The way in which the theory of classical Mechanics makes new things appear can b
 For development install Clojure/Java and Node and do:
  ```
  npm init -y
- npm install shadow-cljs
+ npm install --save-dev shadow-cljs
  npm install blockly
  npm install sax
  npm install odex

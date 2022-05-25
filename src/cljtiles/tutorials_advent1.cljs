@@ -8,6 +8,10 @@
 
 ;;------------
 
+;; clean the ui of modal window: move select box upwards above buttons
+
+;;------------
+
 ;;klm TODO
 
 ;; parse the :as e alias (str "(require '[sicmutils.env :as e]) #_(" (subs t 4)) out of org-file

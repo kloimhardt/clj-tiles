@@ -15,7 +15,7 @@
              :modules {:main {:entries [cljtiles.view]}}}}}
 
 ;; npm init -y
-;; npm install shadow-cljs
+;; npm install --save-dev shadow-cljs ;;the --save-dev is important for some reason, I had a class not found error without it
 ;; npm install blockly
 ;; npm install sax
 ;; npm install odex
