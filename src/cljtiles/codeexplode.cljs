@@ -88,8 +88,8 @@
                   empty-colls
                   remove-functions-and-keys
                   reverse
-                  ;;klm if reverse is before remove-functions-and-keys
-                  ;;klm it does not work correctly
+                  ;;if reverse is before remove-functions-and-keys
+                  ;;it does not work correctly
                   (cond-> shuffle? shuffle))]
     {:blockpos-yx (blockpos-yx code)
      :code code}))

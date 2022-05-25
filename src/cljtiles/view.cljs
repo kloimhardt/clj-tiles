@@ -35,7 +35,7 @@
    ;;[cljtiles.sc]
    ))
 
-(def dev true) ;;!! also disable spec!!
+(def dev false) ;;!! also disable spec!!
 
 (defn generate-xml [_tutorial-no page {:keys [shuffle?]}] ;;tutorial-no is to debug explode
   (if (and (:xml-code page) (not (and shuffle? (:code page))))
@@ -203,7 +203,8 @@
               :desc ds
               :solution-no sn
               :colored-code false
-              :forward-button-green false}
+              :forward-button-green false
+              :url-select ""}
         check (or (not @state) (= (into (hash-set) (keys init))
                                   (into (hash-set) (keys @state))))]
     (reset! state (merge init
@@ -527,7 +528,7 @@
         run-parser
         (fn []
           (let [txt (.-value @textarea-element)]
-            (if (string/starts-with? txt "https://")
+            (if (some #(string/starts-with? txt %) ["http" "file"])
               (init-url txt)
               (let [xml (parse txt)]
                 (if (seq? xml)
@@ -537,7 +538,7 @@
         (fn []
           (set! (.-value @textarea-element) "")
           (swap! state assoc :modal-style-display "none"))]
-    (fn [{:keys [tutorial-no modal-style-display]}]
+    (fn [{:keys [tutorial-no modal-style-display url-select]}]
       [:div {:id "myModal", :class "modal"
              :style {:display modal-style-display}}
        [:div {:class "modal-content"}
@@ -561,9 +562,16 @@
                               (set! (.-value @textarea-element)
                                     "\"For more information go to:\"\n\"https://github.com/kloimhardt/clj-tiles\""))}
          "About"]
+        [:p "Select a tutorial:"]
         [:div
-         [:pre
-          "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"]]]])))
+         [:select {:value url-select
+                   :on-change (fn [el]
+                                (let [v (.. el -target -value)]
+                                  (set-state-field :url-select v)
+                                  (set! (.-value @textarea-element) v)))}
+          (map-indexed (fn [idx val] [:option {:key idx :value val} val])
+                       [""
+                        "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"])]]]])))
 
 (defn desc-button []
   [:button {:on-click #(reset-state nil)} "Clear output"])

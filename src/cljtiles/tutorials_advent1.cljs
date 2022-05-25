@@ -3,20 +3,12 @@
             [clojure.string :as str]
             [cljtiles.utils :as utils]
             [cljs.reader :as edn]
-            [clojure.walk :as walk]))
-
-;;#16
-;;could not resolve symbol d:dt
-
-;;#19
-;;No method in multimethod 'sicmutils.gener
-;;ic/mul' for dispatch value: [:sicmutils.s
+            [clojure.walk :as walk]
+            [goog.uri.utils :as guri]))
 
 ;;------------
 
-;; in context->parser: with input field and a default box with urls from Sam's fdg
-
-;;------------
+;;klm TODO
 
 ;; parse the :as e alias (str "(require '[sicmutils.env :as e]) #_(" (subs t 4)) out of org-file
 
@@ -27,6 +19,12 @@
 ;; update spec, respectively replace with malli
 
 ;; make inline of only one slot possible in UI context menu (maybe upgrade blockly)
+
+;;only close the modal when new content is visible in workspace (there is a dely when loading the url)
+
+;;use promises properly and not a callback in function "init" below
+
+;;------------
 
 (defn read-tuts [txt]
   (let [src-split (map #(str/split % #"\#\+begin_src clojure")
@@ -98,20 +96,20 @@
             (merge (explode/explode (:code %) nil)))
        tuts-mapvec))
 
-(defn generate-content-and-call [txt init-fn]
+(defn generate-content-and-call [txt init-fn url]
   (let [tuts (->> txt
                   (read-tuts)
                   (tuts-edn)
                   (replace-reference)
                   (smuggle-shadow)
                   (explode-all))
-        content {:tutorials tuts :chapnames ["Advent"] :chaps [(count tuts)]}]
+        content {:tutorials tuts :chapnames [(re-find #"[ \w-]+?(?=\.)" (guri/getPath url))] :chaps [(count tuts)]}]
     (init-fn [content])))
 
 (defn init [url init-fn]
   (-> (js/fetch url)
       (.then #(.text %))
-      (.then #(generate-content-and-call % init-fn))))
+      (.then #(generate-content-and-call % init-fn url))))
 
 (comment
   (type ((fnil conj []) nil 3))
