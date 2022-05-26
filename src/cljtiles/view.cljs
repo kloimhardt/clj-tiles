@@ -397,6 +397,9 @@
     'app-state app-state
     'start-timer start-timer}))
 
+(defn get-inspect-form [edn-code]
+  (ca/inspect-form edn-code workspace!/inspect-fn-sym))
+
 ;; this executes every form one by one, no matter whether an error occurs
 ;; lets inspect expressions after an error
 ;; would also appear to have the advantage of showing the last valid result
@@ -405,7 +408,7 @@
 ;; along with an error after pressing the run button.
 ;; So: the thing is very useful for inspect, so it is used there
 ;; and there only the errors are important, no results needed.
-(defn cljtiles-eval-one-by-one [edn-code {:keys [bindings sci-env]}]
+(defn cljtiles-eval-one-by-one [edn-code {:keys [bindings sci-env] :as context}]
   (let [the-errs (atom [])
         the-env (atom @sci-env)
         sci-eval (fn [code-str env errs]
@@ -427,16 +430,18 @@
         ;; takes result before first error
         ;;good-results (take-while #(not= % :sci-error) results)
         ;;good-result (last good-results)
-        ]
-    {:result nil #_{:expression good-result
-                    :number (dec (count good-results))
-                    :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
-     :err {:message (first err-msgs)
-           :line nil ;;(:line err-correct-line)
-           :column nil ;;(:column err-correct-line)
-           :err-msgs err-msgs}
-     :str-expressions cbr
-     :str-code (apply str (interpose "\n" cbr))}))
+        erg {:result nil #_{:expression good-result
+                            :number (dec (count good-results))
+                            :line (inc (nth cbr-sumlines (dec (count good-results)) -1))}
+             :err {:message (first err-msgs)
+                   :line nil ;;(:line err-correct-line)
+                   :column nil ;;(:column err-correct-line)
+                   :err-msgs err-msgs}
+             :str-expressions cbr
+             :str-code (apply str (interpose "\n" cbr))}]
+    (if-not (or (:result erg) (get-in erg [:err :message]) (:recur context))
+      (cljtiles-eval-one-by-one [(get-inspect-form edn-code)] (assoc context :recur true))
+      erg)))
 
 (defn cljtiles-eval [code-break-str {:keys [bindings sci-env]}]
   (let [the-err-msg (atom nil)
@@ -490,12 +495,12 @@
     (.log js/console erg)))
 
 (defn ^:export startsci [{:keys [store-env?] :as context}]
+  (reset-state nil)
   (let [{:keys [edn-code edn-code-orig]} (gen-code context)
         sci-env (get-data-store-field :sci-env)
         erg (run-code edn-code (if store-env?
                                  (assoc context :sci-env sci-env)
                                  (assoc context :sci-env (atom @sci-env))))]
-    (reset-state nil)
     (swap! state merge
            (let [{:keys [result err str-code]} erg]
              {:code str-code
@@ -575,9 +580,6 @@
 
 (defn desc-button []
   [:button {:on-click #(reset-state nil)} "Clear output"])
-
-(defn get-inspect-form [edn-code]
-  (ca/inspect-form edn-code workspace!/inspect-fn-sym))
 
 (defn radios []
   [:<>
