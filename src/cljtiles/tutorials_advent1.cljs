@@ -6,30 +6,6 @@
             [clojure.walk :as walk]
             [goog.uri.utils :as guri]))
 
-;;------------
-
-;; clean the ui of modal window: move select box upwards above buttons
-
-;;------------
-
-;;klm TODO
-
-;; parse the :as e alias (str "(require '[sicmutils.env :as e]) #_(" (subs t 4)) out of org-file
-
-;; move all the defs (chaps etc) into data-store and provide data-store as an atom to components
-
-;; read 1/2 as 1/2 and not 0.5
-
-;; update spec, respectively replace with malli
-
-;; make inline of only one slot possible in UI context menu (maybe upgrade blockly)
-
-;;only close the modal when new content is visible in workspace (there is a dely when loading the url)
-
-;;use promises properly and not a callback in function "init" below
-
-;;------------
-
 (defn read-tuts [txt]
   (let [src-split-1 (str/split (str txt "\n") #"\#\+end_src")
         re-merge (fn [txtvec inter]

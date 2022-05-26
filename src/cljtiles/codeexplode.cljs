@@ -41,7 +41,7 @@
                  [[(first x)] (cons (first x) (repeat (dec (count x)) :tiles/slot))]
 
                  (and (list? x) (list? (first x)))
-                 [[] (list :tiles/slot :tiles/slot)]
+                 [[] (apply list (repeat (count x) :tiles/slot))]
 
                  (map? x)
                  [(keys x) (into {} (map (fn [[k _]] [k :tiles/slot])) x)]
