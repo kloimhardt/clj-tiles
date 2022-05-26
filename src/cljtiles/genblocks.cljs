@@ -148,7 +148,8 @@
         (= ":tiles/num" erst) (num (second l))
         (= "clojure.core/deref" erst) (tiles-deref (second l))
         (= "quote" erst) (num (str "'" (second l)))
-        (infix-sensible? l) (appl fun-infi)
+        ;;(infix-sensible? l) (appl fun-infi) ;;detect infix automatically for simple expressions
+        (= ":tiles/infix" erst) (assoc (parse (second l)) :subtype "infi-h")
         (#{"def" "defn" "do"} erst) (assoc (appl fun) :inline? false)
         :else (appl fun)))
     (vector? l)
