@@ -439,7 +439,7 @@
                    :err-msgs err-msgs}
              :str-expressions cbr
              :str-code (apply str (interpose "\n" cbr))}]
-    (if-not (or (:result erg) (get-in erg [:err :message]) (:recur context))
+    (if-not (or (seq (:inspect @state)) (get-in erg [:err :message]) (:recur context))
       (cljtiles-eval-one-by-one [(get-inspect-form edn-code)] (assoc context :recur true))
       erg)))
 
