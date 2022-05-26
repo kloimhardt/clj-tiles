@@ -25,10 +25,10 @@
   (->> exprns
        (mapv (fn [x]
                (cond
-                 (and (list? x) (#{:tiles/vert} (first x)))
+                 (and (list? x) (#{:tiles/vert :tiles/infix} (first x)))
                  nil
 
-                 (#{:tiles/vert :tiles/slot} x)
+                 (#{:tiles/vert :tiles/slot :tiles/infix} x)
                  nil
 
                  (map-entry? x)
