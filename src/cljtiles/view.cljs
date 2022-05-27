@@ -238,13 +238,65 @@
   (reset! app-state 0)
   page-no)
 
+(defn tex-comp [txt]
+  [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
+                                    #js ["Typeset" (.-Hub js/MathJax) el])
+                            (catch js/Error e (println (.-message e)))))}
+   txt])
+
+(defn html-tex-comp [e]
+  [tex-comp (sicm/tex e)])
+
+(def reagent-component-bindings
+  {'->tex-equation html-tex-comp
+   'tex html-tex-comp
+   'verse-rotate cmpnts/html-verse-rotate-comp
+   'verse-fade-in cmpnts/html-verse-fade-in-comp
+   'verse-fade-out cmpnts/html-verse-fade-out-comp})
+
+(defn start-timer [fu ms max msg]
+  (let [timer (atom nil)
+        counter (atom 0)
+        stop-timer (fn [msg]
+                     (js/clearInterval @timer)
+                     msg)
+        step (fn []
+               (swap! counter inc)
+               (if (< @counter max) (fu nil) (stop-timer nil)))]
+    (reset! timer (js/setInterval step ms))
+    msg))
+
+(def bindings-all
+  (let [new-println
+        (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
+        tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)]
+    (merge
+     (es/namespaces 'sicmutils.numerical.minimize)
+     (es/namespaces 'sicmutils.mechanics.lagrange)
+     (es/namespaces 'sicmutils.env)
+     (es/namespaces 'sicmutils.abstract.function) ;;needs to be after sicmutils.env
+     sicm/bindings
+     reagent-component-bindings
+     {'println new-println
+      'html-tex html-tex-comp
+      workspace!/inspect-fn-sym tex-inspect
+      'app-state app-state
+      'start-timer start-timer})))
+
+(defn set-sci-environment []
+  (sci/eval-string "(identity 0)"
+                   {:bindings bindings-all
+                    :namespaces es/namespaces
+                    :env (get-data-store-field :sci-env)}))
+
 (defn reset-tutorials! [content]
   (let [foc (make-first-chapters (:chaps content))]
     (set! tutorials (:tutorials content))
     (set! chaps (:chaps content))
     (set! chapnames (:chapnames content))
     (set! first-of-chapters foc)
-    (set! data-store (make-data-store foc))))
+    (set! data-store (make-data-store foc))
+    (set-sci-environment)))
 
 (defn goto-lable-page!-1 [lable]
   (let [cnt (count (take-while false? (map #(= lable (:lable %)) tutorials)))]
@@ -289,22 +341,6 @@
 (defn start-with-tex-equation? [last-edn-code]
   (and (list? last-edn-code)
        (= '->tex-equation (first last-edn-code))))
-
-(defn tex-comp [txt]
-  [:div {:ref (fn [el] (try (.Queue js/MathJax.Hub
-                                    #js ["Typeset" (.-Hub js/MathJax) el])
-                            (catch js/Error e (println (.-message e)))))}
-   txt])
-
-(defn html-tex-comp [e]
-  [tex-comp (sicm/tex e)])
-
-(def reagent-component-bindings
-  {'->tex-equation html-tex-comp
-   'tex html-tex-comp
-   'verse-rotate cmpnts/html-verse-rotate-comp
-   'verse-fade-in cmpnts/html-verse-fade-in-comp
-   'verse-fade-out cmpnts/html-verse-fade-out-comp})
 
 (defn parse-:div> [e]
   (let [sf (str (first e))
@@ -371,35 +407,6 @@
         (augment-code-div inspect-fn)
         (augment-code-tex-equation inspect-fn))))
 
-(defn start-timer [fu ms max msg]
-  (let [timer (atom nil)
-        counter (atom 0)
-        stop-timer (fn [msg]
-                     (js/clearInterval @timer)
-                     msg)
-        step (fn []
-               (swap! counter inc)
-               (if (< @counter max) (fu nil) (stop-timer nil)))]
-    (reset! timer (js/setInterval step ms))
-    msg))
-
-(def bindings-all
-  (let [new-println
-        (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
-        tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)]
-    (merge
-     (es/namespaces 'sicmutils.numerical.minimize)
-     (es/namespaces 'sicmutils.mechanics.lagrange)
-     (es/namespaces 'sicmutils.env)
-     (es/namespaces 'sicmutils.abstract.function) ;;needs to be after sicmutils.env
-     sicm/bindings
-     reagent-component-bindings
-     {'println new-println
-      'html-tex html-tex-comp
-      workspace!/inspect-fn-sym tex-inspect
-      'app-state app-state
-      'start-timer start-timer})))
-
 (defn get-inspect-form [edn-code]
   (ca/inspect-form edn-code workspace!/inspect-fn-sym))
 
@@ -411,11 +418,11 @@
 ;; along with an error after pressing the run button.
 ;; So: the thing is very useful for inspect, so it is used there
 ;; and there only the errors are important, no results needed.
-(defn cljtiles-eval-one-by-one [edn-code {:keys [bindings sci-env] :as context}]
+(defn cljtiles-eval-one-by-one [edn-code {:keys [sci-env] :as context}]
   (let [the-errs (atom [])
         the-env (atom @sci-env)
         sci-eval (fn [code-str env errs]
-                   (try (sci/eval-string code-str {:bindings bindings :env env :namespaces es/namespaces})
+                   (try (sci/eval-string code-str {:env env})
                         (catch js/Error e (swap! errs conj e) :sci-error)))
         cbr (utils/code-break-primitive edn-code)
         _results (doall (map #(sci-eval % the-env the-errs) cbr))
@@ -446,9 +453,9 @@
       (cljtiles-eval-one-by-one [(get-inspect-form edn-code)] (assoc context :recur true))
       erg)))
 
-(defn cljtiles-eval [code-break-str {:keys [bindings sci-env]}]
+(defn cljtiles-eval [code-break-str {:keys [sci-env]}]
   (let [the-err-msg (atom nil)
-        erg (try (sci/eval-string code-break-str {:bindings bindings :env sci-env :namespaces es/namespaces})
+        erg (try (sci/eval-string code-break-str {:env sci-env})
                  (catch js/Error e
                    (reset! the-err-msg {:message (.-message e)
                                         :line (:line (.-data e))
@@ -457,13 +464,6 @@
     {:result {:expression erg}
      :err @the-err-msg
      :str-code code-break-str}))
-
-(defn run-code [edn-code {:keys [inspect-fn] :as context}]
-  (let [context2 (assoc context :bindings bindings-all)
-        cbr (utils/code->break-str edn-code)]
-    (if inspect-fn
-      (cljtiles-eval-one-by-one edn-code context2)
-      (cljtiles-eval cbr context2))))
 
 (defn get-edn-code [xml-str inspect-id inspect-fn]
   (let [edn-xml (sax/xml->clj xml-str)
@@ -481,33 +481,33 @@
     (set-state-field :show-result-raw false)
     (update-state-field :result-raw (fnil identity "nothing calculated"))
     (swap! state merge
-           {:code str-code ;;is overridden by startsci with (str aug-edn-code)
+           {:code str-code ;;can be overridden by startsci + tex-inspect
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
+(defn ^:export startsci [context]
+  (reset-state nil)
+  (let [{:keys [edn-code]} (gen-code context)
+        sci-env (get-data-store-field :sci-env)
+        run-code (fn [edn-code {:keys [inspect-fn] :as context}]
+                   (let [cbr (utils/code->break-str edn-code)]
+                     (if inspect-fn
+                       (cljtiles-eval-one-by-one edn-code context)
+                       (cljtiles-eval cbr context))))
+        erg (run-code edn-code (assoc context :sci-env (atom @sci-env)))]
+    (swap! state merge
+           (let [{:keys [result err str-code]} erg]
+             {:code str-code
+              :result-raw (:expression result)
+              :sci-error (:message err)
+              :sci-error-full err}))))
+
 (defn run-raw-code [code-str]
-  (let [erg (cljtiles-eval code-str {:sci-env (get-data-store-field :sci-env)
-                                     :bindings bindings-all})]
+  (let [erg (cljtiles-eval code-str {:sci-env (get-data-store-field :sci-env)})]
     (if (:err erg)
       (println "code execution error")
       (println "code executed sucessfully"))
     (.log js/console erg)))
-
-(defn ^:export startsci [{:keys [store-env?] :as context}]
-  (reset-state nil)
-  (let [{:keys [edn-code edn-code-orig]} (gen-code context)
-        sci-env (get-data-store-field :sci-env)
-        erg (run-code edn-code (if store-env?
-                                 (assoc context :sci-env sci-env)
-                                 (assoc context :sci-env (atom @sci-env))))]
-    (swap! state merge
-           (let [{:keys [result err str-code]} erg]
-             {:code str-code
-              :edn-code edn-code
-              :edn-code-orig edn-code-orig
-              :result-raw (:expression result)
-              :sci-error (:message err)
-              :sci-error-full err}))))
 
 (defn init-url [url]
   (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
@@ -840,6 +840,7 @@
 (defn ^{:export true} output []
   (workspace!/init startsci open-modal)
   (goto-page! (dec 1))
+  (set-sci-environment)
   (when-let [p (some-> (not-empty (.. js/window -location -search))
                        js/URLSearchParams.
                        (.get "page"))]
