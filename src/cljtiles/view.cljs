@@ -182,6 +182,9 @@
       (swap! state assoc :solution-no -1)
       (load-workspace (get-saved-workspace-xml :xml-code)))))
 
+(def org-mode-tutorials
+  (concat [["" "Select a tutorial"]] (js->clj ^js js/external_tutorials)))
+
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
         ds (:desc @state)
@@ -204,7 +207,7 @@
               :solution-no sn
               :colored-code false
               :forward-button-green false
-              :url-select ""}
+              :url-select (ffirst org-mode-tutorials)}
         check (or (not @state) (= (into (hash-set) (keys init))
                                   (into (hash-set) (keys @state))))]
     (reset! state (merge init
@@ -541,6 +544,7 @@
         close-modal
         (fn []
           (set! (.-value @textarea-element) "")
+          (set-state-field :url-select (ffirst org-mode-tutorials))
           (swap! state assoc :modal-style-display "none"))]
     (fn [{:keys [tutorial-no modal-style-display url-select]}]
       [:div {:id "myModal", :class "modal"
@@ -555,10 +559,7 @@
                                (let [v (.. el -target -value)]
                                  (set-state-field :url-select v)
                                  (set! (.-value @textarea-element) v)))}
-         (map-indexed (fn [idx [val txt]] [:option {:key idx :value val} txt])
-                      [["" "Select a tutorial"]
-                       ["https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"
-                        "FDG Chapter 1"]])]
+         (map-indexed (fn [idx [val txt]] [:option {:key idx :value val} txt]) org-mode-tutorials)]
         " "
         [:button {:on-click #(do (run-parser) (close-modal))}
          "Insert"]

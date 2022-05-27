@@ -9,13 +9,7 @@
         </script>
     </head>
 
-<body onbeforeunload="return myFunction()">
-
-        <script>
-         function myFunction() {
-             return "Write something clever here...";
-         }
-        </script>
+<body onbeforeunload="return dummyFunction()">
 
     <xml id="toolbox" style="display: none">
         <category name="Function">
@@ -74,6 +68,18 @@
     <input id="tutorial_no" type="hidden" value=0>
     <script src="sicmblocks_fun.js"></script>
     <script src="cljtiles_jsutils.js"></script>
+
+    <script>
+     function dummyFunction() {
+         return "Write something clever here...";
+     }
+
+     var external_tutorials =
+         [
+             ["https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org",
+              "FDG Chapter 1"]
+         ]
+    </script>
 
     <script src="target/main.js"></script>
     <div id="out">Loading Data... (Firefox and Chrome are known to work)</div>
