@@ -546,9 +546,20 @@
       [:div {:id "myModal", :class "modal"
              :style {:display modal-style-display}}
        [:div {:class "modal-content"}
-        [:div
-         [:textarea {:cols 80 :rows 10
-                     :ref (fn [e] (reset! textarea-element e) (some-> e .focus))}]]
+        [:p "Type an expression:"]
+        [:textarea {:cols 80 :rows 10
+                    :ref (fn [e] (reset! textarea-element e) (some-> e .focus))}]
+        [:p]
+        [:select {:value url-select
+                  :on-change (fn [el]
+                               (let [v (.. el -target -value)]
+                                 (set-state-field :url-select v)
+                                 (set! (.-value @textarea-element) v)))}
+         (map-indexed (fn [idx [val txt]] [:option {:key idx :value val} txt])
+                      [["" "Select a tutorial"]
+                       ["https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"
+                        "FDG Chapter 1"]])]
+        " "
         [:button {:on-click #(do (run-parser) (close-modal))}
          "Insert"]
         " "
@@ -565,17 +576,7 @@
                   :on-click (fn []
                               (set! (.-value @textarea-element)
                                     "\"For more information go to:\"\n\"https://github.com/kloimhardt/clj-tiles\""))}
-         "About"]
-        [:p "Select a tutorial:"]
-        [:div
-         [:select {:value url-select
-                   :on-change (fn [el]
-                                (let [v (.. el -target -value)]
-                                  (set-state-field :url-select v)
-                                  (set! (.-value @textarea-element) v)))}
-          (map-indexed (fn [idx val] [:option {:key idx :value val} val])
-                       [""
-                        "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"])]]]])))
+         "About"]]])))
 
 (defn desc-button []
   [:button {:on-click #(reset-state nil)} "Clear output"])
