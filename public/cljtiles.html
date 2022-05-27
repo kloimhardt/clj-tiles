@@ -9,7 +9,14 @@
         </script>
     </head>
 
-<body>
+<body onbeforeunload="return myFunction()">
+
+        <script>
+         function myFunction() {
+             return "Write something clever here...";
+         }
+        </script>
+
     <xml id="toolbox" style="display: none">
         <category name="Function">
             <block type="funs-h-2-cus"></block>
