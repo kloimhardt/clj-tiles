@@ -550,7 +550,7 @@
       [:div {:id "myModal", :class "modal"
              :style {:display modal-style-display}}
        [:div {:class "modal-content"}
-        [:p "Type an expression:"]
+        [:p "Type a Clojure expression or a URI of a tutorial file:"]
         [:textarea {:cols 80 :rows 10
                     :ref (fn [e] (reset! textarea-element e) (some-> e .focus))}]
         [:p]
@@ -691,7 +691,7 @@
               "Get the Puzzle"])]
           [:span
            [codeview-button-comp tutorial-no solution-no]
-           [:p "The \"Run\" button will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."]])
+           [:p "The \"Run\" button will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapters up to the next page."]])
         :else
         [run-button-comp tutorial-no solution-no]))]])
 
