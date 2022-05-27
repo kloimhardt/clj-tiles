@@ -383,19 +383,22 @@
     (reset! timer (js/setInterval step ms))
     msg))
 
-(defn bindings [new-println tex-inspect]
-  (merge
-   (es/namespaces 'sicmutils.numerical.minimize)
-   (es/namespaces 'sicmutils.mechanics.lagrange)
-   (es/namespaces 'sicmutils.env)
-   (es/namespaces 'sicmutils.abstract.function) ;;needs to be after sicmutils.env
-   sicm/bindings
-   reagent-component-bindings
-   {'println new-println
-    'html-tex html-tex-comp
-    workspace!/inspect-fn-sym tex-inspect
-    'app-state app-state
-    'start-timer start-timer}))
+(def bindings-all
+  (let [new-println
+        (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
+        tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)]
+    (merge
+     (es/namespaces 'sicmutils.numerical.minimize)
+     (es/namespaces 'sicmutils.mechanics.lagrange)
+     (es/namespaces 'sicmutils.env)
+     (es/namespaces 'sicmutils.abstract.function) ;;needs to be after sicmutils.env
+     sicm/bindings
+     reagent-component-bindings
+     {'println new-println
+      'html-tex html-tex-comp
+      workspace!/inspect-fn-sym tex-inspect
+      'app-state app-state
+      'start-timer start-timer})))
 
 (defn get-inspect-form [edn-code]
   (ca/inspect-form edn-code workspace!/inspect-fn-sym))
@@ -456,11 +459,7 @@
      :str-code code-break-str}))
 
 (defn run-code [edn-code {:keys [inspect-fn] :as context}]
-  (let [new-println
-        (fn [& x] (swap! state #(update % :stdout conj (apply str x))) nil)
-        tex-inspect (fn [x] (swap! state #(update % :inspect conj x)) x)
-        bindings2 (bindings new-println tex-inspect)
-        context2 (assoc context :bindings bindings2)
+  (let [context2 (assoc context :bindings bindings-all)
         cbr (utils/code->break-str edn-code)]
     (if inspect-fn
       (cljtiles-eval-one-by-one edn-code context2)
@@ -488,7 +487,7 @@
 
 (defn run-raw-code [code-str]
   (let [erg (cljtiles-eval code-str {:sci-env (get-data-store-field :sci-env)
-                                     :bindings (bindings nil nil)})]
+                                     :bindings bindings-all})]
     (if (:err erg)
       (println "code execution error")
       (println "code executed sucessfully"))
