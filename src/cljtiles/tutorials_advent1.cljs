@@ -123,18 +123,12 @@
             (merge (explode/explode (:code %) nil)))
        tuts-mapvec))
 
-(defn generate-content-and-call [txt init-fn url]
+(defn generate-content [txt chapname]
   (let [tuts (->> txt
                   (read-tuts)
                   (tuts-edn)
                   (replace-reference)
                   (smuggle-shadow)
                   (format-description)
-                  (explode-all))
-        content {:tutorials tuts :chapnames [(re-find #"[ \w-]+?(?=\.)" (guri/getPath url))] :chaps [(count tuts)]}]
-    (init-fn [content])))
-
-(defn init [url init-fn]
-  (-> (js/fetch url)
-      (.then #(.text %))
-      (.then #(generate-content-and-call % init-fn url))))
+                  (explode-all))]
+    {:tutorials tuts :chapnames [chapname] :chaps [(count tuts)]}))

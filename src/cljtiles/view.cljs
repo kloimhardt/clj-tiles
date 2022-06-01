@@ -4,6 +4,7 @@
    [goog.string :as gstring]
    [clojure.string :as string]
    [goog.dom.forms :as gforms]
+   [goog.uri.utils :as guri]
    [sci.core :as sci]
    [sicmutils.env.sci :as es]
    ["blockly" :as blockly]
@@ -513,12 +514,15 @@
     (.log js/console erg)))
 
 (defn init-url [url]
-  (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
-  (t-adv1/init url #(do
-                      (reset-tutorials! (make-content (conj % t-ac/content)))
-                         ;; the conj is to make sure that more than one tutorial is therefore
-                         ;; so that the above (goto-page! 1) does not fail
-                      (goto-page! 0))))
+  (let [chapname (re-find #"[ \w-]+?(?=\.)" (guri/getPath url))]
+    (goto-page! 1) ;;to make the next (goto-page! 0) trigger a re-render
+    (-> (js/fetch url)
+        (.then #(.text %))
+        (.then (fn [txt]
+                 (reset-tutorials!
+                  (make-content
+                   [(t-adv1/generate-content txt chapname) t-ac/content]))
+                 (goto-page! 0))))))
 
 (defn open-modal []
   (swap! state assoc :modal-style-display "block"))
