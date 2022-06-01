@@ -554,17 +554,18 @@
       [:div {:id "myModal", :class "modal"
              :style {:display modal-style-display}}
        [:div {:class "modal-content"}
-        [:p "Type a Clojure expression or a URI of a tutorial file:"]
+        [:span
+         [:select {:value url-select
+                   :on-change (fn [el]
+                                (let [v (.. el -target -value)]
+                                  (set-state-field :url-select v)
+                                  (set! (.-value @textarea-element) v)))}
+          (map-indexed (fn [idx [val txt]] [:option {:key idx :value val} txt]) org-mode-tutorials)]
+         " made by the community, or type a Clojure expression:"]
+        [:p]
         [:textarea {:cols 80 :rows 10
                     :ref (fn [e] (reset! textarea-element e) (some-> e .focus))}]
         [:p]
-        [:select {:value url-select
-                  :on-change (fn [el]
-                               (let [v (.. el -target -value)]
-                                 (set-state-field :url-select v)
-                                 (set! (.-value @textarea-element) v)))}
-         (map-indexed (fn [idx [val txt]] [:option {:key idx :value val} txt]) org-mode-tutorials)]
-        " "
         [:button {:on-click #(do (run-parser) (close-modal))}
          "Insert"]
         " "
@@ -689,7 +690,7 @@
               "Get the Puzzle"])]
           (do (set-state-field :accepted? true)
               (gen-code nil)
-              [:p "The description will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."]))
+              [:p "A description will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."]))
         :else
         [run-button-comp tutorial-no solution-no]))]])
 
