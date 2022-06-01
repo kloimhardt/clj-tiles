@@ -617,12 +617,6 @@
                         (set-forward-button-green tutorial-no solution-no))}
    "Run"])
 
-(defn codeview-button-comp [tutorial-no solution-no]
-  [:button {:on-click (fn []
-                        (gen-code nil)
-                        (set-forward-button-green tutorial-no solution-no))}
-   "Generate Code"])
-
 (defn tutorials-comp [{:keys [run-button tutorial-no edn-code forward-button-green
                               solution-no accepted?]}]
   [:div
@@ -693,9 +687,9 @@
                                      (swap-workspace))
                                    (gen-code nil))}
               "Get the Puzzle"])]
-          [:span
-           [codeview-button-comp tutorial-no solution-no]
-           [:p "The \"Run\" button will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapters up to the next page."]])
+          (do (set-state-field :accepted? true)
+              (gen-code nil)
+              [:p "The description will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."]))
         :else
         [run-button-comp tutorial-no solution-no]))]])
 
@@ -770,7 +764,7 @@
            (extended-gen-code tutorial-no solution-no)]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
-                           desc result-raw edn-code-orig code show-result-raw]
+                           desc result-raw edn-code-orig code show-result-raw accepted?]
                     :as the-state}]
   (let [tut (nth tutorials tutorial-no)]
     (if-let [ifo (get-inspect-form edn-code)]
@@ -817,7 +811,7 @@
                     "Show source-code"]]]
               :else
               [result-comp the-state])
-            (when desc [:p [desc-button]])]
+            (when (and desc (not accepted?)) [:p [desc-button]])]
            desc
            [:div {:style {:column-count 2}}
             [tex-comp desc]])]))))
