@@ -374,6 +374,12 @@
             'cljtiles-reagent-component)
       edn-code)))
 
+(defn solved? [tutorial-no]
+  (when-let [xml-sol (:xml-solution (nth tutorials tutorial-no))]
+    (let [edn-sol (utils/get-edn-code-simpl xml-sol)
+          edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
+       (= edn-sol edn-puzz))))
+
 (defn augment-code [edn-code inspect-fn]
   (let [s1 "(L-free-particle 'm)"
         s2 "(L-free-particle m)"
@@ -407,11 +413,11 @@
                          '(def Lagrangian-signature '(-> (UP Real Real Real) Real)))
         (augment-code-fu flat-code
                          '(defn printlns [& lines] (run! println lines)))
-        (as-> $ (if-not (:accepted? @state)
+        (as-> $ (if (and (:accepted? @state) (not (solved? (:tutorial-no @state))))
+                  (identity $)
                   (-> $
                       (augment-code-div inspect-fn)
-                      (augment-code-tex-equation inspect-fn))
-                  (identity $))))))
+                      (augment-code-tex-equation inspect-fn)))))))
 
 (defn get-inspect-form [edn-code]
   (ca/inspect-form edn-code workspace!/inspect-fn-sym))
@@ -603,12 +609,6 @@
 
 (defn chapter-range [n]
   (range (apply max (take-while (partial >= n) first-of-chapters)) (inc n)))
-
-(defn solved? [tutorial-no]
-  (when-let [xml-sol (:xml-solution (nth tutorials tutorial-no))]
-    (let [edn-sol (utils/get-edn-code-simpl xml-sol)
-          edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
-       (= edn-sol edn-puzz))))
 
 (defn set-forward-button-green [tutorial-no solution-no]
   (if (and (= -1 solution-no) (solved? tutorial-no))
