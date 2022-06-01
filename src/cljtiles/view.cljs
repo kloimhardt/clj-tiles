@@ -196,7 +196,6 @@
               :sci-error nil
               :sci-error-full nil
               :result-raw nil
-              :show-result-raw true
               :code nil
               :edn-code nil
               :edn-code-orig nil
@@ -408,8 +407,11 @@
                          '(def Lagrangian-signature '(-> (UP Real Real Real) Real)))
         (augment-code-fu flat-code
                          '(defn printlns [& lines] (run! println lines)))
-        (augment-code-div inspect-fn)
-        (augment-code-tex-equation inspect-fn))))
+        (as-> $ (if-not (:accepted? @state)
+                  (-> $
+                      (augment-code-div inspect-fn)
+                      (augment-code-tex-equation inspect-fn))
+                  (identity $))))))
 
 (defn get-inspect-form [edn-code]
   (ca/inspect-form edn-code workspace!/inspect-fn-sym))
@@ -484,8 +486,7 @@
         str-code (utils/code->break-str aug-edn-code)]
     (update-state-field :result-raw (fnil identity "nothing calculated"))
     (swap! state merge
-           {:show-result-raw false
-            :code str-code ;;can be overridden by startsci + tex-inspect
+           {:code str-code ;;can be overridden by startsci + tex-inspect
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
@@ -502,7 +503,6 @@
     (swap! state merge
            (let [{:keys [result err str-code]} erg]
              {:code str-code
-              :show-result-raw true
               :result-raw (:expression result)
               :sci-error (:message err)
               :sci-error-full err}))))
@@ -604,14 +604,16 @@
 (defn chapter-range [n]
   (range (apply max (take-while (partial >= n) first-of-chapters)) (inc n)))
 
-(defn set-forward-button-green [tutorial-no solution-no]
+(defn solved? [tutorial-no]
   (when-let [xml-sol (:xml-solution (nth tutorials tutorial-no))]
-    (when (= -1 solution-no)
-      (let [edn-sol (utils/get-edn-code-simpl xml-sol)
-            edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
-        (if (= edn-sol edn-puzz)
-          (set-state-field :forward-button-green true)
-          (set-state-field :forward-button-green false))))))
+    (let [edn-sol (utils/get-edn-code-simpl xml-sol)
+          edn-puzz (utils/get-edn-code-simpl (get-workspace-xml-str))]
+       (= edn-sol edn-puzz))))
+
+(defn set-forward-button-green [tutorial-no solution-no]
+  (if (and (= -1 solution-no) (solved? tutorial-no))
+    (set-state-field :forward-button-green true)
+    (set-state-field :forward-button-green false)))
 
 (defn run-button-comp [tutorial-no solution-no]
   [:button {:on-click (fn []
@@ -766,7 +768,7 @@
            (extended-gen-code tutorial-no solution-no)]])])))
 
 (defn output-comp [{:keys [edn-code tutorial-no inspect sci-error stdout
-                           desc result-raw edn-code-orig code show-result-raw accepted?]
+                           desc result-raw code accepted?]
                     :as the-state}]
   (let [tut (nth tutorials tutorial-no)]
     (if-let [ifo (get-inspect-form edn-code)]
@@ -805,12 +807,8 @@
             (cond
               custom-comp
               [custom-comp]
-              (and show-result-raw (or (start-with-div? (last edn-code-orig))
-                                       (start-with-tex-equation? (last edn-code-orig))))
-              [:div
-               [result-raw]
-               [:p [:button {:on-click #(set-state-field :show-result-raw false)}
-                    "Show source-code"]]]
+              (= 'cljtiles-reagent-component (last edn-code))
+              [result-raw]
               :else
               [result-comp the-state])
             (when (and desc (not accepted?)) [:p [desc-button]])]
