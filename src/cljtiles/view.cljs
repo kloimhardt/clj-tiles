@@ -482,10 +482,10 @@
                                inspect-fn)
         aug-edn-code (augment-code edn-code inspect-fn)
         str-code (utils/code->break-str aug-edn-code)]
-    (set-state-field :show-result-raw false)
     (update-state-field :result-raw (fnil identity "nothing calculated"))
     (swap! state merge
-           {:code str-code ;;can be overridden by startsci + tex-inspect
+           {:show-result-raw false
+            :code str-code ;;can be overridden by startsci + tex-inspect
             :edn-code aug-edn-code
             :edn-code-orig edn-code})))
 
@@ -502,6 +502,7 @@
     (swap! state merge
            (let [{:keys [result err str-code]} erg]
              {:code str-code
+              :show-result-raw true
               :result-raw (:expression result)
               :sci-error (:message err)
               :sci-error-full err}))))
