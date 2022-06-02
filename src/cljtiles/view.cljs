@@ -627,6 +627,7 @@
 
 (defn tutorials-comp [{:keys [run-button tutorial-no edn-code forward-button-green
                               solution-no accepted?]}]
+  (when dev (prn "in tutorial-comp"))
   [:div
    [:span
     [:select {:value (page->chapter tutorial-no)
@@ -637,7 +638,12 @@
                              (goto-page! no)))}
      (map-indexed (fn [idx val] [:option {:key idx :value idx} val]) chapnames)]
     " "
-    [:button {:on-click (tutorial-fu dec)} "<"]
+    [:button {:on-click (fn [_]
+                          ((tutorial-fu dec))
+                          (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
+                            (set-state-field :accepted? true)
+                            (gen-code nil)))}
+     "<"]
     " "
     [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
              :value (str (inc tutorial-no) "/" (count tutorials))}]
@@ -663,7 +669,10 @@
                                     new-tuts-unlocked)
                               (update-data-store-field :solved-tutorials
                                                        #(apply conj % new-tutnos-unlocked))))
-                          ((tutorial-fu inc)))
+                          ((tutorial-fu inc))
+                          (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
+                            (set-state-field :accepted? true)
+                            (gen-code nil)))
               :style (when forward-button-green {:color "white"
                                                  :background-color "green"})}
      ">"]
@@ -695,9 +704,7 @@
                                      (swap-workspace))
                                    (gen-code nil))}
               "Get the Puzzle"])]
-          (do (set-state-field :accepted? true)
-              (gen-code nil)
-              [:p "A description will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."]))
+          [:p "A description will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."])
         :else
         [run-button-comp tutorial-no solution-no]))]])
 
