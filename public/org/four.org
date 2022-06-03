@@ -1,15 +1,59 @@
-Implementation of comp
-file:///Users/kloimhardt/klmplay/cljtiles/src/cljtiles/org/fourcl.org
+4Clojure #57: Function composition:  An explanation of function composition can be found here: 
+
+https://www.youtube.com/watch?v=397NASfRgNQ
+
+You verify that indeed (inc (inc 0)) = ((comp inc inc) 0). Plus you implement your own version of the Clojure core function <<comp>>.
 
 #+begin_src clojure
   (defn my-comp [& functions]
-  (reduce (fn [function-f function-g]
-            (fn [& args]
-              (function-f (apply function-g args))))
-          functions))
+    (reduce (fn [function-f function-g]
+              (fn [& args]
+                (function-f (apply function-g args))))
+            functions))
   
   (= (inc (inc 0))
    ((my-comp inc inc) 0))
 #+end_src
 
+4Clojure #63: Implement your own version of the Clojure core function <<group-by>>
 
+#+begin_src clojure
+  (defn my-group-by [f xs]
+    (reduce (fn [x y]
+              (update x (f y) (fnil conj []) y))
+            {}
+            xs))
+
+   (my-group-by (fn [x] (> x 5)) [1 3 6 8])
+#+end_src
+
+4Clojure #85: Implement the powerset
+
+#+begin_src clojure
+ (defn powerset [s]
+  (reduce
+   (fn [r e]
+     (into r (map (fn [x] (conj x e)) r)))
+   (hash-set #{})
+   s))
+
+(powerset (hash-set 1 2 3))
+#+end_src
+
+4Clojure #110: [1 1] is pronounced as [2 1] ("two ones"), which in turn is pronounced as [1 2 1 1] ("one two, one one") .
+
+#+begin_src clojure
+  (defn pronounce [s]
+  (mapcat (juxt count first)
+          (partition-by identity s)))
+
+  (pronounce [1])
+  (pronounce [1 1])
+  (pronounce [2 1])
+#+end_src
+
+Simple example
+
+#+begin_src clojure
+  "Hello World!"
+#+end_src

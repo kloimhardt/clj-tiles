@@ -157,9 +157,15 @@
       (num "[ ]")
       (apply args (map parse l)))
     (map? l)
-    (if (:tiles/numslot l)
+    (cond
+      (empty? l)
+      (num "{ }")
+      (:tiles/numslot l)
       slot
+      :else
       (apply t-map (map (fn [[k v]] [k (parse v)]) l)))
+    (and (set? l) (empty? l))
+    (num "#{ }")
     (= :tiles/slot l) slot
     (nil? l) (num "nil")
     (string? l) (text l)

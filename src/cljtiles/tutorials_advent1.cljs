@@ -114,11 +114,16 @@
     (map #(assoc %1 :description %2) tuts-mapvec pre-and-p)))
 
 (defn calc-y-for-solution [edn-code]
-  (->> edn-code
-       (map (fn [cd]
-              (count (filter #{:tiles/vert} (flatten cd)))))
-       (cons 0)
-       (map (fn [y] [(* y 70) 0]))))
+  (let [summit (fn [xs]
+                 (reduce (fn [acc x]
+                           (conj acc (+ (peek acc) x)))
+                         [] xs))]
+    (->> edn-code
+         (map (fn [cd]
+                (inc (count (filter #{:tiles/vert} (flatten cd))))))
+         (cons 0)
+         summit
+         (map (fn [y] [(* y 75) 0])))))
 
 (defn explode-all [tuts-mapvec]
   (map #(-> %
