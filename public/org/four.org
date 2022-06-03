@@ -23,7 +23,7 @@ You verify that indeed (inc (inc 0)) = ((comp inc inc) 0). Plus you implement yo
             {}
             xs))
 
-  (:tiles/keep (my-group-by (fn [x] (> x 5)) [1 3 6 8]))
+  (:tiles/keep (my-group-by (fn [x] (> x 5)) [8 3 6 1]))
 #+end_src
 
 4Clojure #85: Implement the powerset
