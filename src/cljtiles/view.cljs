@@ -184,7 +184,7 @@
       (load-workspace (get-saved-workspace-xml :xml-code)))))
 
 (def org-mode-tutorials
-  (concat [["" "Select a tutorial"]] (js->clj ^js js/external_tutorials)))
+  (concat [["" "Select a tutorial" "dummy-slug"]] (js->clj ^js js/external_tutorials)))
 
 (defn reset-state [tutorial-no]
   (let [tn (:tutorial-no @state)
@@ -853,22 +853,28 @@
   (workspace!/init startsci open-modal)
   (goto-page! (dec 1))
   (set-sci-environment)
-  (when-let [p (some-> (not-empty (.. js/window -location -search))
-                       js/URLSearchParams.
-                       (.get "page"))]
-    (cond
-      (= p "freeparticle")
-      (goto-lable-page! :free-particle
-                        #(assoc % :run-button false :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
-      (= p "higherorder")
-      (goto-lable-page! :higher-order nil)
-      (= p "pendulumfinal")
-      (goto-lable-page! :pendulum-final nil)
-      :else
-      (-> p
-          js/parseInt
-          dec
-          goto-page!)))
+  (when-let [u (some-> (not-empty (.. js/window -location -search))
+                       js/URLSearchParams.)]
+    (let [urls (into {} (map (fn [[url _label slug]] [slug url])) org-mode-tutorials)
+          p (.get u "page")
+          o (.get u "org")]
+      (cond
+        o
+        (init-url o)
+        (get urls p)
+        (init-url (get urls p))
+        (= p "freeparticle")
+        (goto-lable-page! :free-particle
+                          #(assoc % :run-button false :edn-code (list workspace!/inspect-fn-sym :start-interactive)))
+        (= p "higherorder")
+        (goto-lable-page! :higher-order nil)
+        (= p "pendulumfinal")
+        (goto-lable-page! :pendulum-final nil)
+        :else
+        (-> p
+            js/parseInt
+            dec
+            goto-page!))))
   (render))
 
 (comment
