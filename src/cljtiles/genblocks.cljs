@@ -145,6 +145,7 @@
       (cond
         (or (list? (first l)) (= ":tiles/slot" erst)) (apply lst (map parse l))
         (= ":tiles/vert" erst) (assoc (parse (second l)) :inline? false)
+        (= ":tiles/keep" erst) (parse (second l))
         (= ":tiles/num" erst) (num (second l))
         (= "clojure.core/deref" erst) (tiles-deref (second l))
         (= "quote" erst) (num (str "'" (second l)))

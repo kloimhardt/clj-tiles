@@ -28,6 +28,9 @@
                  (and (list? x) (#{:tiles/vert :tiles/infix} (first x)))
                  nil
 
+                 (and (list? x) (#{:tiles/keep} (first x)))
+                 [[] (last x)]
+
                  (#{:tiles/vert :tiles/slot :tiles/infix} x)
                  nil
 
@@ -83,13 +86,19 @@
                    (conj coords [(+ y y-offset) (if x-offset (+ x x-offset) 0)])))
                [[0 0]])))
 
+(defn mod-tree-seq [xs]
+  (mapcat #(if (= :tiles/keep (first %))
+             (list %)
+             (tree-seq coll? seq %))
+          xs))
+
 (defn explode [solution shuffle?]
-  (let [code (-> (rest (tree-seq coll? seq (reverse solution)))
-                  empty-colls
-                  remove-functions-and-keys
-                  reverse
+  (let [code (-> (mod-tree-seq (reverse solution))
+                 empty-colls
+                 remove-functions-and-keys
+                 reverse
                   ;;if reverse is before remove-functions-and-keys
                   ;;it does not work correctly
-                  (cond-> shuffle? shuffle))]
+                 (cond-> shuffle? shuffle))]
     {:blockpos-yx (blockpos-yx code)
      :code code}))
