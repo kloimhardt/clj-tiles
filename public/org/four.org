@@ -1,0 +1,15 @@
+Implementation of comp
+file:///Users/kloimhardt/klmplay/cljtiles/src/cljtiles/org/fourcl.org
+
+#+begin_src clojure
+  (defn my-comp [& functions]
+  (reduce (fn [function-f function-g]
+            (fn [& args]
+              (function-f (apply function-g args))))
+          functions))
+  
+  (= (inc (inc 0))
+   ((my-comp inc inc) 0))
+#+end_src
+
+

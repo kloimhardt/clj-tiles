@@ -3,8 +3,7 @@
             [clojure.string :as str]
             [cljtiles.utils :as utils]
             [cljs.reader :as edn]
-            [clojure.walk :as walk]
-            [goog.uri.utils :as guri]))
+            [clojure.walk :as walk]))
 
 (defn read-tuts [txt]
   (let [src-split-1 (str/split (str txt "\n") #"\#\+end_src")
@@ -114,9 +113,16 @@
                                         (partition 2 1 (cons "" %))))))]
     (map #(assoc %1 :description %2) tuts-mapvec pre-and-p)))
 
+(defn calc-y-for-solution [edn-code]
+  (->> edn-code
+       (map (fn [cd]
+              (count (filter #{:tiles/vert} (flatten cd)))))
+       (cons 0)
+       (map (fn [y] [(* y 70) 0]))))
+
 (defn explode-all [tuts-mapvec]
   (map #(-> %
-            (assoc :solpos-yx [[0 0]])
+            (assoc :solpos-yx (calc-y-for-solution (:code %)))
             (assoc :solution (:code %))
             (dissoc :name)
             (dissoc :header)

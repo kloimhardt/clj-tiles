@@ -38,6 +38,9 @@
 
 (def dev false) ;;!! also disable spec!!
 
+(defn rep-amp [xml-text]
+  (string/replace xml-text "&" "&amp;"))
+
 (defn generate-xml [_tutorial-no page {:keys [shuffle?]}] ;;tutorial-no is to debug explode
   (if (and (:xml-code page) (not (and shuffle? (:code page))))
     page
@@ -59,14 +62,14 @@
                    :else
                    page)]
         (-> page
-            (assoc :xml-code (apply gb/rpg (or (switch-yx (:blockpos-yx page))
-                                               (:blockpos page))
-                                    (:code page)))
+            (assoc :xml-code (rep-amp (apply gb/rpg (or (switch-yx (:blockpos-yx page))
+                                                        (:blockpos page))
+                                             (:code page))))
             (update :solpos-yx (fnil identity (or (:blockpos-yx page)
                                                   (switch-yx (:blockpos page)))))
             (as-> $ (assoc $ :xml-solution (when (:solution page)
-                                             (apply gb/rpg (switch-yx (:solpos-yx $))
-                                                    (:solution page))))))))))
+                                             (rep-amp (apply gb/rpg (switch-yx (:solpos-yx $))
+                                                             (:solution page)))))))))))
 
 (defn make-content [tuts]
   (let [f (fn [ks v]
@@ -537,7 +540,7 @@
                 b (first a)]
             (if (and (map? b) (:code b))
               (:xml-code (generate-xml nil b {}))
-              (map #(gb/rpg [] %) a))))
+              (map #(rep-amp (gb/rpg [] %)) a))))
         run-parser
         (fn []
           (let [txt (.-value @textarea-element)]
