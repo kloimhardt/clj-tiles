@@ -19,6 +19,7 @@
    [cljtiles.tutorials-sicm3 :as t-s3]
    [cljtiles.tutorials-appen :as t-ax]
    [cljtiles.tutorials-advent1 :as t-adv1]
+   [cljtiles.tutorials-fizzbuzz :as t-fizz]
    [cljs.reader :as edn]
    [clojure.walk :as w]
    [tubax.core :as sax]
@@ -91,7 +92,8 @@
                             t-l/content
                             t-s2/content
                             t-s/content t-s3/content
-                            t-ax/content]))
+                            t-ax/content
+                            t-fizz/content])
 
 (def tutorials (:tutorials content))
 (def chaps (:chaps content))
