@@ -646,7 +646,7 @@
     " "
     [:button {:on-click (fn [_]
                           ((tutorial-fu dec))
-                          (when (:xml-solution (nth tutorials tutorial-no))
+                          (when (:xml-solution (nth tutorials (:tutorial-no @state)))
                             (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
                               (set-state-field :accepted? true)
                               (gen-code nil))))}
@@ -677,7 +677,7 @@
                               (update-data-store-field :solved-tutorials
                                                        #(apply conj % new-tutnos-unlocked))))
                           ((tutorial-fu inc))
-                          (when (:xml-solution (nth tutorials tutorial-no))
+                          (when (:xml-solution (nth tutorials (:tutorial-no @state)))
                             (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
                               (set-state-field :accepted? true)
                               (gen-code nil))))
