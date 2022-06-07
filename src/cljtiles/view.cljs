@@ -87,13 +87,13 @@
                                            (generate-xml tut-no page {:shuffle? false}))
                                          %)))))
 
-(def content (make-content [t-ac/content
-                            t-0/content t-k/content
-                            t-l/content
-                            t-s2/content
-                            t-s/content t-s3/content
-                            t-ax/content
-                            t-fizz/content])
+(def content (make-content (cond-> [t-ac/content
+                                    t-0/content t-k/content
+                                    t-l/content
+                                    t-s2/content
+                                    t-s/content t-s3/content
+                                    t-ax/content]
+                             dev (conj t-fizz/content))))
 
 (def tutorials (:tutorials content))
 (def chaps (:chaps content))
@@ -151,6 +151,7 @@
              last-of-chapters
              last-of-chapters)
            :sci-env (atom nil)})))
+
 
 (defonce data-store (make-data-store first-of-chapters))
 
@@ -645,9 +646,10 @@
     " "
     [:button {:on-click (fn [_]
                           ((tutorial-fu dec))
-                          (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
-                            (set-state-field :accepted? true)
-                            (gen-code nil)))}
+                          (when (:xml-solution (nth tutorials tutorial-no))
+                            (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
+                              (set-state-field :accepted? true)
+                              (gen-code nil))))}
      "<"]
     " "
     [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
@@ -675,9 +677,10 @@
                               (update-data-store-field :solved-tutorials
                                                        #(apply conj % new-tutnos-unlocked))))
                           ((tutorial-fu inc))
-                          (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
-                            (set-state-field :accepted? true)
-                            (gen-code nil)))
+                          (when (:xml-solution (nth tutorials tutorial-no))
+                            (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
+                              (set-state-field :accepted? true)
+                              (gen-code nil))))
               :style (when forward-button-green {:color "white"
                                                  :background-color "green"})}
      ">"]
@@ -843,8 +846,8 @@
     set-state-field :stdout ["Something went wrong rendering the result"]]])
 
 (defn some-development-stuff []
-  ;;((tutorial-fu identity)) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
-  (let [url
+  ((tutorial-fu identity)) ;;load currenet workspace new !!:free-particle dose not work as a consequence!!
+  #_(let [url
         "https://raw.githubusercontent.com/mentat-collective/fdg-book/main/clojure/org/chapter001.org"]
     (init-url url)
     )
@@ -907,5 +910,4 @@
       txt)
     txt))
 
-
-  :end)
+:end)

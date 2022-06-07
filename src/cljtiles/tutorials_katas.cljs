@@ -8,26 +8,19 @@
      :blockpos [[0 0] [100 0] [200 0] [300 0] [0 100]]
      :code ['(:tiles/vert (let :tiles/slot :tiles/slot))
             [:tiles/slot :tiles/slot]
-            'x 2 '(square x)]
-     :solution ['(:tiles/vert (let [x 2] (square x)))]}
+            'x 2 '(square x)]}
     {:blockpos [[0 0] [100 0] [100 30] [100 60] [100 90] [0 150]]
      :code ['(:tiles/vert (let (:tiles/vert [:tiles/slot :tiles/slot :tiles/slot :tiles/slot])
                             :tiles/slot))
             'x 2
             'f 'square
-            '(f x)]
-     :solution ['(:tiles/vert (let (:tiles/vert [x 2 f square]) (f x)))]}
+            '(f x)]}
     {:blockpos [[0 0] [100 70] [300 70] [0 150] [0 200]]
      :code
      ['(defn call-that-with-3 some-function :tiles/slot)
       '(some-function :tiles/slot) 3
       'inc
-      '(call-that-with-3 :tiles/slot)]
-     :solpos-yx [[0 0] [150 0]]
-     :solution ['(defn call-that-with-3
-                   some-function
-                   (some-function 3))
-                '(call-that-with-3 inc)]}
+      '(call-that-with-3 :tiles/slot)]}
     {:blockpos [[0 0] [150 50] [250 50] [400 50] [150 100] [350 100] [150 250] [250 250] [0 300]]
      :code
      ['(defn call-with-squared :tiles/slot :tiles/slot)
@@ -35,12 +28,7 @@
       'some-function 'number
       '(some-function :tiles/slot) '(square number)
       'inc 3
-      '(call-with-squared :tiles/slot :tiles/slot)]
-     :solpos-yx [[0 0] [150 0]]
-     :solution ['(defn call-with-squared
-                  [some-function number]
-                  (some-function (square number)))
-                '(call-with-squared inc 3)]}
+      '(call-with-squared :tiles/slot :tiles/slot)]}
     {:blockpos [[0 0] [0 50] [0 100]]
      :code
      ['(mapv :tiles/slot :tiles/slot)
