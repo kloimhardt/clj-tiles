@@ -52,5 +52,5 @@ You verify that indeed (inc (inc 0)) = ((comp inc inc) 0). Plus you implement yo
 Simple example
 
 #+begin_src clojure
-  "Hello World!"
+  "End of 4Clojure tutorials"
 #+end_src
