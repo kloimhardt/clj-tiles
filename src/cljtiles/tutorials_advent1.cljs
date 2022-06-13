@@ -110,7 +110,7 @@
 
                                             :else
                                             [:p (replace-inline-tex prg)]))
-                                        (partition 2 1 (cons "" %))))))]
+                                    (partition 2 1 (cons "" %))))))]
     (map #(assoc %1 :description %2) tuts-mapvec pre-and-p)))
 
 (defn calc-y-for-solution [edn-code]
@@ -141,5 +141,6 @@
                   (replace-reference)
                   (smuggle-shadow)
                   (format-description)
-                  (explode-all))]
-    {:tutorials tuts :chapnames [chapname] :chaps [(count tuts)]}))
+                  (explode-all))
+        tuts-with-end (concat tuts [{:description [:p "End of chapter"] :solution ["End of Chapter"] :code ["End of Chapter"]}])]
+    {:tutorials tuts-with-end :chapnames [chapname] :chaps [(count tuts-with-end)]}))
