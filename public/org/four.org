@@ -48,9 +48,3 @@ You verify that indeed (inc (inc 0)) = ((comp inc inc) 0). Plus you implement yo
 
  (:tiles/keep (str (pronounce [1]) "-" (pronounce [1 1]) "-" (pronounce [2 1])))
 #+end_src
-
-Simple example
-
-#+begin_src clojure
-  "End of 4Clojure tutorials"
-#+end_src
