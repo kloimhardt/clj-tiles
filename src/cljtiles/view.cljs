@@ -317,6 +317,8 @@
     (when swap-state-fn
       (swap! state swap-state-fn))))
 
+(declare gen-code)
+
 (defn tutorial-fu [inc-or-dec]
   (fn []
     (let [el (gdom/getElement "tutorial_no")
@@ -328,7 +330,11 @@
                 (< (dec (count tutorials)) idx-new) (dec (count tutorials))
                 (< -1 idx-old (count tutorials)) idx-old
                 :else 0)]
-      (goto-page! idx))))
+      (goto-page! idx)
+      (when (:xml-solution (nth tutorials idx))
+        (when-not (contains? (get-data-store-field :solved-tutorials) (dec idx))
+          (set-state-field :accepted? true)
+          (gen-code nil))))))
 
 (def output-width utils/output-width)
 
@@ -644,12 +650,7 @@
                              (goto-page! no)))}
      (map-indexed (fn [idx val] [:option {:key idx :value idx} val]) chapnames)]
     " "
-    [:button {:on-click (fn [_]
-                          ((tutorial-fu dec))
-                          (when (:xml-solution (nth tutorials (:tutorial-no @state)))
-                            (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
-                              (set-state-field :accepted? true)
-                              (gen-code nil))))}
+    [:button {:on-click (tutorial-fu dec)}
      "<"]
     " "
     [:input {:read-only true :size (inc (* 2 (count (str (count tutorials)))))
@@ -676,11 +677,7 @@
                                     new-tuts-unlocked)
                               (update-data-store-field :solved-tutorials
                                                        #(apply conj % new-tutnos-unlocked))))
-                          ((tutorial-fu inc))
-                          (when (:xml-solution (nth tutorials (:tutorial-no @state)))
-                            (when-not (contains? (get-data-store-field :solved-tutorials) (dec (:tutorial-no @state)))
-                              (set-state-field :accepted? true)
-                              (gen-code nil))))
+                          ((tutorial-fu inc)))
               :style (when forward-button-green {:color "white"
                                                  :background-color "green"})}
      ">"]
