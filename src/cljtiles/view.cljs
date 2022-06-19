@@ -37,7 +37,7 @@
    ;;[cljtiles.sc]
    ))
 
-(def dev false) ;;!! also disable spec!!
+(def dev true) ;;!! also disable spec!!
 
 (defn rep-amp [xml-text]
   (string/replace xml-text "&" "&amp;"))
@@ -147,8 +147,8 @@
     (atom {:saved-workspace-xml nil
            :solved-tutorials
            (if dev
-             ;;(into #{} (range -1 300)) ;;to unlock all solutions ;;klm
-             last-of-chapters
+             (into #{} (range -1 300)) ;;to unlock all solutions ;;klm
+             ;;last-of-chapters
              last-of-chapters)
            :sci-env (atom nil)})))
 
@@ -707,7 +707,8 @@
                                   ;; solution should always be loaded when this button appears
                                   ;; and we want to switch to the puzzle
                                      (swap-workspace))
-                                   (gen-code nil))}
+                                   (when-not (:puzzle-keep-desc (nth tutorials tutorial-no))
+                                     (gen-code nil)))}
               "Get the Puzzle"])]
           [:p "A description will appear if the previous puzzle is solved. Maybe you want to go back. However, if you solve this puzzle, the green arrow will unlock the chapter up to the next page."])
         :else
