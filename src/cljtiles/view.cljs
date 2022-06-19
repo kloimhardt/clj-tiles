@@ -178,16 +178,22 @@
        (.workspaceToDom blockly/Xml)
        (.domToPrettyText blockly/Xml)))
 
+(defn set-scrollbar [x y]
+  (when x
+    (.. blockly -mainWorkspace (scroll x y))))
+
 (defn swap-workspace []
   (if (= (:solution-no @state) -1)
     (do
       (update-saved-workspace-xml #(assoc % :xml-code (get-workspace-xml-str)))
       (swap! state assoc :solution-no 0)
-      (load-workspace (get-saved-workspace-xml :xml-solution)))
+      (load-workspace (get-saved-workspace-xml :xml-solution))
+      (apply set-scrollbar (:scroll (nth tutorials (:tutorial-no @state)))))
     (do
       (update-saved-workspace-xml #(assoc % :xml-solution (get-workspace-xml-str)))
       (swap! state assoc :solution-no -1)
-      (load-workspace (get-saved-workspace-xml :xml-code)))))
+      (load-workspace (get-saved-workspace-xml :xml-code))
+      (apply set-scrollbar (:scroll (nth tutorials (:tutorial-no @state)))))))
 
 (def org-mode-tutorials
   (concat [["" "Select a tutorial" "dummy-slug"]] (js->clj ^js js/external_tutorials)))
@@ -234,10 +240,6 @@
       (swap! state assoc :stdout [(str "state is not in best state, pls. report. " (keys @state))]))))
 
 (defonce app-state (rc/atom nil))
-
-(defn set-scrollbar [x y]
-  (when x
-    (.. blockly -mainWorkspace (scroll x y))))
 
 (defn goto-page! [page-no]
   (load-workspace (:xml-code (nth tutorials page-no)))
