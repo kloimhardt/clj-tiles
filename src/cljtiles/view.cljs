@@ -16,7 +16,6 @@
    [cljtiles.tutorials-sicm2 :as t-s2]
    [cljtiles.tutorials-lagr :as t-l]
    [cljtiles.tutorials-sicm :as t-s]
-   [cljtiles.tutorials-sicm3 :as t-s3]
    [cljtiles.tutorials-appen :as t-ax]
    [cljtiles.tutorials-advent1 :as t-adv1]
    [cljtiles.tutorials-fizzbuzz :as t-fizz]
@@ -37,7 +36,7 @@
    ;;[cljtiles.sc]
    ))
 
-(def dev true) ;;!! also disable spec!!
+(def dev false) ;;!! also disable spec!!
 
 (defn rep-amp [xml-text]
   (string/replace xml-text "&" "&amp;"))
@@ -91,7 +90,7 @@
                                     t-0/content t-k/content
                                     t-l/content
                                     t-s2/content
-                                    t-s/content t-s3/content
+                                    t-s/content
                                     t-ax/content]
                              dev (conj t-fizz/content))))
 
