@@ -13,7 +13,9 @@
     :blockpos [[0 0] [0 170] [0 260] [0 300] [0 340] [150 340]]
     :code ['(defn Path-of-a-Free-Particle
               time
-              (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
+              (:tiles/vert
+               (up (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
+                   (:tiles/infix (+ 3 (:tiles/infix (* 4 time)))))))
            '(defn :tiles/slot :tiles/slot :tiles/slot)
            'Kinetic-Energy
            'velocity
@@ -23,7 +25,9 @@
     :solution ['(:tiles/keep
                  (defn Path-of-a-Free-Particle
                    time
-                   (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time))))))
+                   (:tiles/vert
+                    (up (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
+                        (:tiles/infix (+ 3 (:tiles/infix (* 4 time))))))))
                '(defn Kinetic-Energy
                   velocity
                   (square velocity))]}
@@ -40,7 +44,9 @@
                [300 250] [400 250] [550 250] [650 250] [750 250]]
     :code ['(defn Path-of-a-Free-Particle
               time
-              (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
+              (:tiles/vert
+               (up (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
+                   (:tiles/infix (+ 3 (:tiles/infix (* 4 time)))))))
            '(defn Kinetic-Energy
               velocity
               (square velocity))
@@ -57,7 +63,9 @@
     :solution ['(:tiles/keep
                  (defn Path-of-a-Free-Particle
                    time
-                   (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time))))))
+                   (:tiles/vert
+                    (up (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
+                        (:tiles/infix (+ 3 (:tiles/infix (* 4 time))))))))
                '(:tiles/keep
                  (defn Kinetic-Energy
                    velocity
@@ -94,7 +102,9 @@ If you now apply this operator to the Path-of-a-Free-Particle, the zero row vect
                [400 450] [450 400] [600 350]]
     :code ['(defn Path-of-a-Free-Particle
               time
-              (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))
+              (:tiles/vert
+               (up (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
+                   (:tiles/infix (+ 3 (:tiles/infix (* 4 time)))))))
            '(defn Kinetic-Energy
               velocity
               (square velocity))
@@ -113,7 +123,9 @@ If you now apply this operator to the Path-of-a-Free-Particle, the zero row vect
     :solution ['(:tiles/keep
                  (defn Path-of-a-Free-Particle
                    time
-                   (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time))))))
+                   (:tiles/vert
+                    (up (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
+                        (:tiles/infix (+ 3 (:tiles/infix (* 4 time))))))))
                '(:tiles/keep (defn Kinetic-Energy
                                velocity
                                (square velocity)))
@@ -210,9 +222,9 @@ second you introduce the mass \\(m\\) into the kinetic energy. After running, yo
               velocity
               (square velocity))
            ''m
-           '(/ :tiles/slot :tiles/slot)
+           '(:tiles/infix (/ :tiles/slot :tiles/slot))
            '2
-           '(* :tiles/slot :tiles/slot)
+           '(:tiles/infix (* :tiles/slot :tiles/slot))
            '(defn Lagrangian
               [[time position velocity]]
               (Kinetic-Energy velocity))
@@ -223,9 +235,10 @@ second you introduce the mass \\(m\\) into the kinetic energy. After running, yo
                    (literal-function 'q_y)))
               10)]]
     :solpos-yx [[0 0] [150 0] [300 0]]
-    :solution ['(:tiles/keep (defn Kinetic-Energy
-                               velocity
-                               (* (/ 'm 2) (square velocity))))
+    :solution ['(defn Kinetic-Energy
+                  velocity
+                  (:tiles/infix (* (:tiles/infix (/ 'm 2))
+                                   (square velocity))))
                '(:tiles/keep (defn Lagrangian
                                [[time position velocity]]
                                (Kinetic-Energy velocity)))
@@ -249,16 +262,16 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                [0 500]]
     :code ['(defn Kinetic-Energy
               velocity
-              (* (/ 'm 2) (square velocity)))
+              (:tiles/infix (* (:tiles/infix (/ 'm 2)) (square velocity))))
            '(defn :tiles/slot
               :tiles/slot
               :tiles/slot)
            'Potential-Energy
            'hight
            ''m
-           '(* :tiles/slot :tiles/slot)
+           '(:tiles/infix (* :tiles/slot :tiles/slot))
            ''g
-           '(* :tiles/slot :tiles/slot)
+           '(:tiles/infix (* :tiles/slot :tiles/slot))
            'hight
 
            '(defn Lagrangian
@@ -267,7 +280,7 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            [:tiles/slot :tiles/slot]
            '_
            'hight
-           '(- :tiles/slot :tiles/slot)
+           '(:tiles/infix (- :tiles/slot :tiles/slot))
            '(Potential-Energy :tiles/slot)
            'hight
 
@@ -282,14 +295,15 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                 [500 0]]
     :solution ['(:tiles/keep (defn Kinetic-Energy
                                velocity
-                               (* (/ 'm 2) (square velocity))))
+                               (:tiles/infix (* (:tiles/infix (/ 'm 2))
+                                                (square velocity)))))
                '(defn Potential-Energy
                   hight
-                  (* (* 'm 'g) hight))
+                  (:tiles/infix (* (:tiles/infix (* 'm 'g)) hight)))
                '(defn Lagrangian
                   [[time [_ hight] velocity]]
-                  (- (Kinetic-Energy velocity)
-                     (Potential-Energy hight)))
+                  (:tiles/infix (- (Kinetic-Energy velocity)
+                                   (Potential-Energy hight))))
                '(:tiles/keep [:div>tex
                               (((Lagrange-equations Lagrangian)
                                 (up (literal-function 'q_x)
@@ -312,14 +326,15 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                [0 750]]
     :code ['(defn Kinetic-Energy
               velocity
-              (* (/ 'm 2) (square velocity)))
+              (:tiles/infix (* (:tiles/infix (/ 'm 2))
+                               (square velocity))))
            '(defn Potential-Energy
               hight
-              (* (* 'm 'g) hight))
+              (:tiles/infix (* (:tiles/infix (* 'm 'g)) hight)))
            '(defn Lagrangian
               [[time [_ hight] velocity]]
-              (- (Kinetic-Energy velocity)
-                 (Potential-Energy hight)))
+              (:tiles/infix (- (Kinetic-Energy velocity)
+                               (Potential-Energy hight))))
            'Rectangular-Angle
            '(defn :tiles/slot
               :tiles/slot
@@ -328,9 +343,10 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            [:tiles/slot :tiles/slot] '_ [:tiles/slot] 'angle
            '(:tiles/vert
              (up :tiles/slot :tiles/slot))
-           ''l '(* :tiles/slot :tiles/slot) '(sin :tiles/slot) 'angle
-           ''h '(- :tiles/slot :tiles/slot)
-           ''l '(* :tiles/slot :tiles/slot)
+           ''l '(:tiles/infix (* :tiles/slot :tiles/slot))
+           '(sin :tiles/slot) 'angle
+           ''h '(:tiles/infix (- :tiles/slot :tiles/slot))
+           ''l '(:tiles/infix (* :tiles/slot :tiles/slot))
            '(cos :tiles/slot) 'angle
 
            '(compose :tiles/slot :tiles/slot)
@@ -341,9 +357,9 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
            '(literal-function :tiles/slot)
            ''phi
            '[:div>tex
-             (((Lagrange-equations Lagrangian)
-               (up (literal-function 'q_x)
-                   (literal-function 'q_y)))
+             (((Lagrange-equations _Lagrangian)
+               (_up (_literal-function 'q_x)
+                    (_literal-function 'q_y)))
               't)]]
     :solpos-yx [[0 0]
                 [150 0]
@@ -352,19 +368,20 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                 [750 0]]
     :solution ['(:tiles/keep (defn Kinetic-Energy
                                velocity
-                               (* (/ 'm 2) (square velocity))))
+                               (:tiles/infix (* (:tiles/infix (/ 'm 2))
+                                                (square velocity)))))
                '(:tiles/keep (defn Potential-Energy
                                hight
-                               (* (* 'm 'g) hight)))
+                               (:tiles/infix (* (:tiles/infix (* 'm 'g)) hight))))
                '(:tiles/keep (defn Lagrangian
                                [[time [_ hight] velocity]]
-                               (- (Kinetic-Energy velocity)
-                                  (Potential-Energy hight))))
+                               (:tiles/infix (- (Kinetic-Energy velocity)
+                                                (Potential-Energy hight)))))
                '(defn Rectangular-Angle
                   [[_ [angle]]]
                   (:tiles/vert
-                   (up (* 'l (sin angle))
-                       (- 'h (* 'l (cos angle))))))
+                   (up (:tiles/infix (* 'l (sin angle)))
+                       (:tiles/infix (- 'h (:tiles/infix (* 'l (cos angle))))))))
                '(:tiles/keep [:div>tex
                               (((Lagrange-equations
                                  (compose Lagrangian (F->C Rectangular-Angle)))
@@ -392,23 +409,24 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                [0 900]]
     :code ['(defn Kinetic-Energy
               velocity
-              (* (/ 'm 2) (square velocity)))
+              (:tiles/infix (* (:tiles/infix (/ 'm 2))
+                               (square velocity))))
            '(defn Potential-Energy
               hight
-              (* (* 'm 'g) hight))
+              (:tiles/infix (* (:tiles/infix (* 'm 'g)) hight)))
            '(defn Lagrangian
               [[time [_ hight] velocity]]
-              (- (Kinetic-Energy velocity)
-                 (Potential-Energy hight)))
+              (:tiles/infix (- (Kinetic-Energy velocity)
+                               (Potential-Energy hight))))
            'Hight-of-Pivot
            '(defn :tiles/slot :tiles/slot :tiles/slot)
            'time
            '(:tiles/slot :tiles/slot) '(literal-function :tiles/slot) ''h 'time
            '(defn Rectangular-Angle
-              [[_ [angle]]]
+              [[__ [angle]]]
               (:tiles/vert
-               (up (* 'l (sin angle))
-                   (- 'h (* 'l (cos angle))))))
+               (up (:tiles/infix (* 'l (sin angle)))
+                   (:tiles/infix (- '_h (:tiles/infix (* 'l (cos angle))))))))
            'time
            '(Hight-of-Pivot :tiles/slot) 'time
            '[:div>tex
@@ -424,22 +442,24 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
                 [750 0]]
     :solution ['(:tiles/keep (defn Kinetic-Energy
                                velocity
-                               (* (/ 'm 2) (square velocity))))
+                               (:tiles/infix (* (:tiles/infix (/ 'm 2))
+                                                (square velocity)))))
                '(:tiles/keep (defn Potential-Energy
                                hight
-                               (* (* 'm 'g) hight)))
+                               (:tiles/infix (* (:tiles/infix (* 'm 'g)) hight))))
                '(:tiles/keep (defn Lagrangian
                                [[time [_ hight] velocity]]
-                               (- (Kinetic-Energy velocity)
-                                  (Potential-Energy hight))))
+                               (:tiles/infix (- (Kinetic-Energy velocity)
+                                                (Potential-Energy hight)))))
                '(defn Hight-of-Pivot
                   time
                   ((literal-function 'h) time))
                '(defn Rectangular-Angle
                   [[time [angle]]]
                   (:tiles/vert
-                   (up (* 'l (sin angle))
-                       (- (Hight-of-Pivot time) (* 'l (cos angle))))))
+                   (up (:tiles/infix (* 'l (sin angle)))
+                       (:tiles/infix (- (Hight-of-Pivot time)
+                                        (:tiles/infix (* 'l (cos angle))))))))
                '(:tiles/keep [:div>tex
                               (((Lagrange-equations
                                  (compose Lagrangian (F->C Rectangular-Angle)))

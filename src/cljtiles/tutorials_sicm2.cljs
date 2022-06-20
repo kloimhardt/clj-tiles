@@ -193,7 +193,10 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
     :puzzle-keep-desc true
     :solution ['(defn Path-of-a-Free-Particle
                   time
-                  (:tiles/vert (up (+ 2 (* 5 time)) (+ 3 (* 4 time)))))]}])
+                  (:tiles/vert
+                   (up
+                    (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
+                    (:tiles/infix (+ 3 (:tiles/infix (* 4 time)))))))]}])
 
 (def chapnames ["Pendulum begin"])
 (def chaps [(count e-vect)])
