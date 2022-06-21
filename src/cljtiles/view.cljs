@@ -89,8 +89,8 @@
 (def content (make-content (cond-> [t-ac/content
                                     t-0/content t-k/content
                                     t-l/content
-                                    t-s2/content
                                     t-s/content
+                                    t-s2/content
                                     t-ax/content]
                              dev (conj t-fizz/content))))
 

@@ -8,45 +8,10 @@
     :description
     [:div
      [:div bold "Description"]
-     [:p "We start by creating a function Path-of-a-Free-Particle. Newtons first law states that in some inertial frame of reference, an object continues to move in space at a constant velocity. This movement takes time, so our function depends on time. It returns a vector of two elements because we choose our path to live in two dimensions."]
-
-     [:div bold "Explanation"]
-     [:p "
-Modelling the path of a free particle is the first step for creating the equatios of motion for the driven pendulum in a gravitational field.
-In familiar notation, the path is denoted by:
-   \\[\\vec{x}(t) =
-      \\begin{pmatrix}
-      x^1(t) \\\\
-      x^2(t)
-      \\end{pmatrix}
-=
-      \\begin{pmatrix}
-      x(t) \\\\
-      y(t)
-      \\end{pmatrix}
-=
-      \\begin{pmatrix}
-      2 + 5t \\\\
-      3 + 4t
-      \\end{pmatrix}
-
-      \\]"]
-     [:p "Note that \\(\\vec{x}\\) is a column vector with according superscripted component-indizes, hence the name \"up\" in the code."]
-     [:p "The vector \\(\\vec{x}\\) describes a moving body which is at time \\(t=0\\) at point
-\\(\\big(\\begin{smallmatrix}
-  x\\\\
-  y
-\\end{smallmatrix}\\big)\\)
-=
-\\(\\big(\\begin{smallmatrix}
-  2\\\\
-  3
-\\end{smallmatrix}\\big)\\)
-and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \\frac{m}{s}\\) in \\(y\\) direction. Imagine the body as a "
-      [:a {:href "https://www.youtube.com/watch?v=z74OwRy8o9I"} "Pizza in space"]
-      " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]
+     [:p "This is the Free Particle again. You reconize it: it was at the very beginning of the Driven Pendulum chapter. But here, solving the puzzle comes in the form of an interactive journey. The right-click + inspect feature not only delivers the result of the code under scrutiny, it also gives some hint on how to proceed. Note: the journey feature is very experimental and you can get off track quickly. But there is a "
+      [:a {:href "https://www.youtube.com/watch?v=DHcZkmXKp04"} "walkthrough video"] "."]
      [:div bold "Interactive tutorial"]
-     [:p "After pressing the \"Get the Puzzle\" button, number 5 on the upper left catches your attention. Full of curiosity, you right click and inspect it."]]
+     [:p "Number 5 on the upper left catches your attention. Full of curiosity, you right click and inspect it."]]
     :hint ["(Path-of-a-Free-Particle :tiles/slot) 10"
            "(Path-of-a-Free-Particle :tiles/slot) 't"]
     :error-message-fn
@@ -190,15 +155,12 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            'time
            '(:tiles/infix (+ :tiles/slot :tiles/slot))
            'time]
-    :puzzle-keep-desc true
-    :solution ['(defn Path-of-a-Free-Particle
-                  time
-                  (:tiles/vert
-                   (up
-                    (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
-                    (:tiles/infix (+ 3 (:tiles/infix (* 4 time)))))))]}])
+    :puzzle-keep-desc true ;;this is not needed anymore, as :solution was removed
+    ;;so the description is displayed anyway.
+    ;;It is kept here to remind that this feature exists as it is nowhere used
+    }])
 
-(def chapnames ["Pendulum begin"])
+(def chapnames ["Free Particle"])
 (def chaps [(count e-vect)])
 
 (def content {:tutorials e-vect :chapnames chapnames :chaps chaps})

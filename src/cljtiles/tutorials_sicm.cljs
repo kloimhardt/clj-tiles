@@ -5,6 +5,69 @@
 (def e-vect
   [{:description
     [:div
+     [:div bold "Introduction"]
+     [:p "This chapter is a step by step guide to derive the equation of motion for the driven pendulum. An animation can be seen at the " [:a {:href "http://blog.littleredcomputer.net/math/js/2017/02/09/driven-pendulum.html"} "blog of Colin Smith"] " who also gave a "
+      [:a {:href "https://www.youtube.com/watch?v=7PoajCqNKpg&t=2145s"} "Clojure/West 2017 talk"] ". Also there is an explanation " [:a {:href "https://www.youtube.com/watch?v=V7unwER5wFc"} "video"]  "."]
+     [:div bold "Description"]
+     [:p "We start by creating a function Path-of-a-Free-Particle. Newtons first law states that in some inertial frame of reference, an object continues to move in space at a constant velocity. This movement takes time, so our function depends on time. It returns a vector of two elements because we choose our path to live in two dimensions."]
+
+     [:div bold "Explanation"]
+     [:p "
+Modelling the path of a free particle is the first step for creating the equatios of motion for the driven pendulum in a gravitational field.
+In familiar notation, the path is denoted by:
+   \\[\\vec{x}(t) =
+      \\begin{pmatrix}
+      x^1(t) \\\\
+      x^2(t)
+      \\end{pmatrix}
+=
+      \\begin{pmatrix}
+      x(t) \\\\
+      y(t)
+      \\end{pmatrix}
+=
+      \\begin{pmatrix}
+      2 + 5t \\\\
+      3 + 4t
+      \\end{pmatrix}
+
+      \\]"]
+     [:p "Note that \\(\\vec{x}\\) is a column vector with according superscripted component-indizes, hence the name \"up\" in the code."]
+     [:p "The vector \\(\\vec{x}\\) describes a moving body which is at time \\(t=0\\) at point
+\\(\\big(\\begin{smallmatrix}
+  x\\\\
+  y
+\\end{smallmatrix}\\big)\\)
+=
+\\(\\big(\\begin{smallmatrix}
+  2\\\\
+  3
+\\end{smallmatrix}\\big)\\)
+and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \\frac{m}{s}\\) in \\(y\\) direction. Imagine the body as a "
+      [:a {:href "https://www.youtube.com/watch?v=z74OwRy8o9I"} "Pizza in space"]
+      " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]]
+    :blockpos-yx [[0 0] [20 300] [70 100]
+                  [70 200] [70 450]
+                  [150 200] [150 450]]
+    :code ['(defn Path-of-a-Free-Particle
+              :tiles/slot
+              :tiles/slot)
+           'time
+           '(:tiles/vert
+             (up :tiles/slot
+                 :tiles/slot))
+           '(:tiles/infix (+ :tiles/slot (:tiles/infix (* 5 time))))
+           '2
+           '(:tiles/infix (+ 3 (:tiles/infix (* :tiles/slot time))))
+           '4]
+    :solution ['(defn Path-of-a-Free-Particle
+                  time
+                  (:tiles/vert
+                   (up
+                    (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
+                    (:tiles/infix (+ 3 (:tiles/infix (* 4 time)))))))]}
+   {:description
+    [:div
      [:div bold "Description"]
      [:p "The kinetic energy is half the mass times velocity squared. If we set the mass to \\(2kg\\) the formula becomes simpler. We know that the velocity of our free particle is constant. In the \\(x\\) direction it is \\(5 \\frac{m}{s}\\). But notice that the velocity here could be any function in time (not in space+time.)"]
      [:div bold "Explanation"]
@@ -469,5 +532,5 @@ the hight of the particle above ground. It is \\(m \\times g \\times hight\\), w
     :solution ["End of Chapter"]
     :code ["End of Chapter"]}])
 
-(def content {:tutorials e-vect :chapnames ["Pendulum main"]
+(def content {:tutorials e-vect :chapnames ["Driven Pendulum"]
               :chaps [(count e-vect)]})
