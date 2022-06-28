@@ -1,0 +1,44 @@
+* Ideas for visual tools meetup 2.7.22
+** re-clojure
+presented at re-clojure conference. Only buildt in puzzles.
+
+** open book + .org + Mahoney
+https://github.com/mentat-collective/fdg-book/blob/main/clojure/org/chapter001.org
+
+https://mitpress.mit.edu/books/functional-differential-geometry
+https://archive.org/details/FunctionalDifferentialGeometry
+
+https://markm208.github.io/cljbook/
+
+** load chapter one + click through
+if not solved, need to complete a puzzle, reward is the solution of the next
+
+** solve first mechanically
+puzzles are solvable mechanically
+
+** End of chapter
+show the last page "End of chapter" trick of the 4Clojure Tutorial to unlock all solutions
+
+** show complicated #17
+e.g. I have no way of understnaidng #17, If I shuffle it, it is hopeless.
+but I can still solve it and try to start to understand or remember in a first step
+
+** #16 +inspect -missing-equation-numbers
+In the text #16 it sais they do not want to show the messy results, but we can do it using inspect
+-> cljtiles added value is 1) puzzle + wordle green coloring 2) inspect
+-> but is only an add on for a good traditional book
+User should Download the original pdfs as these are the original and be consulted when in doubt
+We have no equation numbers for example
+
+** show uniteresting #6
+not every puzzle is interesting: #5&6 (only adds tex-equation)
+
+** four.org -no-story
+show four.org as contrast to the FDG book: it has no story, so claim that this maybe is not so interesting
+
+** driven pendulum + #122 black + mahoney
+show the path-of-a-free-particle black coloring, code as a story,
+relation to Mark Mahony
+
+** free particle #126
+show inspect-tutorial
