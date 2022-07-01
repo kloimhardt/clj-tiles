@@ -10,10 +10,10 @@ https://mitpress.mit.edu/books/functional-differential-geometry
 https://www.nytimes.com/games/wordle/index.html
 https://markm208.github.io/cljbook/
 
-* re-clojure
+* ---------- re-clojure
 ** 1/2/3 + 9 + II + Lagrangian
 
-* FDG
+* ---------- FDG
 ** FDG hompage + mentat.org + URL at will
 
 ** click through (don't solve)
@@ -28,7 +28,7 @@ https://markm208.github.io/cljbook/
 
 ** show uniteresting #6
 
-* Pendulum
+* ---------- Pendulum
 ** Mahoney: blogs do not show workspace
 
 ** pendulum click through to end + unlock
@@ -37,7 +37,7 @@ https://markm208.github.io/cljbook/
 
 ** driven pendulum + #120 black
 
-* Questions
+* ---------- Questions
 ** - four.org -no-story
 show four.org as contrast to the FDG book: it has no story, so claim that this maybe is not so interesting
 ** - free particle #126
