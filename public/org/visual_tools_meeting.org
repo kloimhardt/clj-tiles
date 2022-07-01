@@ -10,55 +10,33 @@ https://mitpress.mit.edu/books/functional-differential-geometry
 https://www.nytimes.com/games/wordle/index.html
 https://markm208.github.io/cljbook/
 
-* re-clojure
-** 1/2/3
-** 9
-** II
-** Lagrangian
-** question about feedback
-presented at re-clojure conference. Only buildt in puzzles.
+* Notes
+** re-clojure 1/2/3 + 9 + II + Lagrangian
 
-* wordle
+** FDG hompage + mentat.org + URL at will
 
-* FDG Book
-** mentat .org
-** open via parser
-** hint anything can be the URL
+** click through (don't solve)
 
-* click through (don't solve)
+** solve first with colors + wordle
 
-* solve first mechanically + shuffle
-puzzles are solvable mechanically
+** End of chapter
 
-* End of chapter
-show the last page "End of chapter" trick of the 4Clojure Tutorial to unlock all solutions
+** show complicated #17 + solve + shuffle
 
-* show complicated #17
-e.g. I have no way of understnaidng #17, If I shuffle it, it is hopeless.
-but I can still solve it and try to start to understand or remember in a first step
+** #16 +inspect -missing-equation-numbers (open pdf)
 
-* #16 +inspect -missing-equation-numbers
-** inspect shows what book does not
-** but missing equation numbers
-** keep .pdf handy (open pdf)
-In the text #16 it sais they do not want to show the messy results, but we can do it using inspect
+** show uniteresting #6
 
-* show uniteresting #6
-not every puzzle is interesting: #5&6 (only adds tex-equation)
+** Mahoney: blogs do not show workspace
 
-* Mahoney: blogs do not show workspace
+** pendulum click through to end + unlock
 
-* pendulum click through (don't solve)
-if not solved, need to complete a puzzle, reward is the solution of the next
+** click through again
 
-* solve first
-
-* driven pendulum + #120 black
-show the path-of-a-free-particle black coloring, code as a story,
-relation to Mark Mahony
+** driven pendulum + #120 black
 
 * Questions
-** four.org -no-story
+** - four.org -no-story
 show four.org as contrast to the FDG book: it has no story, so claim that this maybe is not so interesting
-** free particle #126
+** - free particle #126
 show inspect-tutorial
