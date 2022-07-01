@@ -10,9 +10,10 @@ https://mitpress.mit.edu/books/functional-differential-geometry
 https://www.nytimes.com/games/wordle/index.html
 https://markm208.github.io/cljbook/
 
-* Notes
-** re-clojure 1/2/3 + 9 + II + Lagrangian
+* re-clojure
+** 1/2/3 + 9 + II + Lagrangian
 
+* FDG
 ** FDG hompage + mentat.org + URL at will
 
 ** click through (don't solve)
@@ -27,6 +28,7 @@ https://markm208.github.io/cljbook/
 
 ** show uniteresting #6
 
+* Pendulum
 ** Mahoney: blogs do not show workspace
 
 ** pendulum click through to end + unlock
