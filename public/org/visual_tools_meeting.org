@@ -19,12 +19,15 @@ Lagrangian has description like a book
 ** FDG hompage + mentat.org
 
 ** URL at will + click through (don't solve)
+when run, sometimes no interesting result. Improved in Pendulum section.
 
 ** solve first with colors + wordle
 
 ** End of chapter
 
 ** show complicated #17 + solve + shuffle
+puzzles are complicated because automatically generated.
+Improved on by hand made puzzles presented in Pendulum section.
 
 ** #16 +inspect -missing-equation-numbers (open pdf)
 
@@ -40,7 +43,16 @@ Lagrangian has description like a book
 ** driven pendulum + #120 black
 
 * ---------- Questions
+** For whom is it?
+1) Armchair physicists
+2) anyone who wants to live code his .org file in front of audience
+
+** Compared to scratch?
+Parsons puzzles, not creating programs
+
 ** - four.org -no-story
-show four.org as contrast to the FDG book: it has no story, so claim that this maybe is not so interesting
+show four.org as contrast to the FDG book:
+it has no story, so claim that this maybe is not so interesting
+
 ** - free particle #126
 show inspect-tutorial
