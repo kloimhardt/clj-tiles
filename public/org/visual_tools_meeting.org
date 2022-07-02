@@ -12,11 +12,13 @@ https://markm208.github.io/cljbook/
 
 * ---------- re-clojure
 ** 1/2/3 + 9 + II + Lagrangian
+Dylan poems have feedback, II does not (like mostly all others),
+Lagrangian has description like a book 
 
 * ---------- FDG
-** FDG hompage + mentat.org + URL at will
+** FDG hompage + mentat.org
 
-** click through (don't solve)
+** URL at will + click through (don't solve)
 
 ** solve first with colors + wordle
 
