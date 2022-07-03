@@ -45,7 +45,8 @@ Improved on by hand made puzzles presented in Pendulum section.
 * ---------- Questions
 ** For whom is it?
 1) Armchair physicists
-2) anyone who wants to live code his .org file in front of audience
+2) Clojurebridge tutors (+ beginners)
+3) anyone who wants to live code his .org file in front of audience
 
 ** Compared to scratch?
 Parsons puzzles, not creating programs

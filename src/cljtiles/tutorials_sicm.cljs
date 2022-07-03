@@ -43,12 +43,18 @@ In familiar notation, the path is denoted by:
   2\\\\
   3
 \\end{smallmatrix}\\big)\\)
-and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \\frac{m}{s}\\) in \\(y\\) direction. Imagine the body as a "
+and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \\frac{m}{s}\\) in \\(y\\) direction. So, after \\(t=6\\) seconds, the body is at position
+\\(\\big(\\begin{smallmatrix}
+  32\\\\
+  27
+\\end{smallmatrix}\\big)\\).
+  Imagine the body as a "
       [:a {:href "https://www.youtube.com/watch?v=z74OwRy8o9I"} "Pizza in space"]
       " (and always think of a sattelite when someone talks about \"inertial frame of reference\")"]]
     :blockpos-yx [[0 0] [20 300] [70 100]
                   [70 200] [70 450]
-                  [150 200] [150 450]]
+                  [150 200] [150 450]
+                  [250 0]]
     :code ['(defn Path-of-a-Free-Particle
               :tiles/slot
               :tiles/slot)
@@ -59,13 +65,16 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            '(:tiles/infix (+ :tiles/slot (:tiles/infix (* 5 time))))
            '2
            '(:tiles/infix (+ 3 (:tiles/infix (* :tiles/slot time))))
-           '4]
+           '4
+           '[:div>tex (Path-of-a-Free-Particle 6)]]
+    :solpos-yx [[0 0] [250 0]]
     :solution ['(defn Path-of-a-Free-Particle
                   time
                   (:tiles/vert
                    (up
                     (:tiles/infix (+ 2 (:tiles/infix (* 5 time))))
-                    (:tiles/infix (+ 3 (:tiles/infix (* 4 time)))))))]}
+                    (:tiles/infix (+ 3 (:tiles/infix (* 4 time)))))))
+               '(:tiles/keep [:div>tex (Path-of-a-Free-Particle 6)])]}
    {:description
     [:div
      [:div bold "Description"]
@@ -73,7 +82,8 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
      [:div bold "Explanation"]
      [:p "You define the kinetic energy as another function, which is not yet connected to the function defined before. The kinetic energy is a function of velocity, \\(T=T(\\vec{v}) = \\frac{m}{2} |\\vec{v}|^2 = \\frac{m}{2}v^2\\). With \\(m=2\\) you get \\( T=v^2\\) and with \\(v=\\sqrt{5^2 + 4^2}\\frac{m}{s}\\), you get \\(T=41 \\frac{kg\\ m^2}{s^2}\\). Again, \\(v\\) is a constant here, as we are dealing with the free particle. But \\(v\\) will become a function of time \\(v=v(t)\\). That means you need to accept the fact that \\(T\\) will become a function of a function. And, to make no mistake, velocity never is a function of position but only of time."]]
     :scroll [0 0]
-    :blockpos [[0 0] [0 170] [0 260] [0 300] [0 340] [150 340]]
+    :blockpos [[0 0] [0 170] [0 260] [0 300] [0 340] [150 340]
+               [0 450]]
     :code ['(defn Path-of-a-Free-Particle
               time
               (:tiles/vert
@@ -83,8 +93,9 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            'Kinetic-Energy
            'velocity
            '(square :tiles/slot)
-           'velocity]
-    :solpos-yx [[0 0] [170 0]]
+           'velocity
+           '(Kinetic-Energy (:tiles/vert (up 5 4)))]
+    :solpos-yx [[0 0] [170 0] [450 0]]
     :solution ['(:tiles/keep
                  (defn Path-of-a-Free-Particle
                    time
@@ -93,7 +104,9 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                         (:tiles/infix (+ 3 (:tiles/infix (* 4 time))))))))
                '(defn Kinetic-Energy
                   velocity
-                  (square velocity))]}
+                  (square velocity))
+               '(:tiles/keep
+                 (Kinetic-Energy (:tiles/vert (up 5 4))))]}
    {:description
     [:div
      [:div bold "Description"]
@@ -104,7 +117,8 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
      [:p "You come to the conclusion: The Lagrangian always is a function of the parameter time which at the moment does not depend on time at all. This sounds paradoxical only due to the limits of usual mathematical notation and natural language usage. The conclusion is completely right. Time appears in the arguments of the function, but not in its body."]]
     :scroll [0 0]
     :blockpos [[0 0] [0 170] [0 280] [150 280] [150 330] [350 330]
-               [300 250] [400 250] [550 250] [650 250] [750 250]]
+               [300 250] [400 250] [550 250] [650 250] [750 250]
+               [0 450]]
     :code ['(defn Path-of-a-Free-Particle
               time
               (:tiles/vert
@@ -121,8 +135,12 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
            [:tiles/slot :tiles/slot :tiles/slot]
            'time
            'position
-           'velocity]
-    :solpos-yx [[0 0] [170 0] [280 0]]
+           'velocity
+           '(Lagrangian [6
+                         (:tiles/vert (up 2 3))
+                         (:tiles/vert (up 5 4))])]
+    :solpos-yx [[0 0] [170 0] [280 0]
+                [450 0]]
     :solution ['(:tiles/keep
                  (defn Path-of-a-Free-Particle
                    time
@@ -135,7 +153,11 @@ and has a constant speed of \\(5 \\frac{m}{s}\\) in \\(x\\) direction and \\(4 \
                    (square velocity)))
                '(defn Lagrangian
                   [[time position velocity]]
-                  (Kinetic-Energy velocity))]}
+                  (Kinetic-Energy velocity))
+               '(:tiles/keep
+                 (Lagrangian [6
+                              (:tiles/vert (up 2 3))
+                              (:tiles/vert (up 5 4))]))]}
    {:description
     [:div
      [:div bold "Description"]
