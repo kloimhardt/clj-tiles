@@ -1,14 +1,29 @@
+
+> I read your treatise the way a curious child listens in suspense to the solution of a puzzle that has plagued him for a long time, and I delight in the beauties revealed to the eye.
+
+><font size="1">
+German Original: Ich lese ihre Abhandlung, wie ein neugieriges Kind die Auflösung eines Rätsels, mit dem es sich lange geplagt hat, voller Spannung anhört, und freue mich an den Schönheiten, die sich dem Auge enthüllen.</font>
+
+[Max Planck](https://phaidra.univie.ac.at/o:1542358) to Erwin Schrödinger on 2 April 1926
+
+
 # Clj-Tiles
 
-Watch the [video](https://www.youtube.com/watch?v=bHBALgxjeLo) presented at the [re-clojure](https://www.reclojure.org/2021/speaker/markus-kloimwieder) 2021 conference, and also the [panel discussion](https://www.youtube.com/watch?v=euH8iZGbJD8)
+## Features
 
-* Learn or teach functional programming by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html).
-* There are over 100 puzzles built in. Starting with simple examples, they continue to basic web-programming and lead to sophisticated examples taken from theoretical physics.
+* Solve graphical [puzzles](https://kloimhardt.github.io/cljtiles.html) in the browser.
+* Learn functional programming to your inner child.
+* Over 100 puzzles built in. Start with simple examples, continue to basic web-programming and move to sophisticated examples taken from theoretical physics.
 * Investigate puzzles with the built in value inspector.
-* Make new puzzle tutorials by using the built in parser.
+* [Load more puzzles] (https://kloimhardt.github.io/cljtiles.html?page=FDG001) from the web (and also extend them) with the built in parser.
+* Create textfiles with whole new puzzle tutorials.
 * Live coding made easy, just prepare a puzzle and solve it in front of the audience.
 
-Watch the [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04).
+## Videos
+* [Talk](https://www.youtube.com/watch?v=bHBALgxjeLo) presented at the [re-clojure](https://www.reclojure.org/2021/speaker/markus-kloimwieder) 2021 conference, with [panel discussion](https://www.youtube.com/watch?v=euH8iZGbJD8).
+*  [Visual tools meeting](https://clojureverse.org/t/visual-tools-meeting-9-summary-video-clj-tiles-obsidian-wielder-cardigan-bay-platypub/9081) from July 2nd 2022. It shows the [first chapter](https://github.com/mentat-collective/fdg-book) of the open-access book [Functional Differential Geometry](https://mitpress.mit.edu/books/functional-differential-geometry), you can try it yourself [here](https://kloimhardt.github.io/cljtiles.html?page=FDG001).
+
+* Earlier [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04).
 
 ## Solve puzzles
 The first few puzzles consist of completing the lyrics of a famous song. Then, the following coding puzzles are taken from the book [Getting Clojure](https://pragprog.com/titles/roclojure/getting-clojure/). Another resource is [Clojure for the Brave and True](https://www.braveclojure.com). Do you notice the similarities between writing code and poetry?
