@@ -10,7 +10,7 @@
 * Learn functional programming to your inner child.
 * Over 100 puzzles built in. Start with simple examples, continue to basic web-programming and move to sophisticated examples taken from theoretical physics.
 * Investigate puzzles with the built in value inspector.
-* [Load more puzzles] (https://kloimhardt.github.io/cljtiles.html?page=FDG001) from the web (and also extend them) with the built in parser.
+* [Load more puzzles](https://kloimhardt.github.io/cljtiles.html?page=FDG001) from the web (and also extend them) with the built in parser.
 * Create textfiles with whole new puzzle tutorials.
 * Live coding made easy, just prepare a puzzle and solve it in front of the audience.
 
