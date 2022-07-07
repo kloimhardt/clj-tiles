@@ -1,13 +1,8 @@
+# Clj-Tiles
 
 > I read your treatise the way a curious child listens in suspense to the solution of a puzzle that has plagued him for a long time, and I delight in the beauties revealed to the eye.
 
-><font size="1">
-German Original: Ich lese ihre Abhandlung, wie ein neugieriges Kind die Auflösung eines Rätsels, mit dem es sich lange geplagt hat, voller Spannung anhört, und freue mich an den Schönheiten, die sich dem Auge enthüllen.</font>
-
-[Max Planck](https://phaidra.univie.ac.at/o:1542358) to Erwin Schrödinger on 2 April 1926
-
-
-# Clj-Tiles
+> [Max Planck](https://phaidra.univie.ac.at/o:1542358) to Erwin Schrödinger on 2 April 1926
 
 ## Features
 
@@ -34,15 +29,19 @@ The most simple example looks like this:
 
 Just press the `Run` button, as this is already a fully functional program.
 
-A more sophisticated example looks like this:
+A [more sophisticated example](https://kloimhardt.github.io/cljtiles.html?page=freeparticle) looks like this:
 
 ![pendulum](screenshots/pendulum_begin.png)
 
-After completion, this puzzle (which uses the built in [SICMutils](https://github.com/sicmutils/sicmutils) library) represents a working program. By right clicking on the individual blocks and `inspect`, you can trace the program execution and get some type information. This special puzzle also provides an experimental feature: the value inspector is enhanced to provide additional descriptions and explanations. Also the completed puzzle is provided in a separate example.
+After completion, this puzzle (which uses the built in [SICMutils](https://github.com/sicmutils/sicmutils) library) represents a working program. By right clicking on the individual blocks and `inspect`, you can trace the program execution and get some type information. This special puzzle also provides an experimental feature: the value inspector is enhanced to provide additional descriptions and explanations (see also the [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04)).
 
-## Create a new puzzle
+## Load or create new puzzles
 
-Open the parser by right clicking on a white space. Paste the following code:
+Open the parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press `insert`. You just loaded an new tutorial from the web. 
+
+The URL in the text field can be changed, so you can provide your own files (they need to follow the format of the provided tutorials).
+
+However, there is a more direct way to create new puzzles. Paste the following code into the text field:
 ```
 {:blockpos [[0 0] [0 100] [0 170] [100 170] [0 220]]
  :code [(:tiles/vert {:title "Getting Clojure"
@@ -69,7 +68,7 @@ Or paste:
 ```
 Notice that in the simplest last case, the workspace is not cleared before insert.
 
-The [examples](https://github.com/kloimhardt/clj-tiles/tree/master/examples) directory contains code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). It can be readily pasted into the clj-tiles parser. Reading the first pages of the book `Structure and Interpretation of Classical Mechanics` ([original](https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html), [reprint](https://tgvaughan.github.io/sicm/)) is mandatory for understanding.
+The file [book_examples_1.cljs](https://github.com/kloimhardt/clj-tiles/blob/master/public/org/book_examples_1.cljs) contains code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). It can be readily pasted into the clj-tiles parser. Reading the first pages of the book `Structure and Interpretation of Classical Mechanics` ([original](https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html), [reprint](https://tgvaughan.github.io/sicm/)) is mandatory for understanding.
 
 ## A kind note on types and the role of graphical blocks
 
