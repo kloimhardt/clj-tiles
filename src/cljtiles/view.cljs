@@ -857,6 +857,7 @@
   (rd/render [theview] (gdom/getElement "out")))
 
 (defn ^{:export true} output []
+  ;; TODO add "pendulumbegin" lable (sic)
   (workspace!/init startsci open-modal)
   (goto-page! (dec 1))
   (set-sci-environment)
