@@ -1,0 +1,16 @@
+#+begin_src clojure :exports none
+(ns fdg.ch1
+  (:refer-clojure :exclude [+ - * / = compare zero? ref partial
+                            numerator denominator])
+  (:require [sicmutils.env :as e :refer :all :exclude [F->C]]))
+
+(define-coordinates t e/R1-rect)
+#+end_src
+
+Easy polar coordinates
+
+#+begin_src clojure
+(up (* 'R (cos 'phi))
+(* 'R (sin 'phi)))
+#+end_src
+
