@@ -10,7 +10,20 @@
 Easy polar coordinates
 
 #+begin_src clojure
-(up (* 'R (cos 'phi))
-(* 'R (sin 'phi)))
+(->tex-equation
+  (up (* 'R (cos 'phi))
+      (* 'R (sin 'phi))))
 #+end_src
 
+#+begin_src clojure
+(->tex-equation
+  (up (* 'R (sin 'theta) (cos 'phi))
+          (* 'R (sin 'theta) (sin 'phi))
+          (* 'R (cos 'theta))))
+#+end_src
+
+#+begin_src clojure
+(->infix
+  (simplify
+    ((D (* 3 (expt sin 2))) 'x)))
+#+end_src
