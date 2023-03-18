@@ -20,8 +20,11 @@ The executable code of the examples can, however, be viewed and modified on anot
 More information on this visual programming project is available on github [4].
 
 [1] https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html
+
 [2] https://kloimhardt.github.io/blog/literatur/2023/03/16/competence-comprehesion-2.html
+
 [3] https://kloimhardt.github.io/blog/html/sicmutils-as-js-book-part1.html
+
 [4] https://github.com/kloimhardt/clj-tiles
 
 #+begin_src clojure
