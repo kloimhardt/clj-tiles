@@ -73,7 +73,7 @@ Easy polar coordinates
 
 #+begin_src clojure
 (define ((varied-free-particle-action mass q nu t1 t2) eps)
-  (let ((eta (make-eta nu t1 t2)) (_ _))
+  (let ((eta (make-eta nu t1 t2)) (_ 0))
     (Lagrangian-action (L-free-particle mass)
                        (+ q (* eps eta))
                        t1
@@ -108,7 +108,7 @@ Easy polar coordinates
               (multidimensional-minimize
                 (parametric-path-action Lagrangian t0 q0 t1 q1)
                 initial-qs))
-            (_ _))
+            (_ 0))
         (make-path t0 q0 t1 q1 minimizing-qs)))) 
 #+end_src
 
@@ -162,16 +162,19 @@ pi-half is :pi/2 in Scheme
    't)) 
 #+end_src
 
+Had to introduce a new let as 4 bindings cannot be parsed
+
 #+begin_src clojure
-    (define ((L-Kepler-central-polar m V) local)
-      (let ((q (coordinate local))
-            (qdot (velocity local)))
-        (let ((r (ref q 0))
-              (phi (ref q 1))
-              (rdot (ref qdot 0)) (phidot (ref qdot 1)))
+  (define ((L-Kepler-central-polar m V) local)
+    (let ((q (coordinate local))
+          (qdot (velocity local)))
+      (let ((r (ref q 0))
+            (phi (ref q 1)))
+        (let ((rdot (ref qdot 0))
+             (phidot (ref qdot 1)))
           (- (* 1/2 m
                 (+ (square rdot) (square (* r phidot))) )
-             (V r))))) 
+             (V r)))))) 
 #+end_src
 
 #+begin_src clojure
@@ -246,13 +249,14 @@ pi-half is :pi/2 in Scheme
 #+end_src
 
 #+begin_src clojure
-(define (p->r local)
-  (let ((polar-tuple (coordinate local)))
-    (let ((r (ref polar-tuple 0))
-          (phi (ref polar-tuple 1)))
-      (let ((x (* r (cos phi)))
-            (y (* r (sin phi))))
-        (up x y))))) 
+  (define (p->r local)
+    (let ((polar-tuple (coordinate local))
+          (_ 0))
+      (let ((r (ref polar-tuple 0))
+            (phi (ref polar-tuple 1)))
+        (let ((x (* r (cos phi)))
+              (y (* r (sin phi))))
+          (up x y))))) 
 #+end_src
 
 #+begin_src clojure
@@ -306,13 +310,14 @@ pi-half is :pi/2 in Scheme
 #+end_src
 
 #+begin_src clojure
-(define (r->p local)
-  (let ((rect-tuple (coordinate local)))
-    (let ((x (ref rect-tuple 0))
-          (y (ref rect-tuple 1)))
-       (let ((r (sqrt (square rect-tuple)))
-             (phi (atan (/ y x))))
-         (up r phi))))) 
+  (define (r->p local)
+    (let ((rect-tuple (coordinate local))
+          (_ 0))
+      (let ((x (ref rect-tuple 0))
+            (y (ref rect-tuple 1)))
+         (let ((r (sqrt (square rect-tuple)))
+               (phi (atan (/ y x))))
+           (up r phi))))) 
 #+end_src
 
 #+begin_src clojure
@@ -394,9 +399,215 @@ pi-half is :pi/2 in Scheme
 
 #+begin_src clojure
 (define ((dp-coordinates l y_s) local)
-(let ((t (time local) (_ 0))
-(theta (coordinate local)))
+(let ((t (time local))
+      (theta (coordinate local)))
 (let ((x (* l (sin theta)))
       (y (- (y_s t) (* l (cos theta)))))
 (up x y)))) 
 #+end_src
+
+info: part1
+
+#+begin_src clojure
+(define (L-pend m l g y_s)
+(compose (L-uniform-acceleration m g)
+(F->C (dp-coordinates l y_s)))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+((L-pend 'm 'l 'g (literal-function 'y_s))
+(up 't 'theta 'thetadot))) 
+#+end_src
+
+#+begin_src clojure
+(define (Lagrangian->acceleration L)
+(let ((P ((partial 2) L)) (F ((partial 1) L)))
+(solve-linear-left
+((partial 2) P)
+(- F
+(+ ((partial 0) P)
+(* ((partial 1) P) velocity)))))) 
+#+end_src
+
+#+begin_src clojure
+(define (Lagrangian->state-derivative L)
+(let ((acceleration (Lagrangian->acceleration L)) (_ 0))
+(lambda (state)
+(up 1
+(velocity state)
+(acceleration state))))) 
+#+end_src
+
+#+begin_src clojure
+(define (harmonic-state-derivative m k)
+(Lagrangian->state-derivative (L-harmonic m k))) 
+#+end_src
+
+#+begin_src clojure
+((harmonic-state-derivative 'm 'k)
+(up 't (up 'x 'y) (up 'v_x 'v_y))) 
+#+end_src
+
+#+begin_src clojure
+(up 1 (up 'v_x 'v_y) (up (/ (* -1 'k 'x) 'm) (/ (* -1 'k 'y) 'm))) 
+#+end_src
+
+#+begin_src clojure
+(define ((Lagrange-equations-first-order L) q v)
+  (let ((state-path (qv->state-path q v)) (_ 0))
+    (- (D state-path)
+       (compose (Lagrangian->state-derivative L)
+                state-path)))) 
+#+end_src
+
+#+begin_src clojure
+(define ((qv->state-path q v) t)
+  (up t (q t) (v t))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+ (((Lagrange-equations-first-order (L-harmonic 'm 'k))
+   (up (literal-function 'x)
+       (literal-function 'y))
+   (up (literal-function 'v_x)
+       (literal-function 'v_y)))
+  't)) 
+#+end_src
+
+    <h4>Numerical integration</h4>
+
+#+begin_src clojure
+((state-advancer harmonic-state-derivative 2.0 1.0)
+(up 1.0 (up 1.0 2.0) (up 3.0 4.0))
+10.0
+1.0e-12)
+#+end_src
+
+#+begin_src clojure
+(up 11.0
+    (up 3.7127916645844437 5.420620823651583)
+    (up 1.6148030925459782 1.8189103724750855)) 
+#+end_src
+
+#+begin_src clojure
+(define ((periodic-drive amplitude frequency phase) t)
+(* amplitude (cos (+ (* frequency t) phase)))) 
+#+end_src
+
+#+begin_src clojure
+(define (L-periodically-driven-pendulum m l g A omega)
+(let ((ys (periodic-drive A omega 0)) (_ 0))
+(L-pend m l g ys))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+(((Lagrange-equations
+(L-periodically-driven-pendulum 'm 'l 'g 'A 'omega))
+(literal-function 'theta))
+'t)) 
+#+end_src
+
+#+begin_src clojure
+(define (pend-state-derivative m l g A omega)
+(Lagrangian->state-derivative
+(L-periodically-driven-pendulum m l g A omega))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+((pend-state-derivative 'm 'l 'g 'A 'omega)
+(up 't 'theta 'thetadot))) 
+#+end_src
+
+#+begin_src clojure
+(define (Lagrangian->energy L)
+(let ((P ((partial 2) L)) (_ 0))
+(- (* P velocity) L))) 
+#+end_src
+
+#+begin_src clojure
+(define ((T3-spherical m) state)
+(let ((q (coordinate state))
+      (qdot (velocity state)))
+(let ((r (ref q 0))
+      (theta (ref q 1))
+      (rdot (ref qdot 0))
+      (thetadot (ref qdot 1))
+      (phidot (ref qdot 2)))
+(* 1/2 m
+(+ (square rdot)
+(square (* r thetadot))
+(square (* r (sin theta) phidot))))))) 
+#+end_src
+
+#+begin_src clojure
+  (define (L3-central m Vr)
+    (let ((Vs (lambda (state)
+                 (let ((r (ref (coordinate state) 0)))
+                   (Vr r))))
+          (_ 0))
+       (- (T3-spherical m) Vs))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+(((partial 1) (L3-central 'm (literal-function 'V)))
+(up 't
+(up 'r 'theta 'phi)
+(up 'rdot 'thetadot 'phidot)))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+(((partial 2) (L3-central 'm (literal-function 'V)))
+(up 't
+(up 'r 'theta 'phi)
+(up 'rdot 'thetadot 'phidot)))) 
+#+end_src
+
+#+begin_src clojure
+(define ((ang-mom-z m) rectangular-state)
+(let ((xyz (coordinate rectangular-state))
+      (v (velocity rectangular-state)))
+(ref (cross-product xyz (* m v)) 2))) 
+#+end_src
+
+#+begin_src clojure
+(define (s->r spherical-state)
+(let ((q (coordinate spherical-state)) (_ 0))
+(let ((r (ref q 0))
+      (theta (ref q 1))
+      (phi (ref q 2)))
+(let ((x (* r (sin theta) (cos phi)))
+      (y (* r (sin theta) (sin phi)))
+      (z (* r (cos theta))))
+(up x y z))))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+((compose (ang-mom-z 'm) (F->C s->r))
+(up 't
+(up 'r 'theta 'phi)
+(up 'rdot 'thetadot 'phidot)))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+((Lagrangian->energy (L3-central 'm (literal-function 'V)))
+(up 't
+(up 'r 'theta 'phi)
+(up 'rdot 'thetadot 'phidot)))) 
+#+end_src
+
+#+begin_src clojure
+(define ((L0 m V) local)
+(let ((t (time local))
+      (q (coordinates local))
+      (v (velocities local)))
+(- (* 1/2 m (square v)) (V t q)))) 
+#+end_src
+
