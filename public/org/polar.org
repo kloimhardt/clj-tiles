@@ -728,3 +728,123 @@ Scheme replacement: replace (state-advancer ...) with state-advancer-fn
 #+end_src
 
 Scheme replacement: replace ^ with _
+
+#+begin_src clojure
+((Lagrangian->energy (LR3B1 'm 'a_0 'a_1 'Omega 'GM_0 'GM_1))
+(up 't (up 'x_r 'y_r) (up 'v_r_x 'v_r_y)))
+#+end_src
+
+#+begin_src clojure
+(+ (* 1/2 'm (expt 'v_r^x 2))
+(* 1/2 'm (expt 'v_r^y 2))
+(/ (* -1 'GM_0 'm)
+(sqrt (+ (expt (+ 'x_r 'a_0) 2) (expt 'y_r 2))))
+(/ (* -1 'GM_1 'm)
+(sqrt (+ (expt (- 'x_r 'a_1) 2) (expt 'y_r 2))))
+(* -1/2 'm (expt 'Omega 2) (expt 'x_r 2))
+(* -1/2 'm (expt 'Omega 2) (expt 'y_r 2)))
+#+end_src
+
+    <h3>1.8.5 Noether’s Theorem</h3>
+
+#+begin_src clojure
+(define (F-tilde angle-x angle-y angle-z)
+(compose (Rx angle-x) (Ry angle-y) (Rz angle-z) coordinate)) 
+#+end_src
+
+    <p>
+        A <code>let</code> within a variable definition is not allowed
+        in our little Scheme compiler,
+        ... so we split in two expressions.
+        Also we define D-F-tilde as (D F-tilde)
+    </p>
+
+
+#+begin_src clojure
+(define let-L (L-central-rectangular
+              'm (literal-function 'U))) 
+#+end_src
+
+#+begin_src clojure
+(define D-F-tilde (D F-tilde)) 
+#+end_src
+
+#+begin_src clojure
+(define the-Noether-integral
+  (* ((partial 2) let-L) (D-F-tilde 0 0 0))) 
+#+end_src
+
+#+begin_src clojure
+(the-Noether-integral
+(up 't
+(up 'x 'y 'z)
+(up 'vx 'vy 'vz))) 
+#+end_src
+
+#+begin_src clojure
+(down (+ (* 'm 'vy 'z) (* -1 'm 'vz 'y))
+(+ (* 'm 'vz 'x) (* -1 'm 'vx 'z))
+(+ (* 'm 'vx 'y) (* -1 'm 'vy 'x))) 
+#+end_src
+
+    <h2>1.9   Abstraction of Path Functions</h2>
+
+#+begin_src clojure
+(define ((Gamma-bar f-bar) local)
+((f-bar (osculating-path local)) (time local))) 
+#+end_src
+
+#+begin_src clojure
+  (define (F->C1 F)
+    (let [(C (lambda [local]
+                     (let [(n (vector-length local))
+                           (f-bar (lambda [q-prime]
+                                          (let [(q (compose F (Gamma q-prime))  )]
+                                            (Gamma q n))))]
+                       ((Gamma-bar f-bar) local))))]
+      C)) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+((F->C1 p->r)
+(up 't (up 'r 'theta) (up 'rdot 'thetadot)))) 
+#+end_src
+
+#+begin_src clojure
+  (define (Dt F)
+    (let [(DtF (lambda [state]
+                       (let [(n (vector-length state))
+                             (DF-on-path (lambda [q]
+                                                 (D (compose F (Gamma q (- n 1))))))]
+                         ((Gamma-bar DF-on-path) state))))]
+      DtF)) 
+#+end_src
+
+#+begin_src clojure
+(define (Euler-Lagrange-operator L)
+(- (Dt ((partial 2) L)) ((partial 1) L))) 
+#+end_src
+
+#+begin_src clojure
+((Euler-Lagrange-operator
+   (L-harmonic 'm 'k))
+     (up 't 'x 'v 'a)) 
+#+end_src
+
+#+begin_src clojure
+(+ (* 'a 'm) (* 'k 'x)) 
+#+end_src
+
+#+begin_src clojure
+((compose
+(Euler-Lagrange-operator (L-harmonic 'm 'k))
+(Gamma (literal-function 'x) 4))
+'t) 
+#+end_src
+
+#+begin_src clojure
+(+ (* 'k ((literal-function 'x) 't))
+   (* 'm (((expt D 2) (literal-function 'x)) 't))) 
+#+end_src
+
