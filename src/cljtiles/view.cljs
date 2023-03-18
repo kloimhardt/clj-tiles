@@ -858,6 +858,11 @@
 
 (defn ^{:export true} output []
   ;; TODO add "pendulumbegin" lable (sic)
+  ;;Clojure (let [x a y b] (f x y)) ->
+  ;;Scheme (let ((x a) (y b)) (f x)) ->
+  ;; or even better: (let (:tiles/vert [{x a} {y b}]) (f x y))
+  ;; where {x a} is finally allowed and always :tiles/vert and (:tiles/vert (x a)) is forbidden
+
   (workspace!/init startsci open-modal)
   (goto-page! (dec 1))
   (set-sci-environment)

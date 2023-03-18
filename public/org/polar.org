@@ -29,6 +29,8 @@ Easy polar coordinates
 #+end_src
 
 Scheme replacement: replace () in all let expressions with []
+in principle, a :tiles/vert would alaways be in order (only done in a view examples)
+(let ((x a)) (f x)) -> (let (:tiles/vert [(:tiles/vert (x a))]) (f x))
 
 #+begin_src clojure
   (define ((L-free-particle mass) local)
@@ -107,11 +109,13 @@ Scheme replacement: replace () in all let expressions with []
 
 #+begin_src clojure
   (define (find-path Lagrangian t0 q0 t1 q1 n)
-    (let [(initial-qs (linear-interpolants q0 q1 n))]
-      (let [(minimizing-qs
-               (multidimensional-minimize
-                 (parametric-path-action Lagrangian t0 q0 t1 q1)
-                 initial-qs))]
+    (let (:tiles/vert [(:tiles/vert (initial-qs (linear-interpolants q0 q1 n)))])
+      (let (:tiles/vert
+            [(:tiles/vert (minimizing-qs
+                            (multidimensional-minimize
+                              (parametric-path-action Lagrangian
+                                                      t0 q0 t1 q1)
+                              initial-qs)))])
         (make-path t0 q0 t1 q1 minimizing-qs)))) 
 #+end_src
 
@@ -611,9 +615,9 @@ Scheme replacement: replace (state-advancer ...) with state-advancer-fn
 
 #+begin_src clojure
   (define (L3-central m Vr)
-    (let [(Vs (lambda [state]
-                      (let [(r (ref (coordinate state) 0))]
-                        (Vr r))))]
+    (let (:tiles/vert [(:tiles/vert (Vs (lambda [state]
+                                                (let (:tiles/vert [(:tiles/vert (r (ref (coordinate state) 0)))])
+                                                  (Vr r)))))])
       (- (T3-spherical m) Vs))) 
 #+end_src
 
@@ -761,8 +765,7 @@ Scheme replacement: replace ^ with _ in next two
 
 
 #+begin_src clojure
-(define let-L (L-central-rectangular
-              'm (literal-function 'U))) 
+(define let-L (L-central-rectangular 'm (literal-function 'U))) 
 #+end_src
 
 #+begin_src clojure
@@ -796,12 +799,12 @@ Scheme replacement: replace ^ with _ in next two
 
 #+begin_src clojure
   (define (F->C1 F)
-    (let [(C (lambda [local]
-                     (let [(n (vector-length local))
-                           (f-bar (lambda [q-prime]
-                                          (let [(q (compose F (Gamma q-prime))  )]
-                                            (Gamma q n))))]
-                       ((Gamma-bar f-bar) local))))]
+    (let (:tiles/vert [(:tiles/vert (C (lambda [local]
+                                               (let (:tiles/vert [(:tiles/vert (n (vector-length local)))
+                                                                  (:tiles/vert (f-bar (lambda [q-prime]
+                                                                                              (let [(q (compose F (Gamma q-prime)))]
+                                                                                                (Gamma q n)))))])
+                                                 ((Gamma-bar f-bar) local)))))])
       C)) 
 #+end_src
 
@@ -813,11 +816,11 @@ Scheme replacement: replace ^ with _ in next two
 
 #+begin_src clojure
   (define (Dt F)
-    (let [(DtF (lambda [state]
-                       (let [(n (vector-length state))
-                             (DF-on-path (lambda [q]
-                                                 (D (compose F (Gamma q (- n 1))))))]
-                         ((Gamma-bar DF-on-path) state))))]
+    (let (:tiles/vert [(:tiles/vert (DtF (lambda [state]
+                                                 (let (:tiles/vert [(:tiles/vert (n (vector-length state)))
+                                                                    (:tiles/vert (DF-on-path (lambda [q]
+                                                                                                     (D (compose F (Gamma q (- n 1)))))))])
+                                                   ((Gamma-bar DF-on-path) state)))))])
       DtF)) 
 #+end_src
 
