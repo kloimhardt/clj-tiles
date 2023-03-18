@@ -119,11 +119,11 @@ Easy polar coordinates
     (- (* 1/2 m (square v)) (* 1/2 k (square q))))) 
 #+end_src
 
-pi is :pi in Scheme
+pi-half is :pi/2 in Scheme
 
 #+begin_src clojure
 (define q-harmonic 
-  (find-path (L-harmonic 1.0 1.0) 0.0 1.0 pi/2 0.0 3))
+  (find-path (L-harmonic 1.0 1.0) 0.0 1.0 pi-half 0.0 3))
 #+end_src
 
 #+begin_src clojure
