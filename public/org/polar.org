@@ -727,7 +727,7 @@ Scheme replacement: replace (state-advancer ...) with state-advancer-fn
              (/ (* GM0 m) r0) (/ (* GM1 m) r1)))))) 
 #+end_src
 
-Scheme replacement: replace ^ with _
+Scheme replacement: replace ^ with _ in next two
 
 #+begin_src clojure
 ((Lagrangian->energy (LR3B1 'm 'a_0 'a_1 'Omega 'GM_0 'GM_1))
@@ -735,8 +735,8 @@ Scheme replacement: replace ^ with _
 #+end_src
 
 #+begin_src clojure
-(+ (* 1/2 'm (expt 'v_r^x 2))
-(* 1/2 'm (expt 'v_r^y 2))
+(+ (* 1/2 'm (expt 'v_r_x 2))
+(* 1/2 'm (expt 'v_r_y 2))
 (/ (* -1 'GM_0 'm)
 (sqrt (+ (expt (+ 'x_r 'a_0) 2) (expt 'y_r 2))))
 (/ (* -1 'GM_1 'm)
@@ -847,4 +847,3 @@ Scheme replacement: replace ^ with _
 (+ (* 'k ((literal-function 'x) 't))
    (* 'm (((expt D 2) (literal-function 'x)) 't))) 
 #+end_src
-
