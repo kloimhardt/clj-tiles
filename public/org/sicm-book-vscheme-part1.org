@@ -7,7 +7,22 @@
 (define-coordinates t e/R1-rect)
 #+end_src
 
-Easy polar coordinates
+This chapter shows examples of the SICMechanics book [1].
+
+A description of how to begin without any knowledge is in [2].
+
+This first page shows an example of calculating cartesian coordinates out of polar coordinates.
+
+The examples of this whole chapter are to be solved as puzzles only, they cannot be successfully executed.
+
+The executable code of the examples can, however, be viewed and modified on another html page [3].
+
+More information on this visual programming project is available on github [4].
+
+[1] https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html
+[2] https://kloimhardt.github.io/blog/literatur/2023/03/16/competence-comprehesion-2.html
+[3] https://kloimhardt.github.io/blog/html/sicmutils-as-js-book-part1.html
+[4] https://github.com/kloimhardt/clj-tiles
 
 #+begin_src clojure
 (->tex-equation
