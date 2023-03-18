@@ -593,3 +593,282 @@ Scheme replacement: replace (state-advancer ...) with state-advancer-fn
 
     <h2>1.8 Conserved Quantities</h2>
     <h3>1.8.2 Energy Conservation</h3>
+
+#+begin_src clojure
+  (define (Lagrangian->energy L)
+    (let [(P ((partial 2) L))]
+      (- (* P velocity) L))) 
+#+end_src
+
+    <h3>1.8.3 Central Forces in Three Dimensions</h3>
+
+#+begin_src clojure
+  (define ((T3-spherical m) state)
+    (let [(q (coordinate state))
+          (qdot (velocity state))]
+      (let [(r (ref q 0))
+            (theta (ref q 1))
+            (rdot (ref qdot 0))
+            (thetadot (ref qdot 1))
+            (phidot (ref qdot 2))]
+        (* 1/2 m
+           (+ (square rdot)
+              (square (* r thetadot))
+              (square (* r (sin theta) phidot))))))) 
+#+end_src
+
+    <p>Change the second define into a let</p>
+
+#+begin_src clojure
+  (define (L3-central m Vr)
+    (let [(Vs (lambda [state]
+                      (let [(r (ref (coordinate state) 0))]
+                        (Vr r))))]
+      (- (T3-spherical m) Vs))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+(((partial 1) (L3-central 'm (literal-function 'V)))
+(up 't
+(up 'r 'theta 'phi)
+(up 'rdot 'thetadot 'phidot)))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+(((partial 2) (L3-central 'm (literal-function 'V)))
+(up 't
+(up 'r 'theta 'phi)
+(up 'rdot 'thetadot 'phidot)))) 
+#+end_src
+
+#+begin_src clojure
+  (define ((ang-mom-z m) rectangular-state)
+    (let [(xyz (coordinate rectangular-state))
+          (v (velocity rectangular-state))]
+      (ref (cross-product xyz (* m v)) 2))) 
+#+end_src
+
+#+begin_src clojure
+  (define (s->r spherical-state)
+    (let [(q (coordinate spherical-state))]
+      (let [(r (ref q 0))
+            (theta (ref q 1))
+            (phi (ref q 2))]
+        (let [(x (* r (sin theta) (cos phi)))
+              (y (* r (sin theta) (sin phi)))
+              (z (* r (cos theta)))]
+          (up x y z))))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+((compose (ang-mom-z 'm) (F->C s->r))
+(up 't
+(up 'r 'theta 'phi)
+(up 'rdot 'thetadot 'phidot)))) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+((Lagrangian->energy (L3-central 'm (literal-function 'V)))
+(up 't
+(up 'r 'theta 'phi)
+(up 'rdot 'thetadot 'phidot)))) 
+#+end_src
+
+    <h3>1.8.4 The Restricted Three-Body Problem</h3>
+
+#+begin_src clojure
+  (define ((L0 m V) local)
+    (let [(t (time local))
+          (q (coordinates local))
+          (v (velocities local))]
+      (- (* 1/2 m (square v)) (V t q)))) 
+#+end_src
+
+#+begin_src clojure
+  (define ((V a GM0 GM1 m) t xy)
+    (let [(Omega (sqrt (/ (+ GM0 GM1) (expt a 3))))
+          (a0 (* (/ GM1 (+ GM0 GM1)) a))
+          (a1 (* (/ GM0 (+ GM0 GM1)) a))]
+      (let [(x (ref xy 0))
+            (y (ref xy 1))
+            (x0 (* -1 a0 (cos (* Omega t))))
+            (y0 (* -1 a0 (sin (* Omega t))))
+            (x1 (* +1 a1 (cos (* Omega t))))
+            (y1 (* +1 a1 (sin (* Omega t))))]
+        (let [(r0
+                (sqrt (+ (square (- x x0)) (square (- y y0)))))
+              (r1
+                (sqrt (+ (square (- x x1)) (square (- y y1)))))]
+          (- (+ (/ (* GM0 m) r0) (/ (* GM1 m) r1))))))) 
+#+end_src
+
+#+begin_src clojure
+  (define ((LR3B m a GM0 GM1) local)
+    (let [(q (coordinates local))
+          (qdot (velocities local))
+          (Omega (sqrt (/ (+ GM0 GM1) (expt a 3))))
+          (a0 (* (/ GM1 (+ GM0 GM1)) a))
+          (a1 (* (/ GM0 (+ GM0 GM1)) a))]
+      (let [(x (ref q 0))     (y (ref q 1))
+            (xdot (ref qdot 0)) (ydot (ref qdot 1))]
+        (let [(r0 (sqrt (+ (square (+ x a0)) (square y))))
+              (r1 (sqrt (+ (square (- x a1)) (square y))))]
+          (+ (* 1/2 m (square qdot))
+             (* 1/2 m (square Omega) (square q))
+             (* m Omega (- (* x ydot) (* xdot y)))
+             (/ (* GM0 m) r0) (/ (* GM1 m) r1)))))) 
+#+end_src
+
+#+begin_src clojure
+  (define ((LR3B1 m a0 a1 Omega GM0 GM1) local)
+    (let [(q (coordinates local))
+          (qdot (velocities local))]
+      (let [(x (ref q 0))     (y (ref q 1))
+            (xdot (ref qdot 0)) (ydot (ref qdot 1))]
+        (let [(r0 (sqrt (+ (square (+ x a0)) (square y))))
+              (r1 (sqrt (+ (square (- x a1)) (square y))))]
+          (+ (* 1/2 m (square qdot))
+             (* 1/2 m (square Omega) (square q))
+             (* m Omega (- (* x ydot) (* xdot y)))
+             (/ (* GM0 m) r0) (/ (* GM1 m) r1)))))) 
+#+end_src
+
+#+begin_src clojure
+((Lagrangian->energy (LR3B1 'm 'a_0 'a_1 'Omega 'GM_0 'GM_1))
+(up 't (up 'x_r 'y_r) (up 'v_r^x 'v_r^y)))
+#+end_src
+
+#+begin_src clojure
+(+ (* 1/2 'm (expt 'v_r^x 2))
+(* 1/2 'm (expt 'v_r^y 2))
+(/ (* -1 'GM_0 'm)
+(sqrt (+ (expt (+ 'x_r 'a_0) 2) (expt 'y_r 2))))
+(/ (* -1 'GM_1 'm)
+(sqrt (+ (expt (- 'x_r 'a_1) 2) (expt 'y_r 2))))
+(* -1/2 'm (expt 'Omega 2) (expt 'x_r 2))
+(* -1/2 'm (expt 'Omega 2) (expt 'y_r 2)))
+#+end_src
+
+    <h3>1.8.5 Noether’s Theorem</h3>
+
+#+begin_src clojure
+(define (F-tilde angle-x angle-y angle-z)
+(compose (Rx angle-x) (Ry angle-y) (Rz angle-z) coordinate)) 
+#+end_src
+
+    <p>
+        L-central-rectangular is already defined in chapter 1.6
+    </p>
+
+#+begin_src clojure
+  (define ((L-central-rectangular m U) state)
+    (let [(q (coordinate state))
+          (v (velocity state))]
+      (- (* 1/2 m (square v))
+         (U (sqrt (square q)))))) ;;execution not needed
+#+end_src
+
+    <p>
+        A <code>let</code> within a variable definition is not allowed
+        in our little Scheme compiler,
+    </p>
+
+#+begin_src clojure
+  (define the-Noether-integral
+    (let [(L (L-central-rectangular
+               'm (literal-function 'U)))]
+      (* ((partial 2) L) ((D F-tilde) 0 0 0)))) 
+#+end_src
+
+    <p>
+        ... so we split in two expressions.
+    </p>
+
+#+begin_src clojure
+(define let-L (L-central-rectangular
+              'm (literal-function 'U))) 
+#+end_src
+
+#+begin_src clojure
+(define the-Noether-integral
+  (* ((partial 2) let-L) ((D F-tilde) 0 0 0))) 
+#+end_src
+
+#+begin_src clojure
+(the-Noether-integral
+(up 't
+(up 'x 'y 'z)
+(up 'vx 'vy 'vz))) 
+#+end_src
+
+#+begin_src clojure
+(down (+ (* 'm 'vy 'z) (* -1 'm 'vz 'y))
+(+ (* 'm 'vz 'x) (* -1 'm 'vx 'z))
+(+ (* 'm 'vx 'y) (* -1 'm 'vy 'x))) 
+#+end_src
+
+    <h2>1.9   Abstraction of Path Functions</h2>
+
+#+begin_src clojure
+(define ((Gamma-bar f-bar) local)
+((f-bar (osculating-path local)) (time local))) 
+#+end_src
+
+#+begin_src clojure
+  (define (F->C1 F)
+    (let [(C (lambda [local]
+                     (let [(n (vector-length local))
+                           (f-bar (lambda [q-prime]
+                                          (let [(q (compose F (Gamma q-prime))  )]
+                                            (Gamma q n))))]
+                       ((Gamma-bar f-bar) local))))]
+      C)) 
+#+end_src
+
+#+begin_src clojure
+(show-expression
+((F->C1 p->r)
+(up 't (up 'r 'theta) (up 'rdot 'thetadot)))) 
+#+end_src
+
+#+begin_src clojure
+  (define (Dt F)
+    (let [(DtF (lambda [state]
+                       (let [(n (vector-length state))
+                             (DF-on-path (lambda [q]
+                                                 (D (compose F (Gamma q (- n 1))))))]
+                         ((Gamma-bar DF-on-path) state))))]
+      DtF)) 
+#+end_src
+
+#+begin_src clojure
+(define (Euler-Lagrange-operator L)
+(- (Dt ((partial 2) L)) ((partial 1) L))) 
+#+end_src
+
+#+begin_src clojure
+((Euler-Lagrange-operator
+   (L-harmonic 'm 'k))
+     (up 't 'x 'v 'a)) 
+#+end_src
+
+#+begin_src clojure
+(+ (* 'a 'm) (* 'k 'x)) 
+#+end_src
+
+#+begin_src clojure
+((compose
+(Euler-Lagrange-operator (L-harmonic 'm 'k))
+(Gamma (literal-function 'x) 4))
+'t) 
+#+end_src
+
+#+begin_src clojure
+(+ (* 'k ((literal-function 'x) 't))
+   (* 'm (((expt D 2) (literal-function 'x)) 't))) 
+#+end_src
+
