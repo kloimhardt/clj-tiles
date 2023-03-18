@@ -28,10 +28,12 @@ Easy polar coordinates
     ((D (* 3 (expt sin 2))) 'x)))
 #+end_src
 
+Scheme replacement: replace () in all let expressions with []
+
 #+begin_src clojure
-(define ((L-free-particle mass) local)
-(let ((v (velocity local)) (_ 0))
-(* 1/2 mass (dot-product v v)))) 
+  (define ((L-free-particle mass) local)
+    (let [(v (velocity local))])
+    (* 1/2 mass (dot-product v v))) 
 #+end_src
 
 #+begin_src clojure
@@ -72,12 +74,12 @@ Easy polar coordinates
 #+end_src
 
 #+begin_src clojure
-(define ((varied-free-particle-action mass q nu t1 t2) eps)
-  (let ((eta (make-eta nu t1 t2)) (_ 0))
-    (Lagrangian-action (L-free-particle mass)
-                       (+ q (* eps eta))
-                       t1
-                       t2))) 
+  (define ((varied-free-particle-action mass q nu t1 t2) eps)
+    (let [(eta (make-eta nu t1 t2))]
+         (Lagrangian-action (L-free-particle mass)
+                            (+ q (* eps eta))
+                            t1
+                            t2))) 
 #+end_src
 
 #+begin_src clojure
@@ -86,6 +88,8 @@ Easy polar coordinates
                               0.0 10.0)
  0.001) 
 #+end_src
+
+    <p>Calculation takes a few seconds. Add a blank at the end to start.</p>
 
 #+begin_src clojure
 (minimize 
@@ -96,39 +100,62 @@ Easy polar coordinates
 #+end_src
 
 #+begin_src clojure
-(define ((parametric-path-action Lagrangian t0 q0 t1 q1) qs)
-  (let ((path (make-path t0 q0 t1 q1 qs)) (_ 0))
-    (Lagrangian-action Lagrangian path t0 t1))) 
+  (define ((parametric-path-action Lagrangian t0 q0 t1 q1) qs)
+    (let [(path (make-path t0 q0 t1 q1 qs))]
+         (Lagrangian-action Lagrangian path t0 t1))) 
 #+end_src
 
 #+begin_src clojure
   (define (find-path Lagrangian t0 q0 t1 q1 n)
-    (let ((initial-qs (linear-interpolants q0 q1 n)) (_ 0))
-      (let ((minimizing-qs
-              (multidimensional-minimize
-                (parametric-path-action Lagrangian t0 q0 t1 q1)
-                initial-qs))
-            (_ 0))
+    (let [(initial-qs (linear-interpolants q0 q1 n))]
+      (let [(minimizing-qs
+               (multidimensional-minimize
+                 (parametric-path-action Lagrangian t0 q0 t1 q1)
+                 initial-qs))]
         (make-path t0 q0 t1 q1 minimizing-qs)))) 
 #+end_src
 
 #+begin_src clojure
-(define ((L-harmonic m k) local)
-  (let ((q (coordinate local))
-        (v (velocity local)))
-    (- (* 1/2 m (square v)) (* 1/2 k (square q))))) 
+  (define ((L-harmonic m k) local)
+    (let [(q (coordinate local))
+            (v (velocity local))]
+         (- (* 1/2 m (square v)) (* 1/2 k (square q))))) 
 #+end_src
 
-pi-half is :pi/2 in Scheme
+Scheme replacement: pi-half introduced instead of :pi/e
+
+#+begin_src clojure
+(define pi-half 1.57075)
+#+end_src
+
 
 #+begin_src clojure
 (define q-harmonic 
   (find-path (L-harmonic 1.0 1.0) 0.0 1.0 pi-half 0.0 3))
 #+end_src
 
+    <p> Add a blank at the and to start</p>
+
 #+begin_src clojure
 (- (cos 0.8) (q-harmonic 0.8))
 #+end_src 
+
+    <h2>
+        1.5   The Euler–Lagrange Equations
+    </h2>
+    <h3>
+        1.5.2 Computing Lagrange's Equations
+    </h3>
+
+#+begin_src clojure
+(define ((Lagrange-equations Lagrangian) q)
+  (- (D (compose ((partial 2) Lagrangian) (Gamma q)))
+     (compose ((partial 1) Lagrangian) (Gamma q)))) 
+#+end_src
+
+    <p>
+        Here I had to rename <code>test-path</code> to <code>general-test-path</code> to avoid, in chapter 1.4, conflict with the minimize procedure there.
+    </p>
 
 #+begin_src clojure
 (define (general-test-path t)
@@ -162,19 +189,25 @@ pi-half is :pi/2 in Scheme
    't)) 
 #+end_src
 
-Had to introduce a new let as 4 bindings cannot be parsed
+    <h4>
+        Exercise 1.11: Kepler's third law
+    </h4>
+
+    <p>
+        Show that a planet in circular orbit satisfies Kepler's third law 
+        n^2a^3=G(M_1 + m_2), where n is the angular frequency of the orbit and a
+        is the distance between sun and planet. (Hint: use the reduced mass to construct the Lagrangian)
+    </p>
 
 #+begin_src clojure
   (define ((L-Kepler-central-polar m V) local)
-    (let ((q (coordinate local))
-          (qdot (velocity local)))
-      (let ((r (ref q 0))
-            (phi (ref q 1)))
-        (let ((rdot (ref qdot 0))
-             (phidot (ref qdot 1)))
-          (- (* 1/2 m
-                (+ (square rdot) (square (* r phidot))) )
-             (V r)))))) 
+    (let [(q (coordinate local))
+          (qdot (velocity local))]
+      (let [(r (ref q 0))     (phi (ref q 1))
+              (rdot (ref qdot 0)) (phidot (ref qdot 1))]
+           (- (* 1/2 m
+                 (+ (square rdot) (square (* r phidot))) )
+              (V r))))) 
 #+end_src
 
 #+begin_src clojure
@@ -197,12 +230,16 @@ Had to introduce a new let as 4 bindings cannot be parsed
 (((Lagrange-equations lagrangian-reduced) circle) 't) 
 #+end_src
 
+    <h2>
+        1.6 How to find Lagrangians
+    </h2>
+
 #+begin_src clojure
-(define ((L-uniform-acceleration m g) local)
-  (let ((q (coordinate local))
-        (v (velocity local)))
-    (let ((y (ref q 1)) (_ 0))
-      (- (* 1/2 m (square v)) (* m g y))))) 
+  (define ((L-uniform-acceleration m g) local)
+    (let [(q (coordinate local))
+          (v (velocity local))]
+      (let [(y (ref q 1))]
+           (- (* 1/2 m (square v)) (* m g y))))) 
 #+end_src
 
 #+begin_src clojure
@@ -215,12 +252,16 @@ Had to introduce a new let as 4 bindings cannot be parsed
 #+end_src
 
 #+begin_src clojure
-(define ((L-central-rectangular m U) local)
-  (let ((q (coordinate local))
-        (v (velocity local)))
-    (- (* 1/2 m (square v))
-       (U (sqrt (square q)))))) 
+  (define ((L-central-rectangular m U) local)
+    (let [(q (coordinate local))
+            (v (velocity local))]
+         (- (* 1/2 m (square v))
+            (U (sqrt (square q)))))) 
 #+end_src
+
+    <p>
+        <code>show-expression can actually be omitted, our little Scheme syntax compiler does that anyway.</code>
+    </p>
 
 #+begin_src clojure
   (((Lagrange-equations
@@ -239,6 +280,8 @@ Had to introduce a new let as 4 bindings cannot be parsed
    't)) 
 #+end_src
 
+    <h3>1.6.1 Coordinate Transformations</h3>
+
 #+begin_src clojure
 (define ((F->C F) local)
   (up (time local)
@@ -250,12 +293,11 @@ Had to introduce a new let as 4 bindings cannot be parsed
 
 #+begin_src clojure
   (define (p->r local)
-    (let ((polar-tuple (coordinate local))
-          (_ 0))
-      (let ((r (ref polar-tuple 0))
-            (phi (ref polar-tuple 1)))
-        (let ((x (* r (cos phi)))
-              (y (* r (sin phi))))
+    (let [(polar-tuple (coordinate local))]
+      (let [(r (ref polar-tuple 0))
+            (phi (ref polar-tuple 1))]
+        (let [(x (* r (cos phi)))
+              (y (* r (sin phi)))]
           (up x y))))) 
 #+end_src
 
@@ -280,10 +322,10 @@ Had to introduce a new let as 4 bindings cannot be parsed
     <h4>Coriolis and centrifugal forces</h4>
 
 #+begin_src clojure
-(define ((L-free-rectangular m) local)
-  (let ((vx (ref (velocities local) 0))
-        (vy (ref (velocities local) 1)))
-    (* 1/2 m (+ (square vx) (square vy))))) 
+  (define ((L-free-rectangular m) local)
+    (let [(vx (ref (velocities local) 0))
+          (vy (ref (velocities local) 1))]
+      (* 1/2 m (+ (square vx) (square vy))))) 
 #+end_src
 
 #+begin_src clojure
@@ -292,11 +334,11 @@ Had to introduce a new let as 4 bindings cannot be parsed
 #+end_src
 
 #+begin_src clojure
-(define ((F Omega) local)
-  (let ((t (time local))
-        (r (ref (coordinates local) 0))
-        (theta (ref (coordinates local) 1)))
-    (up r (+ theta (* Omega t))))) 
+  (define ((F Omega) local)
+    (let [(t (time local))
+          (r (ref (coordinates local) 0))
+          (theta (ref (coordinates local) 1))]
+      (up r (+ theta (* Omega t))))) 
 #+end_src
 
 #+begin_src clojure
@@ -309,15 +351,16 @@ Had to introduce a new let as 4 bindings cannot be parsed
   (compose (L-rotating-polar m Omega) (F->C r->p))) 
 #+end_src
 
+    <p><code>r->p</code> added</p>
+
 #+begin_src clojure
   (define (r->p local)
-    (let ((rect-tuple (coordinate local))
-          (_ 0))
-      (let ((x (ref rect-tuple 0))
-            (y (ref rect-tuple 1)))
-         (let ((r (sqrt (square rect-tuple)))
-               (phi (atan (/ y x))))
-           (up r phi))))) 
+    (let [(rect-tuple (coordinate local))]
+      (let [(x (ref rect-tuple 0))
+            (y (ref rect-tuple 1))]
+        (let [(r (sqrt (square rect-tuple)))
+              (phi (atan (/ y x)))]
+          (up r phi))))) 
 #+end_src
 
 #+begin_src clojure
@@ -334,11 +377,16 @@ Had to introduce a new let as 4 bindings cannot be parsed
 (* 1/2 'm (expt 'ydot_r 2))) 
 #+end_src
 
+    <p><code>x_r, y_r</code>: underscore added. Calculation takes a few seconds,
+    add a blank at the and to start</p>
+
 #+begin_src clojure
 (((Lagrange-equations (L-rotating-rectangular 'm 'Omega))
   (up (literal-function 'x_r) (literal-function 'y_r)))
  't)
 #+end_src
+
+    <p>definitions x_r y_r added</p>
 
 #+begin_src clojure
 (define x_r (literal-function 'x_r)) 
@@ -358,25 +406,31 @@ Had to introduce a new let as 4 bindings cannot be parsed
 (* 'm (((expt D 2) y_r) 't)))) 
 #+end_src
 
+    <h3>1.6.2 Systems with Rigid Constraints</h3>
+    <h4>A pendulum driven at the pivot</h4>
+
+    <p>See <a href="https://kloimhardt.github.io/cljtiles.html?page=116">here</a> for a presentation of the Driven Pendulum using visual programming</p>
+
 #+begin_src clojure
-(define ((T-pend m l g ys) local)
-(let ((t (time local) (_ 0))
-(theta (coordinate local))
-(thetadot (velocity local)))
-(let ((vys (D ys)) (_ 0))
-(* 1/2 m
-(+ (square (* l thetadot))
-(square (vys t))
-(* 2 l (vys t) thetadot (sin theta))))))) 
+  (define ((T-pend m l g ys) local)
+    (let [(t (time local))
+          (theta (coordinate local))
+          (thetadot (velocity local))]
+      (let [(vys (D ys))]
+        (* 1/2 m
+           (+ (square (* l thetadot))
+              (square (vys t))
+              (* 2 l (vys t) thetadot (sin theta))))))) 
 #+end_src
 
 #+begin_src clojure
-(define ((V-pend m l g ys) local)
-(let ((t (time local))
-      (theta (coordinate local)))
-  (* m g (- (ys t) (* l (cos theta)))))) 
+  (define ((V-pend m l g ys) local)
+    (let [(t (time local))
+          (theta (coordinate local))]
+      (* m g (- (ys t) (* l (cos theta)))))) 
 #+end_src
 
+    <p> Because used later, rename <code>L-pend</code> to <code>L-pendulum</code>
 #+begin_src clojure
 (define L-pendulum (- T-pend V-pend)) 
 #+end_src
@@ -389,24 +443,28 @@ Had to introduce a new let as 4 bindings cannot be parsed
 't)) 
 #+end_src
 
+    <h3>
+        1.6.3 Constraints as Coordinate Transformations
+    </h3>
+
+    <p> <code>L-uniform-acceleration</code> already defined above </p>
+
 #+begin_src clojure
-(define ((L-uniform-acceleration m g) local)
-  (let ((q (coordinate local))
-        (v (velocity local)))
-     (let ((y (ref q 1)) (_ 0))
-       (- (* 1/2 m (square v)) (* m g y)))))
+  (define ((L-uniform-acceleration m g) local)
+    (let [(q (coordinate local))
+          (v (velocity local))]
+      (let [(y (ref q 1))]
+        (- (* 1/2 m (square v)) (* m g y))))) ;;execution not necessary
 #+end_src
 
 #+begin_src clojure
-(define ((dp-coordinates l y_s) local)
-(let ((t (time local))
-      (theta (coordinate local)))
-(let ((x (* l (sin theta)))
-      (y (- (y_s t) (* l (cos theta)))))
-(up x y)))) 
+  (define ((dp-coordinates l y_s) local)
+    (let [(t (time local))
+          (theta (coordinate local))]
+      (let [(x (* l (sin theta)))
+            (y (- (y_s t) (* l (cos theta))))]
+        (up x y)))) 
 #+end_src
-
-info: part1
 
 #+begin_src clojure
 (define (L-pend m l g y_s)
@@ -420,23 +478,28 @@ info: part1
 (up 't 'theta 'thetadot))) 
 #+end_src
 
-#+begin_src clojure
-(define (Lagrangian->acceleration L)
-(let ((P ((partial 2) L)) (F ((partial 1) L)))
-(solve-linear-left
-((partial 2) P)
-(- F
-(+ ((partial 0) P)
-(* ((partial 1) P) velocity)))))) 
-#+end_src
+    <h3>1.7   Evolution of Dynamical State</h3>
 
 #+begin_src clojure
-(define (Lagrangian->state-derivative L)
-(let ((acceleration (Lagrangian->acceleration L)) (_ 0))
-(lambda (state)
-(up 1
-(velocity state)
-(acceleration state))))) 
+  (define (Lagrangian->acceleration L)
+    (let [(P ((partial 2) L)) (F ((partial 1) L))]
+      (solve-linear-left
+        ((partial 2) P)
+        (- F
+           (+ ((partial 0) P)
+              (* ((partial 1) P) velocity)))))) 
+#+end_src
+
+
+Scheme replacement: replace () in all lambda expressions with []
+
+#+begin_src clojure
+  (define (Lagrangian->state-derivative L)
+    (let [(acceleration (Lagrangian->acceleration L))]
+      (lambda [state]
+              (up 1
+                  (velocity state)
+                  (acceleration state))))) 
 #+end_src
 
 #+begin_src clojure
@@ -454,11 +517,11 @@ info: part1
 #+end_src
 
 #+begin_src clojure
-(define ((Lagrange-equations-first-order L) q v)
-  (let ((state-path (qv->state-path q v)) (_ 0))
-    (- (D state-path)
-       (compose (Lagrangian->state-derivative L)
-                state-path)))) 
+  (define ((Lagrange-equations-first-order L) q v)
+    (let [(state-path (qv->state-path q v))]
+      (- (D state-path)
+         (compose (Lagrangian->state-derivative L)
+                  state-path)))) 
 #+end_src
 
 #+begin_src clojure
@@ -478,9 +541,15 @@ info: part1
 
     <h4>Numerical integration</h4>
 
+Scheme replacement: replace (state-advancer ...) with state-advancer-fn
+
 #+begin_src clojure
-((state-advancer harmonic-state-derivative 2.0 1.0)
-(up 1.0 (up 1.0 2.0) (up 3.0 4.0))
+(define state-advancer-fn (state-advancer harmonic-state-derivative 2.0 1.0))
+#+end_src
+
+
+#+begin_src clojure
+(state-advancer-fn (up 1.0 (up 1.0 2.0) (up 3.0 4.0))
 10.0
 1.0e-12)
 #+end_src
@@ -497,9 +566,9 @@ info: part1
 #+end_src
 
 #+begin_src clojure
-(define (L-periodically-driven-pendulum m l g A omega)
-(let ((ys (periodic-drive A omega 0)) (_ 0))
-(L-pend m l g ys))) 
+  (define (L-periodically-driven-pendulum m l g A omega)
+    (let [(ys (periodic-drive A omega 0))]
+      (L-pend m l g ys))) 
 #+end_src
 
 #+begin_src clojure
@@ -522,92 +591,5 @@ info: part1
 (up 't 'theta 'thetadot))) 
 #+end_src
 
-#+begin_src clojure
-(define (Lagrangian->energy L)
-(let ((P ((partial 2) L)) (_ 0))
-(- (* P velocity) L))) 
-#+end_src
-
-#+begin_src clojure
-(define ((T3-spherical m) state)
-(let ((q (coordinate state))
-      (qdot (velocity state)))
-(let ((r (ref q 0))
-      (theta (ref q 1))
-      (rdot (ref qdot 0))
-      (thetadot (ref qdot 1))
-      (phidot (ref qdot 2)))
-(* 1/2 m
-(+ (square rdot)
-(square (* r thetadot))
-(square (* r (sin theta) phidot))))))) 
-#+end_src
-
-#+begin_src clojure
-  (define (L3-central m Vr)
-    (let ((Vs (lambda (state)
-                 (let ((r (ref (coordinate state) 0)))
-                   (Vr r))))
-          (_ 0))
-       (- (T3-spherical m) Vs))) 
-#+end_src
-
-#+begin_src clojure
-(show-expression
-(((partial 1) (L3-central 'm (literal-function 'V)))
-(up 't
-(up 'r 'theta 'phi)
-(up 'rdot 'thetadot 'phidot)))) 
-#+end_src
-
-#+begin_src clojure
-(show-expression
-(((partial 2) (L3-central 'm (literal-function 'V)))
-(up 't
-(up 'r 'theta 'phi)
-(up 'rdot 'thetadot 'phidot)))) 
-#+end_src
-
-#+begin_src clojure
-(define ((ang-mom-z m) rectangular-state)
-(let ((xyz (coordinate rectangular-state))
-      (v (velocity rectangular-state)))
-(ref (cross-product xyz (* m v)) 2))) 
-#+end_src
-
-#+begin_src clojure
-(define (s->r spherical-state)
-(let ((q (coordinate spherical-state)) (_ 0))
-(let ((r (ref q 0))
-      (theta (ref q 1))
-      (phi (ref q 2)))
-(let ((x (* r (sin theta) (cos phi)))
-      (y (* r (sin theta) (sin phi)))
-      (z (* r (cos theta))))
-(up x y z))))) 
-#+end_src
-
-#+begin_src clojure
-(show-expression
-((compose (ang-mom-z 'm) (F->C s->r))
-(up 't
-(up 'r 'theta 'phi)
-(up 'rdot 'thetadot 'phidot)))) 
-#+end_src
-
-#+begin_src clojure
-(show-expression
-((Lagrangian->energy (L3-central 'm (literal-function 'V)))
-(up 't
-(up 'r 'theta 'phi)
-(up 'rdot 'thetadot 'phidot)))) 
-#+end_src
-
-#+begin_src clojure
-(define ((L0 m V) local)
-(let ((t (time local))
-      (q (coordinates local))
-      (v (velocities local)))
-(- (* 1/2 m (square v)) (V t q)))) 
-#+end_src
-
+    <h2>1.8 Conserved Quantities</h2>
+    <h3>1.8.2 Energy Conservation</h3>
