@@ -13,9 +13,10 @@ A description of how to begin without any knowledge is in [2].
 
 This first page shows an example of calculating cartesian coordinates out of polar coordinates.
 
-The examples of this whole chapter are to be solved as puzzles only, they cannot be successfully executed.
+The examples of this whole chapter are to be solved as puzzles only, only the first three
+pages can be successfully executed using the "Run" button.
 
-The executable code of the examples can, however, be viewed and modified on another html page [3].
+The executable code of all examples can, however, be viewed and modified on another html page [3].
 
 More information on this visual programming project is available on github [4].
 
@@ -33,12 +34,17 @@ More information on this visual programming project is available on github [4].
       (* 'R (sin 'phi))))
 #+end_src
 
+This page shows an example of calculating cartesian coordinates out of polar coordinates
+in three dimensions. Press "Run" to look at some nice rendering of the result.
+
 #+begin_src clojure
 (->tex-equation
   (up (* 'R (sin 'theta) (cos 'phi))
           (* 'R (sin 'theta) (sin 'phi))
           (* 'R (cos 'theta))))
 #+end_src
+
+Here we show ho to differentiate a simple expression.
 
 #+begin_src clojure
 (->infix
