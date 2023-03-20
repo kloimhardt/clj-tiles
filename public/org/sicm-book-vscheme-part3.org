@@ -7,13 +7,15 @@
 (define-coordinates t e/R1-rect)
 #+end_src
 
+http://localhost:8080/cljtiles.html?org=http://localhost:8080/org/sicm-book-vscheme-part3.org
+
 Hamiltonian Mechanics
 
 3.1   Hamilton’s Equations
 
 #+begin_src clojure
   (define ((Hamilton-equations Hamiltonian) q p)
-    (let [(state-path (qp->H-state-path q p) )] 
+    (let (:tiles/vert [(:tiles/vert (state-path (qp->H-state-path q p)))]) 
       (- (D state-path)
          (compose (Hamiltonian->state-derivative Hamiltonian)
                   state-path)))) 
