@@ -858,12 +858,15 @@
 
 (defn ^{:export true} output []
   ;;1 TODO add "pendulumbegin" lable (sic)
-  ;;2 Clojure (let [x a y b] (f x y)) ->
-  ;;  Scheme (let ((x a) (y b)) (f x)) ->
+  ;;2 introduce [tiles-vert ] so that puzzles are correctly exploded
+  ;;3 Scheme (let ((x a) (y b)) (f x)) ->
   ;;  (let [tiles-vert (tiles-vert x a) (tiles-vert y b)] (f x))
-  ;;  or even better: (let [tiles-vert {x a} {y b}] (f x y))
+  ;;  or even better? (let [tiles-vert {x a} {y b}] (f x y))
   ;; where {x a} is finally allowed and always :tiles/vert and (:tiles/vert (x a)) is forbidden
-  ;; and introduce (tiles-vert ) so that puzzles are correctly exploded
+  ;; leave Clojure (let [x a y b] (f x y)) as it is
+  ;;4 before execution:
+  ;; a) disentangle (define ((f x) y) ...) into (defn [x] (fn [y] ...))
+  ;; b) remove () in (let [tiles-vert (tiles-vert x a) (tiles-vert y b)] ...)
 
   (workspace!/init startsci open-modal)
   (goto-page! (dec 1))
