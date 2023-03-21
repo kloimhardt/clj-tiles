@@ -133,14 +133,13 @@ in principle, a :tiles/vert would alaways be in order (only done in a view examp
 
 #+begin_src clojure
   (define (find-path Lagrangian t0 q0 t1 q1 n)
-    (let (:tiles/vert [(:tiles/vert (initial-qs (linear-interpolants q0 q1 n)))])
-      (let (:tiles/vert
-            [(:tiles/vert (minimizing-qs
-                            (multidimensional-minimize
-                              (parametric-path-action Lagrangian
-                                                      t0 q0 t1 q1)
-                              initial-qs)))])
-        (make-path t0 q0 t1 q1 minimizing-qs)))) 
+    (let [(:tiles/vert (initial-qs (linear-interpolants q0 q1 n)))
+          (:tiles/vert (minimizing-qs
+                         (multidimensional-minimize
+                           (parametric-path-action Lagrangian
+                                                   t0 q0 t1 q1)
+                           initial-qs)))]
+      (make-path t0 q0 t1 q1 minimizing-qs))) 
 #+end_src
 
 #+begin_src clojure

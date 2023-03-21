@@ -15,10 +15,10 @@ Hamiltonian Mechanics
 
 #+begin_src clojure
   (define ((Hamilton-equations Hamiltonian) q p)
-    (let (:tiles/vert [(:tiles/vert (state-path (qp->H-state-path q p)))]) 
-      (- (D state-path)
-         (compose (Hamiltonian->state-derivative Hamiltonian)
-                  state-path)))) 
+    (let [[state-path (qp->H-state-path q p)]]
+         (- (D state-path)
+            (compose (Hamiltonian->state-derivative Hamiltonian)
+                     state-path)))) 
 #+end_src
 
 #+begin_src clojure
@@ -35,30 +35,30 @@ Hamiltonian Mechanics
 
 #+begin_src clojure
   (define ((H-rectangular m V) state)
-    (let [(q (coordinate state))]
-      (p (momentum state))
+    (let [[q (coordinate state)]
+          [p (momentum state)]]
       (+ (/ (square p) (* 2 m))
          (V (ref q 0) (ref q 1))))) 
 #+end_src
 
 #+begin_src clojure
   (show-expression
-    (let [(V (literal-function ’V (-> (X Real Real) Real)))
-          (q (up (literal-function ’x)
-                 (literal-function ’y)))
-          (p (down (literal-function ’p_x)
-                   (literal-function ’p_y)))]
+    (let [[V (literal-function ’V (-> (X Real Real) Real))]
+          [q (up (literal-function ’x)
+                 (literal-function ’y))]
+          [p (down (literal-function ’p_x)
+                   (literal-function ’p_y))]]
       (((Hamilton-equations (H-rectangular ’m V)) q p) ’t))) 
 #+end_src
 
 #+begin_src clojure
   (define (Legendre-transform F)
-    (let [(w-of-v (D F))]
+    (let [[w-of-v (D F)]]
       (define (G w)
-        (let [(zero (compatible-zero w))]
-          (let [(M ((D w-of-v) zero))
-                (b (w-of-v zero))]
-            (let [(v (solve-linear-left M (- w b)))]
+        (let [[zero (compatible-zero w)]]
+          (let [[M ((D w-of-v) zero)]
+                [b (w-of-v zero)]]
+            (let [[v (solve-linear-left M (- w b))]]
               (- (* w v) (F v))))))
       G))
 #+end_src
