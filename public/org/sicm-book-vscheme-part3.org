@@ -7,11 +7,11 @@
 (define-coordinates t e/R1-rect)
 #+end_src
 
-http://localhost:8080/cljtiles.html?org=http://localhost:8080/org/sicm-book-vscheme-part3.org
-
 Hamiltonian Mechanics
 
 3.1   Hamilton’s Equations
+
+http://localhost:8080/cljtiles.html?org=http://localhost:8080/org/sicm-book-vscheme-part3.org
 
 #+begin_src clojure
   (define ((Hamilton-equations Hamiltonian) q p)
@@ -41,7 +41,7 @@ Hamiltonian Mechanics
          (V (ref q 0) (ref q 1))))) 
 #+end_src
 
-#+begin_src clojure
+x#+xegin_src xlojure
   (show-expression
     (let [[V (literal-function ’V (-> (X Real Real) Real))]
           [q (up (literal-function ’x)
@@ -49,9 +49,9 @@ Hamiltonian Mechanics
           [p (down (literal-function ’p_x)
                    (literal-function ’p_y))]]
       (((Hamilton-equations (H-rectangular ’m V)) q p) ’t))) 
-#+end_src
+x#+xnd_src
 
-#+begin_src clojure
+x#+xegin_src xlojure
   (define (Legendre-transform F)
     (let [[w-of-v (D F)]]
       (define (G w)
@@ -61,7 +61,7 @@ Hamiltonian Mechanics
             (let [[v (solve-linear-left M (- w b))]]
               (- (* w v) (F v))))))
       G))
-#+end_src
+x#+xnd_src
 
 This is the start of the new one 
 
