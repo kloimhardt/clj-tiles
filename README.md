@@ -100,6 +100,7 @@ For development install Clojure/Java and Node and do:
  then open `http://localhost:8080/cljtiles.html` in your browser.
  
 ## Related projects
+* [ClojureBlocks](https://codeberg.org/jhandke/ClojureBlocks)
 * [Blockly](https://developers.google.com/blockly)
 * [BlockPy](https://think.cs.vt.edu/blockpy/) 
 * [blockoid](https://github.com/ParkerICI/blockoid)
