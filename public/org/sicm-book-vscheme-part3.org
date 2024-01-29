@@ -1,0 +1,355 @@
+#+begin_src clojure :exports none
+(ns fdg.ch1
+  (:refer-clojure :exclude [+ - * / = compare zero? ref partial
+                            numerator denominator])
+  (:require [sicmutils.env :as e :refer :all :exclude [F->C]]))
+
+(define-coordinates t e/R1-rect)
+#+end_src
+
+Hamiltonian Mechanics
+
+3.1   Hamilton’s Equations
+
+http://localhost:8080/cljtiles.html?org=http://localhost:8080/org/sicm-book-vscheme-part3.org
+
+#+begin_src clojure
+  (define ((Hamilton-equations Hamiltonian) q p)
+    (let [[state-path (qp->H-state-path q p)]]
+         (- (D state-path)
+            (compose (Hamiltonian->state-derivative Hamiltonian)
+                     state-path)))) 
+#+end_src
+
+#+begin_src clojure
+(define ((Hamiltonian->state-derivative Hamiltonian) H-state)
+(up 1
+(((partial 2) Hamiltonian) H-state)
+(- (((partial 1) Hamiltonian) H-state)))) 
+#+end_src
+
+#+begin_src clojure
+(define ((qp->H-state-path q p) t)
+(up t (q t) (p t))) 
+#+end_src
+
+#+begin_src clojure
+  (define ((H-rectangular m V) state)
+    (let [[q (coordinate state)]
+          [p (momentum state)]]
+      (+ (/ (square p) (* 2 m))
+         (V (ref q 0) (ref q 1))))) 
+#+end_src
+
+x#+xegin_src xlojure
+  (show-expression
+    (let [[V (literal-function ’V (-> (X Real Real) Real))]
+          [q (up (literal-function ’x)
+                 (literal-function ’y))]
+          [p (down (literal-function ’p_x)
+                   (literal-function ’p_y))]]
+      (((Hamilton-equations (H-rectangular ’m V)) q p) ’t))) 
+x#+xnd_src
+
+x#+xegin_src xlojure
+  (define (Legendre-transform F)
+    (let [[w-of-v (D F)]]
+      (define (G w)
+        (let [[zero (compatible-zero w)]]
+          (let [[M ((D w-of-v) zero)]
+                [b (w-of-v zero)]]
+            (let [[v (solve-linear-left M (- w b))]]
+              (- (* w v) (F v))))))
+      G))
+x#+xnd_src
+
+This is the start of the new one 
+
+x#+xegin_src xlojure
+(define ((Lagrangian->Hamiltonian Lagrangian) H-state)
+(let ((t (time H-state))
+(q (coordinate H-state))
+(p (momentum H-state)))
+(define (L qdot)
+(Lagrangian (up t q qdot)))
+((Legendre-transform L) p)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define ((Hamiltonian->Lagrangian Hamiltonian) L-state)
+(let ((t (time L-state))
+(q (coordinate L-state))
+(qdot (velocity L-state)))
+(define (H p)
+(Hamiltonian (up t q p)))
+((Legendre-transform H) qdot)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define ((L-rectangular m V) local)
+(let ((q (coordinate local))
+(qdot (velocity local)))
+(- (* 1/2 m (square qdot))
+(V (ref q 0) (ref q 1)))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(show-expression
+((Lagrangian->Hamiltonian
+(L-rectangular
+’m
+(literal-function ’V (-> (X Real Real) Real))))
+(up ’t (up ’x ’y) (down ’p_x ’p_y))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define F
+(literal-function ’F
+(-> (UP Real (UP Real Real) (DOWN Real Real)) Real)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define G
+(literal-function ’G
+(-> (UP Real (UP Real Real) (DOWN Real Real)) Real)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define H
+(literal-function ’H
+(-> (UP Real (UP Real Real) (DOWN Real Real)) Real)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+((+ (Poisson-bracket F (Poisson-bracket G H))
+(Poisson-bracket G (Poisson-bracket H F))
+(Poisson-bracket H (Poisson-bracket F G)))
+(up ’t (up ’x ’y) (down ’px ’py)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(show-expression
+((Lagrangian->Hamiltonian
+(L-central-polar ’m (literal-function ’V)))
+(up ’t (up ’r ’phi) (down ’p_r ’p_phi))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(show-expression
+(((Hamilton-equations
+(Lagrangian->Hamiltonian
+(L-central-polar ’m (literal-function ’V))))
+(up (literal-function ’r)
+(literal-function ’phi))
+(down (literal-function ’p_r)
+(literal-function ’p_phi)))
+’t))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define ((L-axisymmetric-top A C gMR) local)
+(let ((q (coordinate local))
+(qdot (velocity local)))
+(let ((theta (ref q 0))
+(thetadot (ref qdot 0))
+(phidot (ref qdot 1))
+(psidot (ref qdot 2)))
+(+ (* 1/2 A
+(+ (square thetadot)
+(square (* phidot (sin theta)))))
+(* 1/2 C
+(square (+ psidot (* phidot (cos theta)))))
+(* -1 gMR (cos theta))))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(show-expression
+((Lagrangian->Hamiltonian (L-axisymmetric-top ’A ’C ’gMR))
+(up ’t
+(up ’theta ’phi ’psi)
+(down ’p_theta ’p_phi ’p_psi))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(show-expression
+((Lagrangian->Hamiltonian
+(L-periodically-driven-pendulum ’m ’l ’g ’a ’omega))
+(up ’t ’theta ’p_theta)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (H-pend-sysder m l g a omega)
+(Hamiltonian->state-derivative
+(Lagrangian->Hamiltonian
+(L-periodically-driven-pendulum m l g a omega))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define window (frame :-pi :pi -10.0 10.0))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define ((monitor-p-theta win) state)
+(let ((q ((principal-value :pi) (coordinate state)))
+(p (momentum state)))
+(plot-point win q p)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(let ((m 1.0)	;m=1kg
+(l 1.0)
+
+;l=1m
+(g 9.8)
+
+;g=9.8m/s2
+(A 0.1)
+
+;A=1/10 m
+(omega (* 2 (sqrt 9.8))))
+
+((evolve H-pend-sysder m l g A omega)
+
+(up 0.0
+
+;t0=0
+1.0
+
+;theta0=1 rad
+0.0)
+
+;p0=0 kg m2/s
+(monitor-p-theta window)
+
+0.01
+
+;plot interval
+100.0
+
+;final time
+1.0e-12))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (driven-pendulum-map m l g A omega)
+(let ((advance (state-advancer H-pend-sysder m l g A omega))
+(map-period (/ :2pi omega)))
+(lambda (theta ptheta return fail)
+(let ((ns (advance
+(up 0 theta ptheta)
+; initial state
+map-period)))
+; integration interval
+(return ((principal-value :pi)
+(coordinate ns))
+(momentum ns))))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define win (frame :-pi :pi -20 20))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(let ((m 1.0)
+;m=1kg
+(l 1.0)
+;l=1m
+(g 9.8)
+;g=9.8m/s2
+(A 0.05))
+;A=1/20m
+(let ((omega0 (sqrt (/ g l))))
+(let ((omega (* 4.2 omega0)))
+(explore-map
+win
+(driven-pendulum-map m l g A omega)
+1000)))) ;1000 points for each initial condition
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (HHmap E dt sec-eps int-eps)
+(define ((make-advance advancer eps) s dt)
+(advancer s dt eps))
+(let ((adv
+(make-advance (state-advancer HHsysder) int-eps)))
+(lambda (y py cont fail)
+(let ((initial-state (section->state E y py)))
+(if (not initial-state)
+(fail)
+(find-next-crossing initial-state adv dt sec-eps
+(lambda (crossing-state running-state)
+(cont (ref (coordinate crossing-state)
+1)
+(ref (momentum crossing-state)
+1)))))))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (section->state E y py)
+(let ((d (- E (+ (HHpotential (up 0 (up 0 y)))
+(* 1/2 (square py))))))
+(if (>= d 0.0)
+(let ((px (sqrt (* 2 d))))
+(up 0 (up 0 y) (down px py)))
+#f)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (HHHam s)
+(+ (* 1/2 (square (momentum s)))
+(HHpotential s)))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (HHpotential s)
+(let ((x (ref (coordinate s) 0))
+(y (ref (coordinate s) 1)))
+(+ (* 1/2 (+ (square x) (square y)))
+(- (* (square x) y) (* 1/3 (cube y))))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (HHsysder)
+(Hamiltonian->state-derivative HHHam))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (find-next-crossing state advance dt sec-eps cont)
+(let lp ((s state))
+(let ((next-state (advance s dt)))
+(if (and (> (ref (coordinate next-state) 0) 0)
+(< (ref (coordinate s) 0) 0))
+(let ((crossing-state
+(refine-crossing sec-eps advance s)))
+(cont crossing-state next-state))
+(lp next-state)))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define (refine-crossing sec-eps advance state)
+(let lp ((state state))
+(let ((x (ref (coordinate state) 0))
+(xd (ref (momentum state) 0)))
+(let ((zstate (advance state (- (/ x xd)))))
+(if (< (abs (ref (coordinate zstate) 0))
+sec-eps)
+zstate
+(lp zstate))))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define ((standard-map K) theta I return failure)
+(let ((nI (+ I (* K (sin theta)))))
+(return ((principal-value :2pi) (+ theta nI))
+((principal-value :2pi) nI))))
+x#+xnd_src
+
+x#+xegin_src xlojure
+(define window (frame 0.0 :2pi 0.0 :2pi))
+(explore-map window (standard-map 0.6) 2000)
+x#+xnd_src
+
+x#+xegin_src xlojure
+
+x#+xnd_src
+

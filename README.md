@@ -1,14 +1,24 @@
 # Clj-Tiles
 
-Watch the [video](https://www.youtube.com/watch?v=bHBALgxjeLo) presented at the [re-clojure](https://www.reclojure.org/2021/speaker/markus-kloimwieder) 2021 conference, and also the [panel discussion](https://www.youtube.com/watch?v=euH8iZGbJD8)
+> I read your treatise the way a curious child listens in suspense to the solution of a puzzle that has plagued him for a long time, and I delight in the beauties revealed to the eye.
 
-* Learn or teach functional programming by solving graphical puzzles [in the browser](https://kloimhardt.github.io/cljtiles.html).
-* There are over 100 puzzles built in. Starting with simple examples, they continue to basic web-programming and lead to sophisticated examples taken from theoretical physics.
+> [Max Planck](https://phaidra.univie.ac.at/o:1542358) to Erwin Schrödinger on 2 April 1926
+
+## Features
+
+* Solve graphical [puzzles](https://kloimhardt.github.io/cljtiles.html) in the browser.
+* Learn functional programming to your inner child.
+* Over 100 puzzles built in. Start with simple examples, continue to basic web-programming and move to sophisticated examples taken from theoretical physics.
 * Investigate puzzles with the built in value inspector.
-* Make new puzzle tutorials by using the built in parser.
+* [Load more puzzles](https://kloimhardt.github.io/cljtiles.html?page=FDG001) from the web (and also extend them) with the built in parser.
+* Create textfiles with whole new puzzle tutorials.
 * Live coding made easy, just prepare a puzzle and solve it in front of the audience.
 
-Watch the [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04).
+## Videos
+* [Talk](https://www.youtube.com/watch?v=bHBALgxjeLo) presented at the [re-clojure](https://www.reclojure.org/2021/speaker/markus-kloimwieder) 2021 conference, with [panel discussion](https://www.youtube.com/watch?v=euH8iZGbJD8).
+*  [Visual tools meeting](https://clojureverse.org/t/visual-tools-meeting-9-summary-video-clj-tiles-obsidian-wielder-cardigan-bay-platypub/9081) from July 2nd 2022. It shows the [first chapter](https://github.com/mentat-collective/fdg-book) of the open-access book [Functional Differential Geometry](https://mitpress.mit.edu/books/functional-differential-geometry), you can try it yourself [here](https://kloimhardt.github.io/cljtiles.html?page=FDG001).
+
+* Earlier [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04).
 
 ## Solve puzzles
 The first few puzzles consist of completing the lyrics of a famous song. Then, the following coding puzzles are taken from the book [Getting Clojure](https://pragprog.com/titles/roclojure/getting-clojure/). Another resource is [Clojure for the Brave and True](https://www.braveclojure.com). Do you notice the similarities between writing code and poetry?
@@ -19,15 +29,19 @@ The most simple example looks like this:
 
 Just press the `Run` button, as this is already a fully functional program.
 
-A more sophisticated example looks like this:
+A [more sophisticated example](https://kloimhardt.github.io/cljtiles.html?page=freeparticle) looks like this:
 
 ![pendulum](screenshots/pendulum_begin.png)
 
-After completion, this puzzle (which uses the built in [SICMutils](https://github.com/sicmutils/sicmutils) library) represents a working program. By right clicking on the individual blocks and `inspect`, you can trace the program execution and get some type information. This special puzzle also provides an experimental feature: the value inspector is enhanced to provide additional descriptions and explanations. Also the completed puzzle is provided in a separate example.
+After completion, this puzzle (which uses the built in [SICMutils](https://github.com/sicmutils/sicmutils) library) represents a working program. By right clicking on the individual blocks and `inspect`, you can trace the program execution and get some type information. This special puzzle also provides an experimental feature: the value inspector is enhanced to provide additional descriptions and explanations (see also the [demo video](https://www.youtube.com/watch?v=DHcZkmXKp04)).
 
-## Create a new puzzle
+## Load or create new puzzles
 
-Open the parser by right clicking on a white space. Paste the following code:
+Open the parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press `insert`. You just loaded an new tutorial from the web. 
+
+The URL in the text field can be changed, so you can provide your own files (they need to follow the format of the provided tutorials).
+
+However, there is a more direct way to create new puzzles. Paste the following code into the text field:
 ```
 {:blockpos [[0 0] [0 100] [0 170] [100 170] [0 220]]
  :code [(:tiles/vert {:title "Getting Clojure"
@@ -54,7 +68,7 @@ Or paste:
 ```
 Notice that in the simplest last case, the workspace is not cleared before insert.
 
-The [examples](https://github.com/kloimhardt/clj-tiles/tree/master/examples) directory contains code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). It can be readily pasted into the clj-tiles parser. Reading the first pages of the book `Structure and Interpretation of Classical Mechanics` ([original](https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html), [reprint](https://tgvaughan.github.io/sicm/)) is mandatory for understanding.
+The file [book_examples_1.cljs](https://github.com/kloimhardt/clj-tiles/blob/master/public/org/book_examples_1.cljs) contains code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). It can be readily pasted into the clj-tiles parser. Reading the first pages of the book `Structure and Interpretation of Classical Mechanics` ([original](https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html), [reprint](https://tgvaughan.github.io/sicm/)) is mandatory for understanding.
 
 ## A kind note on types and the role of graphical blocks
 
@@ -86,6 +100,7 @@ For development install Clojure/Java and Node and do:
  then open `http://localhost:8080/cljtiles.html` in your browser.
  
 ## Related projects
+* [ClojureBlocks](https://codeberg.org/jhandke/ClojureBlocks)
 * [Blockly](https://developers.google.com/blockly)
 * [BlockPy](https://think.cs.vt.edu/blockpy/) 
 * [blockoid](https://github.com/ParkerICI/blockoid)
