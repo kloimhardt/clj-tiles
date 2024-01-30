@@ -1,5 +1,5 @@
 # clj-tiles
-## Description
+## Description WIP
 Visual programming for STEM students and instructors at university level.
 
 If you like videos, see my presentation on youtube for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
