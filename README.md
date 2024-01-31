@@ -19,10 +19,13 @@ External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spie
 
 ## Roadmap
 * Out of this documentation, being a conglomeration, make a peer-reviewed journal article
-* Migrate to JAX + Python as main engine for calculations
-* Prepare a series of lectures on basic algebra
-* Do a control group study to assess the efficacy of the lectures
+* Prepare a series of lectures on basic Linear Algebra
+* Add as main calculation engine JAX + Python
+* Perform a control group study to assess the efficacy of the lectures
+
 A long-term research goal is the improvement of non-verbal plot building of the visual tutorials.
+
+External links: [JAX](https://jax.readthedocs.io), [Python](https://www.python.org)
 
 ## Details
 
@@ -70,7 +73,7 @@ I tried to explain this more in a very preliminary draft of a [paper on visual p
 External link: [Parsons puzzle](https://en.wikipedia.org/wiki/Parsons_problem)
 
 ### JAX and Functional Programming for the Win
-The tutorials as well as the implementation of clj-tiles are based on Clojure, a functional programming language from the LISP family. Indeed, many tutorials in clj-tiles are for learning this splendid language, starting with ![hello](screenshots/hello_world.png).
+The tutorials as well as the implementation of clj-tiles are based on Clojure, a functional programming language from the LISP family. Indeed, many tutorials in clj-tiles are for learning this splendid language, starting with ![hello](screenshots/hello_world.png). More advanced tutorials make use of the splendid Emmy Computer Algebra System.
 
 Clojure is a niche language, as opposed to the very popular Python. I tried to show the advantages of the functional notation for STEM (compared to common Python syntax) in a [preprint on how to design a functional interface](https://arxiv.org/abs/2312.13295).
 
@@ -82,7 +85,7 @@ The other main difference is that clj-tiles is not meant for building programs b
 
 JAX+Python opens up a fruitful future path for clj-tiles. It is perfectly feasible, via the Hy language, to generate JAX syntax out of the already existing block notation. In this way, STEM students are introduced to functional notation without any distraction.
 
-External link: [Clojure](https://www.clojure.org), [BlockPy](https://think.cs.vt.edu/blockpy/) [JAX](https://jax.readthedocs.io/en/latest/jax-101/01-jax-basics.html#differences-from-numpy), [Hy](http://hylang.org)
+External link: [Clojure](https://www.clojure.org), [Emmy Computer Algebra System](https://github.com/mentat-collective/emmy) [BlockPy](https://think.cs.vt.edu/blockpy/) [functional-style JAX](https://jax.readthedocs.io/en/latest/jax-101/01-jax-basics.html#differences-from-numpy), [Hy](http://hylang.org)
 
 ### Gamification
 In interactive experiences, points and achievements are not attributes of Gamification but hollow structures without content. To me, under the influence of Jon Blow and his game "The Witness", gamification is about non-verbal plot building, encouraging mimicry and providing immediate feedback. The hand-crafted puzzles mentioned above are testimony to this.
