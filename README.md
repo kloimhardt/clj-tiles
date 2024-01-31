@@ -1,7 +1,4 @@
 # clj-tiles
-## TODO WIP
-* describe more the Wordle feature
-
 ## Description
 Visual programming for STEM students and instructors at university level.
 
@@ -59,6 +56,7 @@ Interesting here is the `Color` button. It indicates that you are on the right t
 ![wordle_2](screenshots/wordle_2.png)
 ![wordle_3](screenshots/wordle_3.png)
 ![wordle_4](screenshots/wordle_4.png)
+
 
 ## Comprehension of the Domain
 The above example is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones.
