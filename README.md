@@ -1,8 +1,11 @@
 # clj-tiles
+## TODO WIP
+* describe more the Wordle feature
+
 ## Description
 Visual programming for STEM students and instructors at university level.
 
-If you like videos, see my presentation on youtube for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
+If you like videos, watch my presentation on youtube for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
 Make sure to interactively follow along: [clj-tiles link to Github pages](https://kloimhardt.github.io/cljtiles.html?page=FDG001).
 
 Being describable as a mixture of Wordle and Scratch, clj-tiles is for every student who, at a young age, has been gotten hooked as a Princess of Science (see the episode with Prof. Johanna Pirker on ZDFtivi).
@@ -12,7 +15,7 @@ External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spie
 ## Features
 * Solve over 100 graphical puzzles in the browser
 * Get Wordle inspired feedback
-* Live coding in front of an audience made easy
+* Live coding in the lecture room without the need for programming experience
 * Learn functional programming to your inner child
 * Notice the similarities between coding and writing poetry
 * Load more puzzles from the web with the built in parser
@@ -33,7 +36,7 @@ External links: [JAX](https://jax.readthedocs.io), [Python](https://www.python.o
 As an introduction, we start with the following picture which also appears when you click on this [clj-tiles link](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org).
 ![cljtiles_polar_1](https://kloimhardt.github.io/blog/images/cljtiles_polar_1.png)
 
-The picture will not tell you much at first. For fun, you can press the `Run` button. But you also might notice the `Get the Puzzle` button. Press it.
+The picture will not tell you much at first. For fun, you can press the `Run` button, but that does not bring particular insight for this specific workspace. But you also might notice the `Get the Puzzle` button. Press it.
 ![cljtiles_polar_2](https://kloimhardt.github.io/blog/images/cljtiles_polar_2.png)
 
 This looks rather complicated, but you start to notice that the content of the graphical blocks are the same as in the first picture. There is `R`, `phi`, `sin` and so on.
@@ -43,14 +46,21 @@ As a hint of how to proceed, we show (with arrows) the first steps to complete t
 After these first steps, you continue...
 ![cljtiles_polar_5](https://kloimhardt.github.io/blog/images/cljtiles_polar_5.png)
 
-... and arrive at the following picture. Interesting here is the `Color` button. It indicates that you are on the right track. It is modelled after Wordle. Can you finish the puzzle now? After all, you can look up the solution in the first picture above.
+... and arrive at the following picture.
 ![cljtiles_polar_6](https://kloimhardt.github.io/blog/images/cljtiles_polar_6.png)
 
-After proving that you finished the puzzle correctly (all code is green), the   `>` button becomes green itself. This means that, when you move to the next page, you already get the solution to that next puzzle.
+Interesting here is the `Color` button. It indicates that you are on the right track. It is modelled after Wordle. Can you finish the puzzle now? After all, you can look up the solution in the first picture above.
 
-So you need to solve a puzzle to get the solution of the next. But if you watch the video mentioned at the beginning, you will find out the trick how to see all puzzles solved without any work. On the other hand, the `Shuffle` button makes it all much harder.
+## Wordle-inspired feedback
 
-### Comprehension of the Domain
+![wordle_1](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/wordle_1.png)
+
+![wordle_1](screenshots/wordle_1.png)
+![wordle_2](screenshots/wordle_2.png)
+![wordle_3](screenshots/wordle_3.png)
+![wordle_4](screenshots/wordle_4.png)
+
+## Comprehension of the Domain
 The above example is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones.
 
 But this is just a start. By completing all the puzzles of this visual tutorial, a Physics student in the 3rd semester can learn Classical Mechanics. Indeed she first gets competent by solving the puzzles, maybe just learning them by heart. Then, she will gain a much deeper comprehension when reading more carefully the book "Structure and Interpretation of Classical Mechanics".
@@ -64,34 +74,36 @@ This set of tutorials also contains the simplest chapter of all: completing Bob 
 External links: [Structure and Interpretation of Classical Mechanics](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html), [Functional Differential Geometry](https://mitpress.mit.edu/books/functional-differential-geometry).
 
 ### Teaching
-clj-tiles is suited for not only learning but especially also teaching STEM. Live coding in front of an audience is made easy. The instructor just prepares puzzles and solves them in front of the audience. Typos like in editor based live coding are impossible. Students can follow along in real-time on their own computers.
+clj-tiles is suited for not only learning but especially also teaching STEM. Live coding in front of an audience is made easy. The instructor does not need to have any programming experiences, he just prepares puzzles and solves them in front of the audience. Typos like in editor based live coding are impossible. Students can follow along in real-time on their own computers.
 
 In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes a subject of an interdisciplinary sociological study. Questionnaires and Control Groups can be used for assessing the efficacy of the method.
 
-I tried to explain this more in a very preliminary draft of a [paper on visual programming](https://github.com/kloimhardt/werkbank/blob/master/latex/ga_pro_kla_mech.pdf).
+I tried to more explain this topic in the context of teaching advanced physics classes in an early preliminary [draft for a paper on visual programming](https://github.com/kloimhardt/werkbank/blob/master/latex/ga_pro_kla_mech.pdf).
 
 External link: [Parsons puzzle](https://en.wikipedia.org/wiki/Parsons_problem)
 
 ### JAX and Functional Programming for the Win
-The tutorials as well as the implementation of clj-tiles are based on Clojure, a functional programming language from the LISP family. Indeed, many tutorials in clj-tiles are for learning this splendid language, starting with ![hello](screenshots/hello_world.png). More advanced tutorials make use of the splendid Emmy Computer Algebra System.
+The tutorials as well as the implementation of clj-tiles are based on Clojure, a functional programming language from the LISP family. Indeed, many tutorials in clj-tiles are for learning this splendid language, starting with ![hello](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/hello_world.png). More advanced tutorials make use of the splendid Emmy Computer Algebra System.
 
-Clojure is a niche language, as opposed to the very popular Python. I tried to show the advantages of the functional notation for STEM (compared to common Python syntax) in a [preprint on how to design a functional interface](https://arxiv.org/abs/2312.13295).
+Clojure is a niche language, as opposed to the very popular Python. I tried to show the advantages of the functional notation for STEM (compared to common Python syntax) in a [preprint article on how to design a functional interface](https://arxiv.org/abs/2312.13295).
 
 However, recently there has been introduced a Python library which rapidly gains popularity, namely JAX: "the kinds of program transformations that JAX enables are much more feasible in functional-style programs". Casually said, JAX is Clojure bolted onto Python.
 
 The blocks of clj-tiles are meant to exclusively represent a functional notation. This is the all important difference between clj-tiles and the visual building tools Scratch and BlockPy.
 
-The other main difference is that clj-tiles is not meant for building programs but for understanding already existing code.
-
-JAX+Python opens up a fruitful future path for clj-tiles. It is perfectly feasible, via the Hy language, to generate JAX syntax out of the already existing block notation. In this way, STEM students are introduced to functional notation without any distraction.
+JAX+Python opens up a fruitful future path for clj-tiles. It is perfectly feasible, via the Hy language, to generate JAX syntax out of the already existing block notation. In this way, STEM students are immediately introduced to functional notation via clj-tiles whilst being able to switch into any professional Python development environment at will as clj-tiles is not meant for building programs but for understanding already existing code.
 
 External link: [Clojure](https://www.clojure.org), [Emmy Computer Algebra System](https://github.com/mentat-collective/emmy) [BlockPy](https://think.cs.vt.edu/blockpy/) [functional-style JAX](https://jax.readthedocs.io/en/latest/jax-101/01-jax-basics.html#differences-from-numpy), [Hy](http://hylang.org)
 
 ### Gamification
 In interactive experiences, points and achievements are not attributes of Gamification but hollow structures without content. To me, under the influence of Jon Blow and his game "The Witness", gamification is about non-verbal plot building, encouraging mimicry and providing immediate feedback. The hand-crafted puzzles mentioned above are testimony to this.
 
+After proving that you finished the puzzle correctly (all code is green), the   `>` button becomes green itself. This means that, when you move to the next page, you already get the solution to that next puzzle.
+
+So you need to solve a puzzle to get the solution of the next. But if you watch the video mentioned at the beginning, you will find out the trick how to see all puzzles solved without any work. On the other hand, the `Shuffle` button makes it all much harder.
+
 Also, inspired by talking chess computers, text- and point-and-click adventure games, I experimented with the "inspect" feature of clj-tiles. The according interactive workspace appears when you click on this [clj-tiles link](https://kloimhardt.github.io/cljtiles.html?page=freeparticle).
-![freeparticle](screenshots/pendulum_begin.png)
+![freeparticle](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/pendulum_begin.png)
 
 As this workspace is not yet self explanatory, I provide a [walkthrough video](https://www.youtube.com/watch?v=DHcZkmXKp04).
 
