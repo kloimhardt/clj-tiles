@@ -12,9 +12,8 @@ External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spie
 ## Features
 * Solve over 100 graphical puzzles in the browser
 * Get Wordle inspired feedback
-* Live coding in the lecture room without the need for programming experience
+* Live coding in the lecture room without the need of programming experience
 * Learn functional programming to your inner child
-* Notice the similarities between coding and writing poetry
 * Load more puzzles from the web with the built in parser
 
 ## Roadmap
@@ -33,7 +32,7 @@ External links: [JAX](https://jax.readthedocs.io), [Python](https://www.python.o
 As an introduction, we start with the following picture which also appears when you click on this [clj-tiles link](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org).
 ![cljtiles_polar_1](https://kloimhardt.github.io/blog/images/cljtiles_polar_1.png)
 
-The picture will not tell you much at first. For fun, you can press the `Run` button, but that does not bring particular insight for this specific workspace. But you also might notice the `Get the Puzzle` button. Press it.
+The picture will not tell you much at first. For fun, you can press the `Run` button, but that does not bring any particular insight for this specific workspace. But you also might notice the `Get the Puzzle` button. Press it.
 ![cljtiles_polar_2](https://kloimhardt.github.io/blog/images/cljtiles_polar_2.png)
 
 This looks rather complicated, but you start to notice that the content of the graphical blocks are the same as in the first picture. There is `R`, `phi`, `sin` and so on.
@@ -49,14 +48,12 @@ After these first steps, you continue...
 Interesting here is the `Color` button. It indicates that you are on the right track. It is modelled after Wordle. Can you finish the puzzle now? After all, you can look up the solution in the first picture above.
 
 ## Wordle-inspired feedback
+When completing a puzzle, the coloring of the generated code changes gradually. As soon as an expression matches the solution, it turns green. Shown below are the according stages of the above example.
 
 ![wordle_1](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/wordle_1.png)
-
-![wordle_1](screenshots/wordle_1.png)
-![wordle_2](screenshots/wordle_2.png)
-![wordle_3](screenshots/wordle_3.png)
-![wordle_4](screenshots/wordle_4.png)
-
+![wordle_2](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/wordle_2.png)
+![wordle_3](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/wordle_3.png)
+![wordle_4](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/wordle_4.png)
 
 ## Comprehension of the Domain
 The above example is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones.
@@ -72,7 +69,7 @@ This set of tutorials also contains the simplest chapter of all: completing Bob 
 External links: [Structure and Interpretation of Classical Mechanics](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html), [Functional Differential Geometry](https://mitpress.mit.edu/books/functional-differential-geometry).
 
 ### Teaching
-clj-tiles is suited for not only learning but especially also teaching STEM. Live coding in front of an audience is made easy. The instructor does not need to have any programming experiences, he just prepares puzzles and solves them in front of the audience. Typos like in editor based live coding are impossible. Students can follow along in real-time on their own computers.
+clj-tiles is suited not only for learning but especially also teaching STEM. Live coding in front of an audience is made easy. The instructor does not need to have any programming experiences, he just solves puzzles in front of the audience. Typos like in editor based live coding are thus avoided. Students can follow along in real-time on their own computers.
 
 In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes a subject of an interdisciplinary sociological study. Questionnaires and Control Groups can be used for assessing the efficacy of the method.
 
@@ -81,13 +78,13 @@ I tried to more explain this topic in the context of teaching advanced physics c
 External link: [Parsons puzzle](https://en.wikipedia.org/wiki/Parsons_problem)
 
 ### JAX and Functional Programming for the Win
-The tutorials as well as the implementation of clj-tiles are based on Clojure, a functional programming language from the LISP family. Indeed, many tutorials in clj-tiles are for learning this splendid language, starting with ![hello](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/hello_world.png). More advanced tutorials make use of the splendid Emmy Computer Algebra System.
-
-Clojure is a niche language, as opposed to the very popular Python. I tried to show the advantages of the functional notation for STEM (compared to common Python syntax) in a [preprint article on how to design a functional interface](https://arxiv.org/abs/2312.13295).
-
-However, recently there has been introduced a Python library which rapidly gains popularity, namely JAX: "the kinds of program transformations that JAX enables are much more feasible in functional-style programs". Casually said, JAX is Clojure bolted onto Python.
+The tutorials as well as the implementation of clj-tiles are based on Clojure, a functional programming language from the LISP family. Indeed, many tutorials in clj-tiles are for learning this great language, starting with ![hello](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/hello_world.png). More advanced tutorials make use of the splendid Emmy Computer Algebra System.
 
 The blocks of clj-tiles are meant to exclusively represent a functional notation. This is the all important difference between clj-tiles and the visual building tools Scratch and BlockPy.
+
+Clojure is a niche language, as opposed to the very popular Python. I tried to show, in comparison to common Python syntax, the advantages of the functional notation for STEM in a [preprint article on how to design a functional interface](https://arxiv.org/abs/2312.13295).
+
+However, recently there has been introduced a Python library which rapidly gains popularity, namely JAX: "the kinds of program transformations that JAX enables are much more feasible in functional-style programs". Casually said, JAX is Clojure bolted onto Python.
 
 JAX+Python opens up a fruitful future path for clj-tiles. It is perfectly feasible, via the Hy language, to generate JAX syntax out of the already existing block notation. In this way, STEM students are immediately introduced to functional notation via clj-tiles whilst being able to switch into any professional Python development environment at will as clj-tiles is not meant for building programs but for understanding already existing code.
 
