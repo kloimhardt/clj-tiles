@@ -112,3 +112,5 @@ More on the parser can be found in the
 
 ## Technical Details
 which are in [this document](screenshots/technical_details.md).
+
+[GPL v3](LICENSE) Copyright © 2021 Markus Kloimwieder

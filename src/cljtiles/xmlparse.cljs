@@ -1,3 +1,5 @@
+#_"SPDX-License-Identifier: GPL-3.0"
+
 (ns cljtiles.xmlparse)
 
 (defn l-block [x]

@@ -1,3 +1,5 @@
+#_"SPDX-License-Identifier: GPL-3.0"
+
 (ns cljtiles.tests
   (:require
    [cljtiles.tutorials-0 :as t-0]

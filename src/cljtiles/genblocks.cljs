@@ -1,3 +1,5 @@
+#_"SPDX-License-Identifier: GPL-3.0"
+
 (ns cljtiles.genblocks
   (:require-macros [hiccups.core :as hiccups :refer [html]])
   (:require [hiccups.runtime :as hiccupsrt]))

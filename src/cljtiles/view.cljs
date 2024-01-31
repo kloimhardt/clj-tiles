@@ -1,3 +1,5 @@
+#_"SPDX-License-Identifier: GPL-3.0"
+
 (ns cljtiles.view
   (:require
    [goog.dom :as gdom]

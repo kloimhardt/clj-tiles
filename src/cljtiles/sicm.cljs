@@ -1,3 +1,5 @@
+#_"SPDX-License-Identifier: GPL-3.0"
+
 (ns cljtiles.sicm
   (:refer-clojure :exclude [+ * / -])
   (:require [clojure.spec.alpha :as s]

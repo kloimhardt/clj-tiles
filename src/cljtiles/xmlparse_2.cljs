@@ -1,3 +1,5 @@
+#_"SPDX-License-Identifier: GPL-3.0"
+
 (ns cljtiles.xmlparse-2)
 
 (defmulti tag-m (fn [x _id] (:tag x)))

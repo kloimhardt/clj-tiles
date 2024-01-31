@@ -1,3 +1,5 @@
+#_"SPDX-License-Identifier: GPL-3.0"
+
 (ns cljtiles.utils
   (:require [clojure.string :as str]
             [clojure.walk :as w]

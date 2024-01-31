@@ -1,3 +1,5 @@
+#_"SPDX-License-Identifier: GPL-3.0"
+
 (ns cljtiles.sc-jvm
   (:require [sc.impl]
             [sc.impl.db :as db]))
