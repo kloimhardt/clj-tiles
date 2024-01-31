@@ -94,6 +94,21 @@ As this workspace is not yet self explanatory, I provide a [walkthrough video](h
 
 External link: [Jon Blow on youtube](https://www.youtube.com/watch?v=qWFScmtiC44), [Scarlett adventure](https://games.zuderstorfer.com/Adventure_1_en.html)
 
-## Parser, Inspect blocks and Technical Details
-see [this document](screenshots/technical_details.md)
+## Parser, Execution and Block Inspection
 
+By pressing the `Run` button, the workspace is executed.
+
+You can inspect the blocks by right clicking on them. The workspace is executed and the result of the expression represented by the according block is displayed. Along with the result, the type of the data is indicated.
+
+You can load a new tutorial from the web. Open the parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press insert.
+
+There is also a more direct way to create new puzzles. Paste the following code into the text field:
+
+```
+(sort [2 1 3])
+```
+
+More on the parser can be found in the
+
+## Technical Details
+which are in [this document](screenshots/technical_details.md).
