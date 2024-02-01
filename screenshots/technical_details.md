@@ -3,14 +3,14 @@
 
 ## Link Index
 ### Sussman books
-*[Structure and Interpretation of Classical Mechanics (SICM)](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html)
+* [Structure and Interpretation of Classical Mechanics (SICM)](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html), ([main page](https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html), [reprint](https://tgvaughan.github.io/sicm/))
 * [Functional Differential Geometry (FDG)](https://mitpress.mit.edu/books/functional-differential-geometry)
 
 ### clj-tiles workspaces
-* [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001): solutions available, auto generated puzzles, all workspaces executable, examples from FDG book
-* [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org): solutions available, auto generated puzzles, only the first three workspaces can be executed, examples from SICM book
-* [Visual Motion](https://kloimhardt.github.io/cljtiles.html?page=116): Chapter "Driven Pendulum": solutions available, hand crafted puzzles, all workspaces executable; Other chapters, including "Bob Dylan lyrics" and "Hello, World!": only puzzles
-* [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle): only puzzle, prototype of interactive dialogue
+* [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001): examples from FDG book, auto generated puzzles, solutions available
+* [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org): examples from SICM book, only first three workspaces executable, auto generated puzzles, solutions available
+* [Visual Motion](https://kloimhardt.github.io/cljtiles.html?page=116): Chapter "Driven Pendulum": hand crafted puzzles, solutions available; Other chapters, including "Bob Dylan lyrics" and "Hello, World!": hand crafted puzzles, no solutions
+* [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle): prototype of interactive dialogue
 
 ## Parser
 Open the parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press `insert`. You just loaded an new tutorial from the web.
@@ -44,7 +44,7 @@ Or paste:
 ```
 Notice that in the simplest last case, the workspace is not cleared before insert.
 
-The file [book_examples_1.cljs](https://github.com/kloimhardt/clj-tiles/blob/master/public/org/book_examples_1.cljs) contains code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). It can be readily pasted into the clj-tiles parser. Reading the first pages of the book `Structure and Interpretation of Classical Mechanics` ([original](https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html), [reprint](https://tgvaughan.github.io/sicm/)) is mandatory for understanding.
+The file [book_examples_1.cljs](https://github.com/kloimhardt/clj-tiles/blob/master/public/org/book_examples_1.cljs) contains code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). It can be readily pasted into the clj-tiles parser. Reading the first pages of the SICM book is mandatory for understanding.
 
 ## A kind note on types and the role of graphical blocks
 
