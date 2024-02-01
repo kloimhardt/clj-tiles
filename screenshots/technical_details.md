@@ -7,7 +7,7 @@
 * [Functional Differential Geometry (FDG)](https://mitpress.mit.edu/books/functional-differential-geometry)
 
 ### clj-tiles workspaces
-* [Visual Functions](https://kloimhardt.github.io/cljtiles.html?page=FDG001): solutions available, auto generated puzzles, all workspaces executable, examples from FDG book
+* [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001): solutions available, auto generated puzzles, all workspaces executable, examples from FDG book
 * [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org): solutions available, auto generated puzzles, only the first three workspaces can be executed, examples from SICM book
 * [Visual Motion](https://kloimhardt.github.io/cljtiles.html?page=116): Chapter "Driven Pendulum": solutions available, hand crafted puzzles, all workspaces executable; Other chapters, including "Bob Dylan lyrics" and "Hello, World!": only puzzles
 * [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle): only puzzle, prototype of interactive dialogue
