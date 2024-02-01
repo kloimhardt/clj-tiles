@@ -1,6 +1,18 @@
-## Technical Details
+# Technical Details
 [back to main document](../README.md)
-### Parser
+
+## Link Index
+### Sussman books
+*[Structure and Interpretation of Classical Mechanics (SICM)](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html)
+* [Functional Differential Geometry (FDG)](https://mitpress.mit.edu/books/functional-differential-geometry)
+
+### clj-tiles workspaces
+* [Visual Functions](https://kloimhardt.github.io/cljtiles.html?page=FDG001): solutions available, auto generated puzzles, all workspaces executable, examples from FDG book
+* [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org): solutions available, auto generated puzzles, only the first three workspaces can be executed, examples from SICM book
+* [Visual Motion](https://kloimhardt.github.io/cljtiles.html?page=116): Chapter "Driven Pendulum": solutions available, hand crafted puzzles, all workspaces executable; Other chapters, including "Bob Dylan lyrics" and "Hello, World!": only puzzles
+* [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle): only puzzle, prototype of interactive dialogue
+
+## Parser
 Open the parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press `insert`. You just loaded an new tutorial from the web.
 
 The URL in the text field can be changed, so you can provide your own files (they need to follow the format of the provided tutorials).
