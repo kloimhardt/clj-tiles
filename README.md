@@ -116,6 +116,6 @@ There is also a more direct way to create new puzzles. Paste the following code 
 More on the parser can be found in the
 
 ## Technical Details
-which are in [this document](screenshots/technical_details.md).
+which are in [this document](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/technical_details.md).
 
 [GPL v3](LICENSE) Copyright © 2021 Markus Kloimwieder
