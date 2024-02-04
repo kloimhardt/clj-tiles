@@ -1,33 +1,34 @@
-# clj-tiles
+# clj-tiles: Competence before Comprehension
 ## Features
-* Visual programming for STEM students and instructors at university level
-* Live coding in the lecture room without any need for experience in software development
-* Solve over 100 graphical puzzles in the browser
-* Puzzles for web-development, algebra, physics
+* Visual programming for STEM students at university level
+* Instead of just copying from colleagues, solve graphical puzzles in the browser
+* Over 100 puzzles including web-development, algebra, physics
+* Live coding for tutors without any need for experience in software development
 * Get Wordle inspired feedback
 * Learn functional programming to your inner child
 * Load more puzzles from the web with the built in parser
 
-## Roadmap
-* Out of this documentation, being a conglomeration, make a peer-reviewed journal article
-* Prepare a series of lectures on basic Linear Algebra
-* Add as main calculation engine JAX + Python
-* Perform a control group study to assess the efficacy of the lectures
-
-A long-term research goal is the improvement of non-verbal plot building of the visual tutorials.
-
-External links: [JAX](https://jax.readthedocs.io), [Python](https://www.python.org)
-
-## Description
-
 As a mixture of Wordle and Scratch, clj-tiles is for every student who, at a young age, has been gotten hooked as a Princess of Science (see the episode with Prof. Johanna Pirker on ZDFtivi).
-
-If you like videos, watch my presentation for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
-Make sure to interactively follow along with clj-tiles for [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001).
 
 External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spielentwicklung-100.html), [STEM](https://en.wikipedia.org/wiki/Science,_technology,_engineering,_and_mathematics), [Scratch](https://scratch.mit.edu), [Wordle](https://www.nytimes.com/games/wordle/index.html)
 
-### Competence before Comprehension
+## Roadmap
+* Out of this documentation, being a conglomeration, write a journal article "Competence before Comprehension"
+* Current tutorials are very high level, prepare a series of lectures on basic Linear Algebra
+* Add as main calculation engine JAX + Python
+* Contribute to the interdisciplinary field of cognitive science with a study to assess the efficacy of the lectures
+
+A long-term research goal is the improvement of non-verbal plot building of the visual tutorials.
+
+External links: [Cognitive Science](https://en.wikipedia.org/wiki/From_Bacteria_to_Bach_and_Back), [JAX](https://jax.readthedocs.io), [Python](https://www.python.org)
+
+## Description
+
+
+If you like videos, watch my presentation for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
+Make sure to interactively follow along with the tutorial [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001).
+
+
 As an introduction, we start with the following picture which appears in clj-tiles for [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org).
 ![cljtiles_polar_1](https://kloimhardt.github.io/blog/images/cljtiles_polar_1.png)
 
@@ -66,19 +67,19 @@ This set of tutorials also contains the simplest chapter of all: completing Bob 
 
 External link: [Structure and Interpretation of Classical Mechanics](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html)
 
-### Teaching
+## Teaching
 clj-tiles is suited not only for learning but especially also teaching STEM. Live coding in front of an audience is made easy. The instructor does not need to have any software development skills, he just solves puzzles in front of the audience. Typos like in editor based live coding are thus avoided. Students can follow along in real-time on their own computers.
 
-In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes a subject of an interdisciplinary sociological study. Questionnaires and control groups can be used to assess the efficacy of the method.
+In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes a subject of an interdisciplinary cognitive study. Questionnaires and control groups can be used to assess the efficacy of the method.
 
 I tried to more explain this topic in the context of teaching advanced physics classes in an early preliminary [draft for a paper on visual programming](https://github.com/kloimhardt/werkbank/blob/master/latex/ga_pro_kla_mech.pdf).
 
 External link: [Parsons puzzle](https://en.wikipedia.org/wiki/Parsons_problem)
 
-### JAX and Functional Programming for the Win
+## JAX and Functional Programming for the Win
 The implementation of the clj-tiles app is based on Clojure, a functional programming language from the LISP family. Indeed, many tutorials in clj-tiles are for learning this great language, starting with ![hello](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/hello_world.png). More advanced tutorials make use of the splendid Emmy Computer Algebra System.
 
-The blocks of clj-tiles are meant to exclusively represent a functional notation. This is the all important difference between clj-tiles and the visual building tools Scratch and BlockPy, which are multi-paradigm.
+The blocks of clj-tiles are meant to exclusively represent a functional-style notation. This is the all important difference between clj-tiles and the visual building tools Scratch and BlockPy, which are multi-paradigm.
 
 As opposed to the very popular Python, Clojure is a niche language. Nevertheless, I tried to show, in comparison to common Python syntax, the advantages of the functional notation for STEM in a [preprint article on how to design a functional interface](https://arxiv.org/abs/2312.13295).
 
@@ -88,12 +89,12 @@ JAX+Python opens up a fruitful future path for clj-tiles. It is perfectly feasib
 
 External link: [Clojure](https://www.clojure.org), [Emmy Computer Algebra System](https://github.com/mentat-collective/emmy), [BlockPy](https://think.cs.vt.edu/blockpy/), [functional-style JAX](https://jax.readthedocs.io/en/latest/jax-101/01-jax-basics.html#differences-from-numpy), [Hy](http://hylang.org)
 
-### Gamification
-In interactive experiences, points, badges and achievements are not attributes of true Gamification but rather hollow structures without content. To me, gamification is about non-verbal plot building, encouraging mimicry and providing immediate feedback. The Wordle colouring and the hand-crafted puzzles mentioned above are testimony to this.
+## Gamification
+In interactive experiences, points, badges and achievements are not attributes of true gamification but rather hollow structures without content. To me, gamification is about non-verbal plot building, encouraging mimicry and providing immediate feedback. The Wordle colouring and the hand-crafted puzzles mentioned above are testimony to this.
 
 In this respect, another feature of clj-tiles is that the user first needs to solve a puzzle before getting the solution to the next one. Yet another way of awarding the user with content is the `Shuffle` button which makes solving much harder. There is also a cheat mode which in principle can be deduced from the in-game descriptions (and spoilt in the "Visual Tools" video above). Among my inspirations for all this is the video game "The Witness", especially the included "Secret of Psalm 46".
 
-Also, inspired by talking chess computers, text- and point-and-click adventure games, I experimented with the "inspect" feature of clj-tiles. The according workspace appears in clj-tiles for [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle).
+Also, inspired by talking chess computers, text- and point-and-click adventure games, I experimented with the "inspect" feature of clj-tiles to create an even more interactive experience. The according workspace appears in the tutorial [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle).
 ![freeparticle](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/pendulum_begin.png)
 
 As this workspace is not yet self explanatory, I provide a [walkthrough video](https://www.youtube.com/watch?v=DHcZkmXKp04).
