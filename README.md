@@ -1,7 +1,7 @@
 # clj-tiles: Competence before Comprehension
 ## Features
-* Visual programming for STEM students at university level
-* Instead of just copying from colleagues, solve graphical puzzles in the browser
+* Visual programming at university level for STEM students
+* Stop to cradle notes on silent paper, solve graphical puzzles in the browser
 * Over 100 puzzles including web-development, algebra, physics
 * Live coding for tutors without any need for experience in software development
 * Get Wordle inspired feedback
