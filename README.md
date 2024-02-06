@@ -4,13 +4,13 @@
 * Stop to cradle notes on silent paper, solve graphical puzzles in the browser
 * Over 100 puzzles represent executable code in web-development, algebra, physics
 * Live coding for tutors without any need for experience in software development
+* Learn functional notation to your inner child where programming feels like using a formula editor
 * Get Wordle inspired feedback
-* Learn functional programming to your inner child
 * Load more puzzles from the web with the built in parser
 
-As a mixture of Wordle and Scratch, clj-tiles is for every student who, at a young age, has been gotten hooked as a Princess of Science (see the episode with Prof. Johanna Pirker on ZDFtivi).
+As a mixture of a formula editor, Wordle and Scratch, clj-tiles is for every student who, at a young age, has been gotten hooked as a Princess of Science (see the episode with Prof. Johanna Pirker on ZDFtivi).
 
-External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spielentwicklung-100.html), [STEM](https://en.wikipedia.org/wiki/Science,_technology,_engineering,_and_mathematics), [Scratch](https://scratch.mit.edu), [Wordle](https://www.nytimes.com/games/wordle/index.html)
+External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spielentwicklung-100.html), [STEM](https://en.wikipedia.org/wiki/Science,_technology,_engineering,_and_mathematics), [Scratch](https://scratch.mit.edu), [Wordle](https://www.nytimes.com/games/wordle/index.html), [Mathlive formula editor](https://cortexjs.io/mathlive)
 
 ## Roadmap
 * Out of this documentation, being a conglomeration, write a journal article "Competence before Comprehension"
@@ -109,16 +109,20 @@ There is a simple way to create own puzzles. Open the dedicated parser by right 
 ```
 Press the `Insert` and then the `Run` button. As can be seen in the picture below, the result of the computer program you just created and executed results in sorted numbers:
 
-![sort213](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/sort213.png)
+<p align="center">
+  <img src="https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/sort213.png" />
+</p>
 
+If you like to see a more involved example of web-programming, launch the rocket found in the book "How to Design Programs" with [Visual Web programming](https://kloimhardt.github.io/cljtiles.html?page=63).
 
 While by pressing the `Run` button a whole workspace is executed, the user can inspect individual blocks by right clicking on them. Then, the result of the expression represented by the respective block is displayed. Indicated along with the result is the type of the data.
 
 Also, you can load new tutorials from the web. Open the parser and select a tutorial in the drop down menu: a URL appears in the text field.
 
-More on the parser can be found in the
+External link: [How to Design Programs](https://htdp.org/2023-8-14/Book/part_prologue.html)
 
-## Technical Details
-which are in [this document](https://github.com/kloimhardt/clj-tiles/blob/master/screenshots/technical_details.md).
+
+## More information ...
+... on the parser and visual representations of code can be found in [this document](https://github.com/kloimhardt/clj-tiles/blob/master/screenshots/technical_details.md).
 
 [GPL v3](LICENSE) Copyright © 2021 Markus Kloimwieder
