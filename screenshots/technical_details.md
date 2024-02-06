@@ -11,6 +11,7 @@
 * [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org): examples from SICM book, only first three workspaces executable, auto generated puzzles, solutions available
 * [Visual Motion](https://kloimhardt.github.io/cljtiles.html?page=116): Chapter "Driven Pendulum": hand crafted puzzles, solutions available; Other chapters, including "Bob Dylan lyrics" and "Hello, World!": hand crafted puzzles, no solutions
 * [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle): prototype of interactive dialogue
+* [Visual Web programming](https://kloimhardt.github.io/cljtiles.html?page=63): show that clj-tiles sports a fully fledged React frontend
 
 ## Parser
 Open the parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press `insert`. You just loaded a new tutorial from the web.

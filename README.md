@@ -57,7 +57,7 @@ When completing a puzzle, the colouring of the generated code changes gradually.
 
 
 ## Comprehension of the Domain
-The domain of the above "Visual Algebra" tutorial is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones.
+The domain of the above "Visual Algebra" tutorial is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones, a formula typed a gazillion times into math editors all over the world.
 
 But this is just a start. By completing all the puzzle-workspaces of this visual tutorial, a physics students in the 3rd semester can learn Classical Mechanics. Indeed they first gets competent by solving the puzzles, maybe just learning the solutions by heart. Then, they will gain a much deeper comprehension when reading more carefully the book "Structure and Interpretation of Classical Mechanics".
 
