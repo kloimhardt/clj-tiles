@@ -35,7 +35,7 @@ As an introduction, we start with the following picture which appears in clj-til
 You notice the `Get the Puzzle` button and press it.
 ![cljtiles_polar_2](https://kloimhardt.github.io/blog/images/cljtiles_polar_2.png)
 
-This looks rather complicated, but you start to notice that the content of the graphical blocks are the same as in the first picture. There is `R`, `phi`, `sin` and so on.
+This looks rather complicated, but you start to notice that the contents of the graphical blocks are the same as in the first picture. There is `R`, `phi`, `sin` and so on.
 As a hint of how to proceed, we show (with arrows) the first steps to complete the puzzle.
 ![cljtiles_polar_4](https://kloimhardt.github.io/blog/images/cljtiles_polar_4.png)
 
@@ -63,14 +63,14 @@ But this is just a start. By completing all the puzzle-workspaces of this visual
 
 Admittedly, the learning curve of that book is very steep. That is way I created a somewhat simpler physics tutorial with my own descriptions and hand-crafted puzzles in the tutorial [Visual Motion](https://kloimhardt.github.io/cljtiles.html?page=116).
 
-This set of tutorials also contains the simplest chapter of all: completing Bob Dylan lyrics. That chapter also shows that the scope of clj-tiles might be broader than STEM. It was also the chapter I opened my talk at the [reClojure conference 2021 (youtube playlist)](https://www.youtube.com/playlist?list=PLchX49hOw0Gapr28Gs4yUmJkuJWaRYXMn).
+This set of tutorials also contains the simplest chapter of all: completing Bob Dylan lyrics. That chapter also shows that the scope of clj-tiles might be broader than STEM. It was also the chapter I opened my talk with at the [reClojure conference 2021 (youtube playlist)](https://www.youtube.com/playlist?list=PLchX49hOw0Gapr28Gs4yUmJkuJWaRYXMn).
 
 External link: [Structure and Interpretation of Classical Mechanics](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html)
 
 ## Teaching
-clj-tiles is suited not only for learning but especially also teaching STEM. Live coding in front of an audience is made easy. The instructor does not need to have any software development skills, he just solves puzzles in front of the audience. Typos like in editor based live coding are thus avoided. Students can follow along in real-time on their own computers.
+clj-tiles is suited not only for learning but especially also teaching STEM. Live coding in front of an audience is made easy. The instructor does not need to have any software development skills, he just solves puzzles in front of the audience. Typos like in text-editor based live coding are thus avoided. Students can follow along in real-time on their own computers.
 
-In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes a subject of an interdisciplinary cognitive study. Questionnaires and control groups can be used to assess the efficacy of the method.
+In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes a subject of an interdisciplinary study in cognitive science. Questionnaires and control groups can be used to assess the efficacy of the method.
 
 I tried to more explain this topic in the context of teaching advanced physics classes in an early preliminary [draft for a paper on visual programming](https://github.com/kloimhardt/werkbank/blob/master/latex/ga_pro_kla_mech.pdf).
 
@@ -81,7 +81,7 @@ The implementation of the clj-tiles app is based on Clojure, a functional progra
 
 The blocks of clj-tiles are meant to exclusively represent a functional-style notation. This is the all important difference between clj-tiles and the visual building tools Scratch and BlockPy, which are multi-paradigm.
 
-As opposed to the very popular Python, Clojure is a niche language. Nevertheless, I tried to show, in comparison to common Python syntax, the advantages of the functional notation for STEM in a [preprint article on how to design a functional interface](https://arxiv.org/abs/2312.13295).
+As opposed to the very popular Python, Clojure is a niche language. Nevertheless, I tried to show, in comparison to common Python syntax, the advantages of its functional notation for STEM in a [preprint article on how to design a functional interface](https://arxiv.org/abs/2312.13295).
 
 However, recently there has been introduced a Python library which rapidly gains popularity and embraces functional notation, namely JAX: "the kinds of program transformations that JAX enables are much more feasible in functional-style programs". Casually said, JAX is Clojure bolted onto Python.
 
@@ -103,9 +103,9 @@ External link: [Witness creator on youtube](https://www.youtube.com/watch?v=qWFS
 
 ## Parser, Execution and Block Inspection
 
-While by pressing the `Run` button a whole workspace is executed, the user can inspect individual blocks by right clicking on them. The result of the expression represented by the respective block is displayed. Indicated along with the result is the type of the data.
+While by pressing the `Run` button a whole workspace is executed, the user can inspect individual blocks by right clicking on them. Then, the result of the expression represented by the respective block is displayed. Indicated along with the result is the type of the data.
 
-You can load a new tutorial from the web. Open the dedicated parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press insert.
+Also, you can load new tutorials from the web. Open the dedicated parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press insert.
 
 There is also a more direct way to create new puzzles. Paste the following code into the text field:
 
