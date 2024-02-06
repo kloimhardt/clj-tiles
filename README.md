@@ -59,7 +59,7 @@ When completing a puzzle, the colouring of the generated code changes gradually.
 ## Comprehension of the Domain
 The domain of the above "Visual Algebra" tutorial is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones.
 
-But this is just a start. By completing all the puzzle-workspaces of this visual tutorial, a physics student in the 3rd semester can learn Classical Mechanics. Indeed she first gets competent by solving the puzzles, maybe just learning them by heart. Then, she will gain a much deeper comprehension when reading more carefully the book "Structure and Interpretation of Classical Mechanics".
+But this is just a start. By completing all the puzzle-workspaces of this visual tutorial, a physics students in the 3rd semester can learn Classical Mechanics. Indeed they first gets competent by solving the puzzles, maybe just learning the solutions by heart. Then, they will gain a much deeper comprehension when reading more carefully the book "Structure and Interpretation of Classical Mechanics".
 
 Admittedly, the learning curve of that book is very steep. That is way I created a somewhat simpler physics tutorial with my own descriptions and hand-crafted puzzles in the tutorial [Visual Motion](https://kloimhardt.github.io/cljtiles.html?page=116).
 
@@ -68,7 +68,7 @@ This set of tutorials also contains the simplest chapter of all: completing Bob 
 External link: [Structure and Interpretation of Classical Mechanics](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html)
 
 ## Teaching
-clj-tiles is suited not only for learning but especially also teaching STEM. Live coding in front of an audience is made easy. The instructor does not need to have any software development skills, he just solves puzzles in front of the audience. Typos like in text-editor based live coding are thus avoided. Students can follow along in real-time on their own computers.
+clj-tiles is suited not only for learning but especially also teaching STEM. Live coding in front of an audience is made easy. Instructors do not need to have any software development skills, they just solve puzzles in front of the audience. Typos like in text-editor based live coding are thus avoided. Students can follow along in real-time on their own computers.
 
 In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes a subject of an interdisciplinary study in cognitive science. Questionnaires and control groups can be used to assess the efficacy of the method.
 
@@ -102,16 +102,19 @@ As this workspace is not yet self explanatory, I provide a [walkthrough video](h
 External link: [Witness creator on youtube](https://www.youtube.com/watch?v=qWFScmtiC44), [The Secret of Psalm 46](https://web.archive.org/web/20200422041019/http://ludix.com/moriarty/psalm46.html), [Scarlett adventure](https://games.zuderstorfer.com/Adventure_1_en.html)
 
 ## Parser, Execution and Block Inspection
-
-While by pressing the `Run` button a whole workspace is executed, the user can inspect individual blocks by right clicking on them. Then, the result of the expression represented by the respective block is displayed. Indicated along with the result is the type of the data.
-
-Also, you can load new tutorials from the web. Open the dedicated parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press insert.
-
-There is also a more direct way to create new puzzles. Paste the following code into the text field:
+There is a simple way to create own puzzles. Open the dedicated parser by right clicking on a white space. Paste the following code into the text field:
 
 ```
 (sort [2 1 3])
 ```
+Press the `Insert` and then the `Run` button. As can be seen in the picture below, the result of the computer program you just created and executed results in sorted numbers:
+
+![sort213](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/sort213.png)
+
+
+While by pressing the `Run` button a whole workspace is executed, the user can inspect individual blocks by right clicking on them. Then, the result of the expression represented by the respective block is displayed. Indicated along with the result is the type of the data.
+
+Also, you can load new tutorials from the web. Open the parser and select a tutorial in the drop down menu: a URL appears in the text field.
 
 More on the parser can be found in the
 
