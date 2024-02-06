@@ -50,7 +50,6 @@ If you create a puzzle with the code,
 ```
 upon `right-click-inspect` you will see the following picture:
 
-![inspect_infix_vert](inspect_infix_vert.png)
 ![inspect_infix_vert](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/inspect_infix_vert.png)
 
 This shows that the arrangement of the blocks, whether vertical or horizontal, is just a visual feature which does not affect the result of the executed program. Also infix or prefix notation for basic math like multiplication `*` has no effect in that respect. In any case, the button `Get the Puzzle` in the current implementation does not preserve visual formatting but reverts to the default horizontal prefix visualisation.
