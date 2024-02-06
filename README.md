@@ -2,7 +2,7 @@
 ## Features
 * Visual programming at university level for STEM students
 * Stop to cradle notes on silent paper, solve graphical puzzles in the browser
-* Over 100 puzzles including web-development, algebra, physics
+* Over 100 puzzles represent executable code in web-development, algebra, physics
 * Live coding for tutors without any need for experience in software development
 * Get Wordle inspired feedback
 * Learn functional programming to your inner child

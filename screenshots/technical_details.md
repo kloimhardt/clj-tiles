@@ -13,7 +13,7 @@
 * [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle): prototype of interactive dialogue
 
 ## Parser
-Open the parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press `insert`. You just loaded an new tutorial from the web.
+Open the parser by right clicking on a white space. Select a tutorial in the drop down menu: a URL appears in the text field. Press `insert`. You just loaded a new tutorial from the web.
 
 The URL in the text field can be changed, so you can provide your own files (they need to follow the format of the provided tutorials).
 
@@ -43,6 +43,17 @@ Or paste:
 (:author book)
 ```
 Notice that in the simplest last case, the workspace is not cleared before insert.
+
+If you create a puzzle with the code,
+```
+[(up (:tiles/infix (* 3 4)) (* 5 6)) (:tiles/vert (up 12 30)) (up 12 30)]
+```
+upon `right-click-inspect` you will see the following picture:
+
+![inspect_infix_vert](inspect_infix_vert.png)
+![inspect_infix_vert](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/inspect_infix_vert.png)
+
+This shows that the arrangement of the blocks, whether vertical or horizontal, is just a visual feature which does not affect the result of the executed program. Also infix or prefix notation for basic math like multiplication `*` has no effect in that respect. In any case, the button `Get the Puzzle` in the current implementation does not preserve visual formatting but reverts to the default horizontal prefix visualisation.
 
 The file [book_examples_1.cljs](https://github.com/kloimhardt/clj-tiles/blob/master/public/org/book_examples_1.cljs) contains code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). It can be readily pasted into the clj-tiles parser. Reading the first pages of the SICM book is mandatory for understanding.
 
