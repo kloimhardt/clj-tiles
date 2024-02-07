@@ -1,14 +1,14 @@
 # clj-tiles: Competence before Comprehension
 ## Features
-* Visual programming at university level for STEM students
+* Visual programming for STEM students at university level
 * Stop to cradle notes on silent paper, solve graphical puzzles in the browser
 * Over 100 puzzles represent executable code in web-development, algebra, physics
 * Live coding for tutors without any need for experience in software development
-* Learn functional notation to your inner child where programming feels like using a formula editor
+* Doing science "in functions" becomes as easy as using a formula editor
 * Get Wordle inspired feedback
 * Load more puzzles from the web with the built in parser
 
-As a mixture of a formula editor, Wordle and Scratch, clj-tiles is for every student who, at a young age, has been gotten hooked as a Princess of Science (see the episode with Prof. Johanna Pirker on ZDFtivi).
+Being a mixture of formula editor, Wordle and Scratch, clj-tiles is for every student who, at a young age, has been gotten hooked as a Princess of Science (see the episode with Prof. Johanna Pirker on ZDFtivi).
 
 External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spielentwicklung-100.html), [STEM](https://en.wikipedia.org/wiki/Science,_technology,_engineering,_and_mathematics), [Scratch](https://scratch.mit.edu), [Wordle](https://www.nytimes.com/games/wordle/index.html), [Mathlive formula editor](https://cortexjs.io/mathlive)
 
@@ -22,8 +22,7 @@ A long-term research goal is the improvement of non-verbal plot building of the 
 
 External links: [Cognitive Science](https://en.wikipedia.org/wiki/From_Bacteria_to_Bach_and_Back), [JAX](https://jax.readthedocs.io), [Python](https://www.python.org)
 
-## Description
-
+## Gain Competence
 
 If you like videos, watch my presentation for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
 Make sure to interactively follow along with the tutorial [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001).
@@ -56,8 +55,8 @@ When completing a puzzle, the colouring of the generated code changes gradually.
 ![wordle_4](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/wordle_4.png)
 
 
-## Comprehension of the Domain
-The domain of the above "Visual Algebra" tutorial is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones, a formula typed a gazillion times into math editors all over the world.
+## Comprehend the Domain
+The domain of the above "Visual Algebra" tutorial is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones, a formula typed into the various math editors of word processors all over the world.
 
 But this is just a start. By completing all the puzzle-workspaces of this visual tutorial, a physics students in the 3rd semester can learn Classical Mechanics. Indeed they first gets competent by solving the puzzles, maybe just learning the solutions by heart. Then, they will gain a much deeper comprehension when reading more carefully the book "Structure and Interpretation of Classical Mechanics".
 
@@ -83,7 +82,7 @@ The blocks of clj-tiles are meant to exclusively represent a functional-style no
 
 As opposed to the very popular Python, Clojure is a niche language. Nevertheless, I tried to show, in comparison to common Python syntax, the advantages of its functional notation for STEM in a [preprint article on how to design a functional interface](https://arxiv.org/abs/2312.13295).
 
-However, recently there has been introduced a Python library which rapidly gains popularity and embraces functional notation, namely JAX: "the kinds of program transformations that JAX enables are much more feasible in functional-style programs". Casually said, JAX is Clojure bolted onto Python.
+However, recently there has been introduced a Python library which rapidly gains popularity and embraces functional notation, namely JAX: "the kinds of program transformations that JAX enables are much more feasible in functional-style programs". Casually said, JAX is Clojure bolted onto Python, both are "Science in Functions".
 
 JAX+Python opens up a fruitful future path for clj-tiles. It is perfectly feasible, via the Hy language, to generate JAX syntax out of the already existing block notation. In this way, STEM students are immediately introduced to functional notation via clj-tiles whilst being able to switch into any professional Python development environment as clj-tiles is not meant for building programs but for understanding already existing code.
 
