@@ -2,7 +2,7 @@
 ## Features
 * Visual programming for STEM students at university level
 * Stop to cradle notes on silent paper, solve graphical puzzles in the browser
-* Over 100 puzzles represent executable code in web-development, algebra, physics
+* Over 100 puzzles represent executable code in algebra and physics
 * Live coding for tutors without any need for experience in software development
 * Doing science "in functions" becomes as easy as using a formula editor
 * Get Wordle inspired feedback
@@ -14,7 +14,7 @@ External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spie
 
 ## Roadmap
 * Out of this documentation, being a conglomeration, write a journal article "Competence before Comprehension"
-* Current tutorials are very high level, prepare a series of lectures on basic Linear Algebra
+* Many current tutorials are very high level, prepare a series of lectures on basic mathematical finance
 * Add as main calculation engine JAX + Python
 * Contribute to the interdisciplinary field of cognitive science with a study to assess the efficacy of the lectures
 
@@ -56,9 +56,9 @@ When completing a puzzle, the colouring of the generated code changes gradually.
 
 
 ## Comprehend the Domain
-The domain of the above "Visual Algebra" tutorial is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones, a formula typed into the various math editors of word processors all over the world.
+The domain of the above "Visual Algebra" tutorial is known to any high school student: conversion of polar coordinates (`R` and `phi`) to the usual rectangular ones, a formula typed into math editors of word processors all over the world.
 
-But this is just a start. By completing all the puzzle-workspaces of this visual tutorial, a physics students in the 3rd semester can learn Classical Mechanics. Indeed they first gets competent by solving the puzzles, maybe just learning the solutions by heart. Then, they will gain a much deeper comprehension when reading more carefully the book "Structure and Interpretation of Classical Mechanics".
+But this is just a start. By completing all the puzzle-workspaces of this visual tutorial, a physics students in the 3rd semester can learn Classical Mechanics. Indeed they first get competent by solving the puzzles, maybe just learning the solutions by heart. Then, they will gain a much deeper comprehension when reading more carefully the book "Structure and Interpretation of Classical Mechanics".
 
 Admittedly, the learning curve of that book is very steep. That is way I created a somewhat simpler physics tutorial with my own descriptions and hand-crafted puzzles in the tutorial [Visual Motion](https://kloimhardt.github.io/cljtiles.html?page=116).
 
@@ -67,9 +67,9 @@ This set of tutorials also contains the simplest chapter of all: completing Bob 
 External link: [Structure and Interpretation of Classical Mechanics](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html)
 
 ## Teaching
-clj-tiles is suited not only for learning but especially also teaching STEM. Live coding in front of an audience is made easy. Instructors do not need to have any software development skills, they just solve puzzles in front of the audience. Typos like in text-editor based live coding are thus avoided. Students can follow along in real-time on their own computers.
+clj-tiles is suited not only for learning but especially also teaching STEM. Live coding in the lecture room is made easy. Instructors do not need to have any software development skills, they just solve puzzles in front of the audience. Typos like in text-editor based live coding are thus avoided. Students can follow along in real-time on their own computers.
 
-In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes a subject of an interdisciplinary study in cognitive science. Questionnaires and control groups can be used to assess the efficacy of the method.
+In the literature this method of learning and teaching is known as Parsons puzzle. With this, teaching itself becomes the subject of interdisciplinary studies in cognitive science. Questionnaires and control groups can be used to assess the efficacy of the method.
 
 I tried to more explain this topic in the context of teaching advanced physics classes in an early preliminary [draft for a paper on visual programming](https://github.com/kloimhardt/werkbank/blob/master/latex/ga_pro_kla_mech.pdf).
 
