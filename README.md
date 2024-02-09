@@ -14,7 +14,7 @@ External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spie
 
 ## Roadmap
 * Out of this documentation, being a conglomeration, write a journal article "Competence before Comprehension"
-* Many current tutorials are very high level, prepare a series of lectures on basic mathematical finance
+* Prepare a series of lectures on basic mathematical finance, showing the advantages of clj-tiles over the usual Excel spreadsheet approach
 * Add as main calculation engine JAX + Python
 * Contribute to the interdisciplinary field of cognitive science with a study to assess the efficacy of the lectures
 
