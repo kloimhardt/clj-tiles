@@ -18,8 +18,6 @@ External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spie
 * Add as main calculation engine JAX + Python
 * Contribute to the interdisciplinary field of cognitive science with a study to assess the efficacy of the lectures
 
-A long-term research goal is the improvement of non-verbal plot building of the visual tutorials.
-
 External links: [Cognitive Science](https://en.wikipedia.org/wiki/From_Bacteria_to_Bach_and_Back), [JAX](https://jax.readthedocs.io), [Python](https://www.python.org)
 
 ## Gain Competence
@@ -88,7 +86,7 @@ JAX+Python opens up a fruitful future path for clj-tiles. It is perfectly feasib
 External link: [Clojure](https://www.clojure.org), [Emmy Computer Algebra System](https://github.com/mentat-collective/emmy), [BlockPy](https://think.cs.vt.edu/blockpy/), [functional-style JAX](https://jax.readthedocs.io/en/latest/jax-101/01-jax-basics.html#differences-from-numpy), [Hy](http://hylang.org)
 
 ## Gamification
-In interactive experiences, points, badges and achievements are not attributes of true gamification but rather hollow structures without content. To me, gamification is about non-verbal plot building, encouraging mimicry and providing immediate feedback. The Wordle colouring and the hand-crafted puzzles mentioned above are testimony to this.
+In interactive experiences, points, badges and achievements are not attributes of true gamification but rather hollow structures. Rather important are content and its exploration and immediate feedback. The Wordle colouring and the hand-crafted puzzles mentioned above are testimony to this.
 
 In this respect, another feature of clj-tiles is that the user first needs to solve a puzzle before getting the solution to the next one. Yet another way of awarding the user with content is the `Shuffle` button which makes solving much harder. There is also a cheat mode which in principle can be deduced from the in-game descriptions (and spoilt in the "Visual Tools" video above).
 
