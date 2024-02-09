@@ -24,9 +24,8 @@ External links: [Cognitive Science](https://en.wikipedia.org/wiki/From_Bacteria_
 
 ## Gain Competence
 
-If you like videos, watch my presentation for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
+If you like videos (I find text better), watch my presentation for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
 Make sure to interactively follow along with the tutorial [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001).
-
 
 As an introduction, we start with the following picture which appears in clj-tiles for [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org).
 ![cljtiles_polar_1](https://kloimhardt.github.io/blog/images/cljtiles_polar_1.png)
@@ -91,14 +90,14 @@ External link: [Clojure](https://www.clojure.org), [Emmy Computer Algebra System
 ## Gamification
 In interactive experiences, points, badges and achievements are not attributes of true gamification but rather hollow structures without content. To me, gamification is about non-verbal plot building, encouraging mimicry and providing immediate feedback. The Wordle colouring and the hand-crafted puzzles mentioned above are testimony to this.
 
-In this respect, another feature of clj-tiles is that the user first needs to solve a puzzle before getting the solution to the next one. Yet another way of awarding the user with content is the `Shuffle` button which makes solving much harder. There is also a cheat mode which in principle can be deduced from the in-game descriptions (and spoilt in the "Visual Tools" video above). Among my inspirations for all this is the video game "The Witness", especially the included "Secret of Psalm 46".
+In this respect, another feature of clj-tiles is that the user first needs to solve a puzzle before getting the solution to the next one. Yet another way of awarding the user with content is the `Shuffle` button which makes solving much harder. There is also a cheat mode which in principle can be deduced from the in-game descriptions (and spoilt in the "Visual Tools" video above).
 
-Also, inspired by talking chess computers, text- and point-and-click adventure games, I experimented with the "inspect" feature of clj-tiles to create an even more interactive experience. The according workspace appears in the tutorial [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle).
+Also, inspired by talking chess computers, poetry apps, text- and point-and-click adventure games, I experimented with the "inspect" feature of clj-tiles to create an even more interactive experience. The according workspace appears in the tutorial [Visual Interaction](https://kloimhardt.github.io/cljtiles.html?page=freeparticle).
 ![freeparticle](https://github.com/kloimhardt/clj-tiles/raw/master/screenshots/pendulum_begin.png)
 
 As this workspace is not yet self explanatory, I provide a [walkthrough video](https://www.youtube.com/watch?v=DHcZkmXKp04).
 
-External link: [Witness creator on youtube](https://www.youtube.com/watch?v=qWFScmtiC44), [The Secret of Psalm 46](https://web.archive.org/web/20200422041019/http://ludix.com/moriarty/psalm46.html), [Scarlett adventure](https://games.zuderstorfer.com/Adventure_1_en.html)
+External links: [Awesome game design](https://web.archive.org/web/20200422041019/http://ludix.com/moriarty/psalm46.html) talk by Brian Moriarty, [Endure](https://texturewriter.com/play/emshort/endure/info) interactive fiction by Emily Short, [Detectiveland](https://versificator.itch.io/detectiveland) point-and-click text adventure by Robin Johnson, [Poems by Heart](https://kloimhardt.github.io/dragdrop/dragdrop.html) not Inkle's but my own attempt
 
 ## Parser, Execution and Block Inspection
 There is a simple way to create own puzzles. Open the dedicated parser by right clicking on a white space. Paste the following code into the text field:
