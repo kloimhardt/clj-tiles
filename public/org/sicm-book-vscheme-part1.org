@@ -3,9 +3,9 @@
   (:refer-clojure :exclude [+ - * / = compare zero? ref partial
                             numerator denominator])
   (:require [sicmutils.env :as e :refer :all :exclude [F->C]]))
-
-(define-coordinates t e/R1-rect)
 #+end_src
+
+* Description
 
 This chapter shows examples of the SICMechanics book [1].
 
@@ -13,10 +13,7 @@ A description of how to begin without any knowledge is in [2].
 
 This first page shows an example of calculating cartesian coordinates out of polar coordinates.
 
-The examples of this whole chapter are to be solved as puzzles only, only the first three
-pages can be successfully executed using the "Run" button.
-
-The executable code of all examples can, however, be viewed and modified on another html page [3].
+The code of all examples can also be viewed, modified and run within a simple html page [3].
 
 More information on this visual programming project is available on github [4].
 
@@ -28,7 +25,48 @@ More information on this visual programming project is available on github [4].
 
 [4] https://github.com/kloimhardt/clj-tiles
 
-#+begin_src clojure
+** Some code (i.e. ignore the following)
+
+#+begin_src clojure :exports none
+(defn walk [inner outer form]
+  (cond
+    (list? form) (outer (apply list (map inner form)))
+    (seq? form)  (outer (doall (map inner form)))
+    (coll? form) (outer (into (empty form) (map inner form)))
+    :else        (outer form)))
+
+(defn postwalk [f form]
+  (walk (partial postwalk f) f form))
+
+(defn postwalk-replace [smap form]
+  (postwalk (fn [x] (if (contains? smap x) (smap x) x)) form))
+
+(defmacro let-scheme [b & e]
+  (concat (list 'let (into [] (apply concat b))) e))
+
+(defmacro define [h & b]
+  (let [body (postwalk-replace {'let 'let-scheme} b)]
+    (if (coll? h)
+      (if (coll? (first h))
+        (list 'defn (ffirst h) (into [] (rest (first h)))
+              (concat (list 'fn (into [] (rest h))) body))
+        (concat (list 'defn (first h) (into [] (rest h)))
+                body))
+      (concat (list 'def h) body))))
+
+(defmacro lambda [h b]
+  (list 'fn (into [] h) b))
+
+(def show-expression simplify)
+(def velocities velocity)
+(def coordinates coordinate)
+(def vector-length count)
+(defn time [state] (first state))
+
+(define-coordinates t e/R1-rect)
+#+end_src
+
+ #+begin_src clojure
 (->tex-equation
   (up (* 'R (cos 'phi))
       (* 'R (sin 'phi))))
@@ -58,8 +96,8 @@ in principle, a :tiles/vert would alaways be in order (only done in a view examp
 
 #+begin_src clojure
   (define ((L-free-particle mass) local)
-    (let [(v (velocity local))])
-    (* 1/2 mass (dot-product v v))) 
+    (let [(v (velocity local))]
+      (* 1/2 mass (dot-product v v))))
 #+end_src
 
 #+begin_src clojure
@@ -283,12 +321,8 @@ Scheme replacement: pi-half introduced instead of :pi/e
     (let [(q (coordinate local))
             (v (velocity local))]
          (- (* 1/2 m (square v))
-            (U (sqrt (square q)))))) 
+            (U (sqrt (square q))))))
 #+end_src
-
-    <p>
-        <code>show-expression can actually be omitted, our little Scheme syntax compiler does that anyway.</code>
-    </p>
 
 #+begin_src clojure
   (((Lagrange-equations
