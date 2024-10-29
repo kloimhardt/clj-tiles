@@ -57,6 +57,48 @@ This shows that the arrangement of the blocks, whether vertical or horizontal, i
 
 The file [book_examples_1.cljs](https://github.com/kloimhardt/clj-tiles/blob/master/public/org/book_examples_1.cljs) contains code from the [SICMutils Jupyter notebook](https://github.com/sicmutils/sicmutils/blob/master/jupyter/book-examples.ipynb). It can be readily pasted into the clj-tiles parser. Reading the first pages of the SICM book is mandatory for understanding.
 
+## Creating own puzzle tutorials
+While the parser allows very fine grained control over the visual representation of code, writing of whole puzzle tutorials is done in text files of the `org` format.
+
+An example is the file [https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org](https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org)
+
+This tutorial was called "Visual Algebra" above, the URL to load it is [https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org)
+
+It is also possible to load this file from local disc. For this you have to start a local web server with so called CORS enabled. Any off the shelf server provides CORS, we give an example using Python.
+
+For a demonstration, the simplest is to download this whole github repository (although this is not strictly necessary, see below). Then, on the command line, change into the `clj-tiles/public/org` directory. Run the following command:
+
+```
+ python3 cors_server.py
+```
+
+Then, to load the local file `sicm-book-vscheme-part1.org`, open the Firefox or Chrome browser with the following URL:
+
+```
+https://kloimhardt.github.io/cljtiles.html?org=http://localhost:8003/sicm-book-vscheme-part1.org
+```
+Note that clj-tiles is still run over the web, only the `.org` file is taken from the local storage. You now can edit the file in a text editor, save it and reload the browser to see the changes.
+
+The local server is the small Python program `cors_server.py` listed below:
+```
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+class CORSRequestHandler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
+        return super(CORSRequestHandler, self).end_headers()
+
+httpd = HTTPServer(('localhost', 8003), CORSRequestHandler)
+print("Server started on localhost:8003")
+httpd.serve_forever()
+```
+
+You can run this small program in any directory on your local disc where you created your own `.org` files. Strictly speaking, it is not necessary to download the whole github repository, only the file `cors_server.py`and some `.org` file is needed.
+
+As mentioned, any local server written in any other programming language will do, just make sure that the CORS flags `Access-Control-Allow-Origin` etc. are set correctly like shown above. Also the browser setting has an influence on the success of this method, for example with my personal Safari-browser setup, this did not work.
+
 ## A kind note on types and the role of graphical blocks
 
 You can inspect the blocks by right clicking on them. The type of the according data is displayed as the program is running.

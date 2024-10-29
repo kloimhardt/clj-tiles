@@ -25,7 +25,11 @@ More information on this visual programming project is available on github [4].
 
 [4] https://github.com/kloimhardt/clj-tiles
 
-** Some code (i.e. ignore the following)
+ #+begin_src clojure
+(->tex-equation
+  (up (* 'R (cos 'phi))
+      (* 'R (sin 'phi))))
+#+end_src
 
 #+begin_src clojure :exports none
 (defn walk [inner outer form]
@@ -64,12 +68,6 @@ More information on this visual programming project is available on github [4].
 (defn time [state] (first state))
 
 (define-coordinates t e/R1-rect)
-#+end_src
-
- #+begin_src clojure
-(->tex-equation
-  (up (* 'R (cos 'phi))
-      (* 'R (sin 'phi))))
 #+end_src
 
 This page shows an example of calculating cartesian coordinates out of polar coordinates

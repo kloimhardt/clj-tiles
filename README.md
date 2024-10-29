@@ -7,10 +7,11 @@
 * Doing science "in functions" becomes as easy as using a formula editor
 * Get Wordle inspired feedback
 * Load more puzzles from the web with the built in parser
+* Create puzzels on your local machine
 
-Being a mixture of formula editor, Wordle and Scratch, clj-tiles is for every student who, at a young age, has been gotten hooked as a Princess of Science (see the episode with Prof. Johanna Pirker on ZDFtivi).
+clj-tiles is a mixture of formula editor, Wordle and Scratch
 
-External links: [ZDFtivi](https://www.zdf.de/kinder/princess-of-science/diy-spielentwicklung-100.html), [STEM](https://en.wikipedia.org/wiki/Science,_technology,_engineering,_and_mathematics), [Scratch](https://scratch.mit.edu), [Wordle](https://www.nytimes.com/games/wordle/index.html), [Mathlive formula editor](https://cortexjs.io/mathlive)
+External links: [STEM](https://en.wikipedia.org/wiki/Science,_technology,_engineering,_and_mathematics), [Scratch](https://scratch.mit.edu), [Wordle](https://www.nytimes.com/games/wordle/index.html), [Mathlive formula editor](https://cortexjs.io/mathlive)
 
 ## Roadmap
 * Out of this documentation, being a conglomeration, write a journal article "Competence before Comprehension"
@@ -22,10 +23,9 @@ External links: [Cognitive Science](https://en.wikipedia.org/wiki/From_Bacteria_
 
 ## Gain Competence
 
-If you like videos (I find text better), watch my presentation for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s).  
-Make sure to interactively follow along with the tutorial [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001).
+If you like videos (I find text better), watch my presentation for the [Visual Tools meeting](https://www.youtube.com/watch?v=m1HbWpWiTk4&t=506s) and load the [Visual Geometry](https://kloimhardt.github.io/cljtiles.html?page=FDG001) tutorial to interactively follow along.
 
-As an introduction, we start with the following picture which appears in clj-tiles for [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org).
+As an alternative introduction, look at the following picture which appears in clj-tiles for [Visual Algebra](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org).
 ![cljtiles_polar_1](https://kloimhardt.github.io/blog/images/cljtiles_polar_1.png)
 
 You notice the `Get the Puzzle` button and press it.
@@ -95,7 +95,7 @@ Also, inspired by talking chess computers, poetry apps, text- and point-and-clic
 
 As this workspace is not yet self explanatory, I provide a [walkthrough video](https://www.youtube.com/watch?v=DHcZkmXKp04).
 
-External links: [Awesome game design](https://web.archive.org/web/20200422041019/http://ludix.com/moriarty/psalm46.html) talk by Brian Moriarty, [Endure](https://texturewriter.com/play/emshort/endure/info) interactive fiction by Emily Short, [Detectiveland](https://versificator.itch.io/detectiveland) point-and-click text adventure by Robin Johnson, [Poems by Heart](https://kloimhardt.github.io/dragdrop/dragdrop.html) not Inkle's but my own attempt
+External links: [Awesome game design](https://web.archive.org/web/20200422041019/http://ludix.com/moriarty/psalm46.html) talk by Brian Moriarty, [Endure](https://texturewriter.com/play/emshort/endure/info) interactive fiction by Emily Short, [Detectiveland](https://versificator.itch.io/detectiveland) point-and-click text adventure by Robin Johnson, [Poems by Heart](https://kloimhardt.github.io/dragdrop/dragdrop.html) not Inkle's but my own attempt.
 
 ## Parser, Execution and Block Inspection
 There is a simple way to create own puzzles. Open the dedicated parser by right clicking on a white space. Paste the following code into the text field:
@@ -117,8 +117,9 @@ Also, you can load new tutorials from the web. Open the parser and select a tuto
 
 External link: [How to Design Programs](https://htdp.org/2023-8-14/Book/part_prologue.html)
 
+## Create your own puzzle tutorials
+The tutorials on the web which can be loaded via the parser are simple text files containing code. Everyone can create such tutorials and load them from the local laptop.
 
-## More information ...
-... on the parser and visual representations of code can be found in [this document](https://github.com/kloimhardt/clj-tiles/blob/master/screenshots/technical_details.md).
+More information on local tutorials, the parser and visual representations of code can be found in [this document](https://github.com/kloimhardt/clj-tiles/blob/master/screenshots/technical_details.md).
 
 [GPL v3](LICENSE) Copyright © 2021 Markus Kloimwieder
