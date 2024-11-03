@@ -62,11 +62,11 @@ While the parser allows very fine grained control over the visual representation
 
 An example is the file [https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org](https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org)
 
-This tutorial was called "Visual Algebra" above, the URL to load it is [https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org)
+The according tutorial was called "Visual Algebra" above, the URL to load it is [https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org](https://kloimhardt.github.io/cljtiles.html?org=https://raw.githubusercontent.com/kloimhardt/clj-tiles/master/public/org/sicm-book-vscheme-part1.org)
 
 It is also possible to load this file from local disc. For this you have to start a local web server with so called CORS enabled. Any off the shelf server provides CORS, we give an example using Python.
 
-For a demonstration, the simplest is to download this whole github repository (although this is not strictly necessary, see below). Then, on the command line, change into the `clj-tiles/public/org` directory. Run the following command:
+For a demonstration, the simplest is to download this whole github repository (although this is not strictly necessary, see all the caveats below). Then, on the command line, change into the `clj-tiles/public/org` directory. Run the following command:
 
 ```
  python3 cors_server.py
@@ -77,7 +77,7 @@ Then, to load the local file `sicm-book-vscheme-part1.org`, open the Firefox or 
 ```
 https://kloimhardt.github.io/cljtiles.html?org=http://localhost:8003/sicm-book-vscheme-part1.org
 ```
-Note that clj-tiles is still run over the web, only the `.org` file is taken from the local storage. You now can edit the file in a text editor, save it and reload the browser to see the changes.
+You now can edit the file in a text editor, save it and reload the browser to see the changes.
 
 The local server is the small Python program `cors_server.py` listed below:
 ```
@@ -85,7 +85,8 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 class CORSRequestHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', 'https://kloimhardt.github.io')
+        self.send_header('Access-Control-Allow-Origin',
+        'https://kloimhardt.github.io')
         self.send_header('Access-Control-Allow-Methods', 'GET')
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         return super(CORSRequestHandler, self).end_headers()
@@ -94,10 +95,12 @@ httpd = HTTPServer(('localhost', 8003), CORSRequestHandler)
 print("Server started on localhost:8003")
 httpd.serve_forever()
 ```
+Note that clj-tiles is still run over the web, only the `.org` file is read from the local storage. So it is not necessary to download the clj-tiles github repository at all, only some suitable `.org` file and some local server program like `cors_server.py`is needed.
 
-You can run this small program in any directory on your local disc where you created your own `.org` files. Strictly speaking, it is not necessary to download the whole github repository, only the file `cors_server.py`and some `.org` file is needed.
+The CORS flags `Access-Control-Allow-Origin` etc. tell your browser that upon request it must send data stored on local disc to https://kloimhardt.github.io . Usually, without these server-flags set, a default web-browser will refuse to forward data from a local server to the web. So I need to thank you for entrusting my website with access to all subdirectories below the location of your server program (be it `cors_server.py` or some other server program of your choice). In any case, do not store other important data amongst your `.org` files!
 
-As mentioned, any local server written in any other programming language will do, just make sure that the CORS flags `Access-Control-Allow-Origin` etc. are set correctly like shown above. Also the browser setting has an influence on the success of this method, for example with my personal Safari-browser setup, this did not work.
+The whole process depends on a successful handshake between your local server and your browser. In my experience (if you really decide to grant access) it helps to give them time, so don't rush things: start the local server, wait, start the browser, wait, open the URL.
+Also your browser setting has an influence on the success of this method, for example with my personal Safari-browser setup, this did not work. Naturally I here do not recommend to change your browser settings, clj-tiles is not worth the risk of uninformed security settings. Remember that there is always the option to install the full stack (NPM, Java) and run clj-tiles locally (see below).
 
 ## A kind note on types and the role of graphical blocks
 
