@@ -80,6 +80,8 @@ https://kloimhardt.github.io/cljtiles.html?org=http://localhost:8003/sicm-book-v
 You now can edit the file in a text editor, save it and reload the browser to see the changes.
 
 The local server is the small Python program `cors_server.py` listed below:
+
+### Local files server in Python with CORS enabled
 ```
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
@@ -95,11 +97,15 @@ httpd = HTTPServer(('localhost', 8003), CORSRequestHandler)
 print("Server started on localhost:8003")
 httpd.serve_forever()
 ```
-Note that clj-tiles is still run over the web, only the `.org` file is read from the local storage. So it is not necessary to download the clj-tiles github repository at all, only some suitable `.org` file and some local server program like `cors_server.py`is needed.
+Note that the `clj-tiles` web-application is still run over the web, only the `.org` file containing your tutorials is read from the local storage by `clj-tiles` (via a JS-`fetch`).
 
-The CORS flags `Access-Control-Allow-Origin` etc. tell your browser that upon request it must send data stored on local disc to https://kloimhardt.github.io . Usually, without these server-flags set, a default web-browser will refuse to forward data from a local server to the web. So I need to thank you for entrusting my website with access to all subdirectories below the location of your server program (be it `cors_server.py` or some other server program of your choice). In any case, do not store other important data amongst your `.org` files!
+As an upshot, it is not necessary to download the `clj-tiles` github repository at all, only some suitable `.org` file and some local server program like `cors_server.py`is needed.
 
-The whole process depends on a successful handshake between your local server and your browser. In my experience (if you really decide to grant access) it helps to give them time, so don't rush things: start the local server, wait, start the browser, wait, open the URL.
+Technical explanation: the CORS flags `Access-Control-Allow-Origin` etc. tell your browser that upon request it is allowed to send data stored on local disc to https://kloimhardt.github.io . Usually, without these server-flags set, a default web-browser will refuse to forward data from a local server to the web.
+
+Aside: so I need to thank you for entrusting my website with access to all subdirectories below the location of your server program (be it `cors_server.py` or some other server program of your choice). In any case, do not store other important data amongst your `.org` files!
+
+The whole CORS process depends on a successful handshake between your local server and your browser. In my experience (if you really decide to grant access) it helps to give them time, so don't rush things: start the local server, wait, start the browser, wait, open the URL.
 Also your browser setting has an influence on the success of this method, for example with my personal Safari-browser setup, this did not work. Naturally I here do not recommend to change your browser settings, clj-tiles is not worth the risk of uninformed security settings. Remember that there is always the option to install the full stack (NPM, Java) and run clj-tiles locally (see below).
 
 ## A kind note on types and the role of graphical blocks
