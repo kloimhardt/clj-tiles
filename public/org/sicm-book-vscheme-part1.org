@@ -41,35 +41,40 @@ in three dimensions. Press "Run" to look at some nice rendering of the result.
 This text will never appear because it lacks a linebreak. Also the next code is not displayed for some reason, but that is good.
 
 #+begin_src clojure :exports none
-(defn walk [inner outer form]
-  (cond
-    (list? form) (outer (apply list (map inner form)))
-    (seq? form)  (outer (doall (map inner form)))
-    (coll? form) (outer (into (empty form) (map inner form)))
-    :else        (outer form)))
-(defn postwalk [f form]
-  (walk (partial postwalk f) f form))
-(defn postwalk-replace [smap form]
-  (postwalk (fn [x] (if (contains? smap x) (smap x) x)) form))
-(defmacro let-scheme [b & e]
-  (concat (list 'let (into [] (apply concat b))) e))
-(defmacro define [h & b]
-  (let [body (postwalk-replace {'let 'let-scheme} b)]
-    (if (coll? h)
-      (if (coll? (first h))
-        (list 'defn (ffirst h) (into [] (rest (first h)))
-              (concat (list 'fn (into [] (rest h))) body))
-        (concat (list 'defn (first h) (into [] (rest h)))
-                body))
-      (concat (list 'def h) body))))
-(defmacro lambda [h b]
-  (list 'fn (into [] h) b))
-(def show-expression simplify)
-(def velocities velocity)
-(def coordinates coordinate)
-(def vector-length count)
-(defn time [state] (first state))
-(define-coordinates t e/R1-rect)
+  (defn walk [inner outer form]
+    (cond
+      (list? form) (outer (apply list (map inner form)))
+      (seq? form)  (outer (doall (map inner form)))
+      (coll? form) (outer (into (empty form) (map inner form)))
+      :else        (outer form)))
+  (defn postwalk [f form]
+    (walk (partial postwalk f) f form))
+  (defn postwalk-replace [smap form]
+    (postwalk (fn [x] (if (contains? smap x) (smap x) x)) form))
+  (defmacro let-scheme [b & e]
+    (concat (list 'let (into [] (apply concat b))) e))
+  (defmacro define-1 [h & b]
+    (let [body (postwalk-replace {'let 'let-scheme} b)]
+      (if (coll? h)
+        (if (coll? (first h))
+          (list 'defn (ffirst h) (into [] (rest (first h)))
+                (concat (list 'fn (into [] (rest h))) body))
+          (concat (list 'defn (first h) (into [] (rest h)))
+                  body))
+        (concat (list 'def h) body))))
+  (defmacro define [h & b]
+    (if (and (coll? h) (= (first h) 'tex-inspect))
+      (list 'do
+            (concat ['define-1 (second h)] b)
+            h)
+      (concat ['define-1 h] b)))
+  (defmacro lambda [h b]
+    (list 'fn (into [] h) b))
+  (def show-expression simplify)
+  (def velocities velocity)
+  (def coordinates coordinate)
+  (def vector-length count)
+  (defn time [state] (first state))
 #+end_src
 
 ** Code
@@ -114,11 +119,16 @@ in principle, a :tiles/vert would alaways be in order (only done in a view examp
 
 ** Code
 
+#+begin_src clojure :exports none
+(define mass 'm_0)
+(define t 't_0)
+#+end_src
+
 #+begin_src clojure
-  (define x (literal-function 'x))
-  (define gamma-x (Gamma x))
-  (define local (gamma-x 't))
-  (->tex-equation local)
+(define x (literal-function 'x))
+(define gamma-x (Gamma x))
+(define local (gamma-x 't))
+(->tex-equation local)
 #+end_src
 
 * 1 Lagrangian Mechanics
@@ -133,7 +143,6 @@ in principle, a :tiles/vert would alaways be in order (only done in a view examp
 (define ((L-free-particle mass) local)
     (let [(:tiles/vert (v (velocity local)))]
       (* 1/2 mass (dot-product v v))))
-((L-free-particle 'm) local)
 #+end_src
 
 #+begin_src clojure
@@ -155,7 +164,6 @@ in principle, a :tiles/vert would alaways be in order (only done in a view examp
   (up (+ (* 4 t) 7)
       (+ (* 3 t) 5)
       (+ (* 2 t) 1)))
-(test-path 't)
 #+end_src
 
 #+begin_src clojure

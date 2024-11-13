@@ -3,7 +3,7 @@
 
 ## Link Index
 ### Sussman books
-* [Structure and Interpretation of Classical Mechanics (SICM)](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html), ([main page](https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html), [reprint](https://tgvaughan.github.io/sicm/))
+* [Structure and Interpretation of Classical Mechanics (SICM)](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/chapter001.html), ([main page](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/book.html), [reprint](https://tgvaughan.github.io/sicm/))
 * [Functional Differential Geometry (FDG)](https://mitpress.mit.edu/books/functional-differential-geometry)
 
 ### clj-tiles workspaces
