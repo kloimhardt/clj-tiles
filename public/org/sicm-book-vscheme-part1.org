@@ -95,9 +95,17 @@ Here we show how to differentiate a simple function.
 (( $D$ (* 3 (expt sin 2))) 'x))) : the expression 6 sin(x) cos(x) ; an expression is just data. Note that with D, the derivative is taken from a function and not perhaps from some expression.
 
 #+begin_src clojure
+(define t1 0)
+(define t2 10)
+(definite-integral (expt sin 2) t1 t2)
+#+end_src
+
+#+begin_src clojure
+(define t 't_0)
+(define mass 'm_0)
 (->infix
   (simplify
-    ((D (* 3 (expt sin 2))) 'x)))
+    ((D (* mass (expt sin 2))) t)))
 #+end_src
 
 * Description
@@ -118,14 +126,6 @@ in principle, a :tiles/vert would alaways be in order (only done in a view examp
 (let ((x a)) (f x)) -> (let (:tiles/vert [(:tiles/vert (x a))]) (f x))
 
 ** Code
-
-#+begin_src clojure :exports none
-(def mass 'm_0)
-(def t 't_0)
-(def t1 't_1)
-(def t2 't_2)
-(def nu cos)
-#+end_src
 
 #+begin_src clojure
 (define x (literal-function 'x))
@@ -175,19 +175,24 @@ in principle, a :tiles/vert would alaways be in order (only done in a view examp
 (Lagrangian-action (L-free-particle 3.0) test-path 0.0 10.0)
 #+end_src
 
+Note that by construction, make-eta is zero if t is either 0 or 10.
+
 #+begin_src clojure
+(define nu (up sin cos square))
 (define ((make-eta nu t1 t2) t)
-(* (- t t1) (- t t2) (nu t))) 
+(* (- t t1) (- t t2) (nu t)))
 #+end_src
 
 #+begin_src clojure
-  (define ((varied-free-particle-action mass q nu t1 t2) eps)
-    (let [(:tiles/vert (eta (make-eta nu t1 t2)))]
-      (Lagrangian-action (L-free-particle mass)
-                         (+ q (* eps eta))
-                         t1
-                         t2))) 
-#+end_src
+(define ((varied-free-particle-action mass q nu t1 t2) eps)
+  (let [(:tiles/vert (eta (make-eta nu t1 t2)))]
+    (Lagrangian-action (L-free-particle mass)
+                       (+ q (* eps eta))
+                       t1
+                       t2)))
+
+((varied-free-particle-action 3.0 test-path nu 0.0 10.0) 0.001)
+ #+end_src
 
 #+begin_src clojure
 ((varied-free-particle-action 3.0 test-path
@@ -204,8 +209,10 @@ in principle, a :tiles/vert would alaways be in order (only done in a view examp
   -2.0 1.0)
 #+end_src
 
+ $make-path$ : (t1, q1, t2, q2, positions) $\rightarrow$ fn ; construct a path by linear inperpolation between the positions.
+
 #+begin_src clojure
-((make-path 0 0 10 5 (up -1 2 -3 4)) 6)
+((make-path t1 0 t2 5 (up -1 2 -3 4)) 6.1)
 #+end_src
 
 #+begin_src clojure
