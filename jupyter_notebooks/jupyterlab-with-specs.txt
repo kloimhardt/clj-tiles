@@ -1,0 +1,650 @@
+Examples from the SICM book
+The chapters and subsections correspond to the second edition of SICM https://mitpress.mit.edu/sites/default/files/titles/content/sicm_edition_2/book.html .
+
+(require '[clojupyter.misc.helper :as helper])
+(run! helper/add-dependencies '[[net.littleredcomputer/sicmutils "0.12.0-SNAPSHOT"]])
+(ns book-examples
+    (:refer-clojure :exclude [partial zero? + - * / ref])
+    (:require [clojure.spec.alpha :as s]
+              [clojure.spec.test.alpha :as ts]
+              [sicmutils.env :refer :all :as env]
+              [sicmutils.mechanics.lagrange :as lg]
+              [sicmutils.numerical.minimize :as mn]
+              [clojupyter.protocol.mime-convertible :as mc]))
+1.4 Computing Actions
+Calculate the action for the free particle along a path. Consider the particle moving at uniform speed along a straight line.
+
+(defn test-path
+  "See p. 20"
+  [t]
+  (up (+ (* 4 t) 7)
+      (+ (* 3 t) 5)
+      (+ (* 2 t) 1)))
+
+(Lagrangian-action (lg/L-free-particle 3.0) test-path 0.0 10.0)
+435.0
+Paths of minimum Action
+Show that the action is smaller along a straight-line test path than along nearby paths
+
+(defn make-η
+  "See p. 21"
+  [ν t1 t2]
+  (fn [t]
+    (* (- t t1) (- t t2) (ν t))))
+
+(defn varied-free-particle-action
+  "See p. 21"
+  [mass q ν t1 t2]
+  (fn [ε]
+    (let [η (make-η ν t1 t2)]
+      (Lagrangian-action (lg/L-free-particle mass)
+                         (+ q (* ε η)) t1 t2))))
+             
+((varied-free-particle-action 3.0 test-path (up sin cos square) 0.0 10.0) 0.01)
+564.1214285996772
+Simulate lots of the paths in this manner. Proof that the minimum value of the action is the action along the straight path. For this proof it suffices that some optimization parameter is close to zero (need not be exactly zero).
+
+(minimize (varied-free-particle-action 3.0 test-path (up sin cos square) 0.0 10.0) -2 1)
+[-9.163058228844889E-10 435.0000000594215 6]
+I provide some helper functions for visualization:
+
+(defrecord Vega [vega-data]
+  mc/PMimeConvertible
+  (to-mime [_]
+    (mc/stream-to-string
+      {"application/vnd.vegalite.v2+json" vega-data})))
+
+(defn points->plot [paths x-axis-name y-axis-name]
+ (let [coord-encoding (fn [coord] {:field coord :type "quantitative" :scale {:zero false}})
+       paths-to-data (flatten 
+                         (map (fn [[id data]] 
+                                  (map (fn [[t x y z]] 
+                                           {:id id :t t :x x :y y :z z}) data)) paths))]
+  {:$schema "https://vega.github.io/schema/vega-lite/v2.json"
+   :data {:values paths-to-data}
+   :encoding 
+     {:x (coord-encoding x-axis-name) 
+      :y (coord-encoding y-axis-name)}
+   :layer
+   [{:mark "line"
+     :encoding
+     {:order {:field "t" :type "temporal"}
+      :color {:field "id" :type "nominal"}}}
+    {:mark {:type "point" :filled true}}]}))
+
+(defn alt-range [t0 t1 nofsteps]
+    (map float (flatten [t0 (linear-interpolants t0 t1 (- nofsteps 2)) t1])))
+
+(defn make-path-txyz [fn_t t0 t1 nofsteps]
+  (mapv #(cons % (.v (fn_t %)))
+    (alt-range t0 t1 nofsteps)))
+
+(defn points-xy->plot [paths] 
+  (points->plot paths "x" "y"))
+
+(defn points-xz->plot [paths] 
+  (points->plot paths "x" "z"))
+
+(defn points-tz->plot [paths] 
+  (points->plot paths "t" "z"))
+
+(defn vega-lite [vega-data]
+    (Vega. vega-data))
+
+(comment
+    (def werte {"sb" [[0 7 5 1] [1 11 8 10]]
+            "uv" [[2 9 2 4] [3 3  9 7]]})
+
+    (-> (points-xz->plot werte)
+         vega-lite))
+Create data to plot two straight paths in the xy plane. One path is along the x axis (name: path-along-x), the second path leads in all directions.
+
+(defn path-along-x
+  [t]
+  (up (+ (* 5 t) 1)
+      (* 0 t)
+      (* 0 t)))
+
+(def path-points-1 {"a straight x" (make-path-txyz path-along-x 0 10 8)
+                    "b book" (make-path-txyz test-path 0 10 8)})
+#'book-examples/path-points-1
+Plot the two paths
+
+(-> (points-xy->plot path-points-1)
+    vega-lite)
+
+Create two variations of the path-along-x. Calculate the action. Show once again that the Lagrangian-action is indeed smallest for the straight path.
+
+(defn make-varied-path [ε t0 t1]
+ (+ path-along-x (* ε (make-η (up #(* 0 %) identity #(* 5.0 (sin %))) t0 t1))))
+
+(def small-varied-path (make-varied-path 0.01 0 10))
+(def large-varied-path (make-varied-path 0.02 0 10))
+
+[(Lagrangian-action (lg/L-free-particle 3.0) path-along-x 0.0 10.0)
+ (Lagrangian-action (lg/L-free-particle 3.0) small-varied-path 0.0 10.0)
+ (Lagrangian-action (lg/L-free-particle 3.0) large-varied-path 0.0 10.0)]
+[375.0 383.8260332594603 410.3041330378416]
+Create data to plot the three paths in the xz plane along with their actions.
+
+(def path-points-2
+    {"path-along-x" (make-path-txyz path-along-x 0 10 8)
+     "small-varied-path" (make-path-txyz small-varied-path 0 10 24)
+     "large-varied-path" (make-path-txyz large-varied-path 0 10 32)})
+#'book-examples/path-points-2
+Plot the three paths.
+
+(-> (points-xz->plot path-points-2)
+    vega-lite)
+
+Finding trajectories that minimize the action
+The SICM library provides a procedure that constructs a one dimensional path (along, say, the z axis) using an interpolation polynomial: (make-path t0 q0 t1 q1 qs), where q0 and q1 are the endpoints, t0 and t1 are the corresponding times, and qs is a list of intermediate points. I give an example (note that the result, initial-path, is itself a function):
+
+(def pi-half (* 0.5 Math/PI))
+(def initial-qs [0.1 0.2 0.2])
+(def initial-path (lg/make-path 0 1.0 pi-half 0.0 initial-qs))
+#'book-examples/initial-path
+Construct a parametric action that is just the action computed along that parametric path. Find approximate solution paths of a free particle and the harmonic oszillator respectively (hint: use the SICM procedure multidimensional-minimize).
+
+(defn parametric-path-actn
+  [Lagrangian t0 q0 t1 q1]
+  (fn [qs]
+    (let [path (lg/make-path t0 q0 t1 q1 qs)]
+      (Lagrangian-action Lagrangian path t0 t1))))
+
+(defn fnd-path
+  [Lagrangian t0 q0 t1 q1 initial-qs]
+  (let [minimizing-qs
+        (mn/multidimensional-minimize
+          (parametric-path-actn Lagrangian t0 q0 t1 q1)
+          initial-qs)]
+    (lg/make-path t0 q0 t1 q1 minimizing-qs)))
+
+(def free-path 
+  (fnd-path (lg/L-free-particle 3.0) 0.0 1.0 pi-half 0.0 initial-qs))
+
+(def harmonic-path 
+  (fnd-path (lg/L-harmonic 1.0 1.0) 0.0 1.0 pi-half 0.0 initial-qs))
+#'book-examples/harmonic-path
+Make a plot of these one dimensional paths, this time not in the x-z plane but in the t-z plane. This shows that, upon optimization, the initial-path turns into a streight line and a sinusoidal curve respectively.
+
+(defn make-path-tz [fn_t t0 t1 nofsteps]
+  (map #(vector % 0 0 (fn_t %)) (alt-range t0 t1 nofsteps)))
+
+(def plot-3
+    (let [i (make-path-tz initial-path 0 pi-half 16)
+          f (make-path-tz free-path 0 pi-half 4)
+          h (make-path-tz harmonic-path 0 pi-half 8)]
+      {"initial-path" i "free-path" f "harmonic-path" h}))
+#'book-examples/plot-3
+(-> (points-tz->plot plot-3)
+    vega-lite)
+
+Show that your numerically attained harmonic-path approximates the well known analytic solution .
+
+(-> (points-tz->plot
+     {"diff" 
+      (make-path-tz #(- (cos %) (harmonic-path %)) 0 pi-half 35)})
+    vega-lite)
+
+Calculate the Lagrange equation of the harmonic oszillator.
+
+(tex$$ (((Lagrange-equations (lg/L-harmonic 'm 'k)) (literal-function 'q)) 't))
+1.5 The Euler-Lagrange Equations
+1.5.2 Computing Lagrange's Equations
+The free particle
+State the dynamic equation of motion (i.e. the Lagrange equation a.k.a Newton's second law) of the free particle.
+
+(tex$$ (((Lagrange-equations (lg/L-free-particle 'm)) (literal-function 'q)) 't))
+Check that an arbitrary straight-line path satisfies this equation, i.e. that inserting a straight line for  gives identically zero (strictly speaking the zero covector of three dimensions).
+
+(letfn [(straight-line [t]
+  (up (+ (* 'a t) 'a0)
+    (+ (* 'b t) 'b0)
+    (+ (* 'c t) 'c0)))]
+  (tex$$ (((Lagrange-equations (lg/L-free-particle 'm)) straight-line) 't)))
+ 
+The harmonic oscillator
+State the dynamic equation of motion for the harmonic oszillator with arbitrary mass and spring constant.
+
+(tex$$ (((Lagrange-equations (lg/L-harmonic 'm 'k)) (literal-function 'q)) 't))
+Plug in a sinusoid with arbitrary amplitude , frequency  and phase  and show that the only solutions allowed are ones where
+
+(let 
+    [proposed-solution (fn [t] (* 'A (cos (+ (* t 'omega) 'phi))))]
+  (tex$$ (((Lagrange-equations (lg/L-harmonic 'm 'k)) proposed-solution) 't)))
+Exercise 1.11: Kepler's third law
+Show that a planet in circular orbit satisfies Kepler's third law , where  is the angular frequency of the orbit and  is the distance between sun and planet. (Hint: use the reduced mass to construct the Lagrangian)
+
+(defn gravitational-energy [G M_1 m_2]
+  (fn [r]
+   (- (/ (* G M_1 m_2) r))))
+
+(defn circle [t]
+  (up 'a (* 'n t)))
+
+(let [lagrangian (lg/L-central-polar     
+                  (/ (* 'M_1 'm_2) (+ 'M_1 'm_2))     
+                  (gravitational-energy 'G 'M_1 'm_2))]
+      (tex$$ (((Lagrange-equations lagrangian) circle) 't)))
+ 
+ 
+1.6 How to find Lagrangians
+Central force field
+State the dynamic equation of motion for the uniform acceleration and the central potential, the latter in rectangular as well as in polar coordinates.
+
+(defn make-tex-matrix [lst]
+    ;;here, the up structure is used for display purposes only
+    ;;the expressions do not conform to the specs at the bottom though
+    ;;I did not want to extend the ::up spec
+    ;;just because of displaying stuff in a convenient way
+    ;;hence the with-instrument-disabled
+  (ts/with-instrument-disabled (apply up lst)))
+
+(defn tex$$-spec [x] (ts/with-instrument-disabled (tex$$ x)))
+
+(tex$$-spec (make-tex-matrix
+           [(((Lagrange-equations
+              (lg/L-uniform-acceleration 'm 'g))
+            (up (literal-function 'x)
+              (literal-function 'y)))
+           't)
+            (((Lagrange-equations
+              (lg/L-central-rectangular 'm (literal-function 'U)))
+            (up (literal-function 'x)
+              (literal-function 'y)))
+           't)
+            (((Lagrange-equations
+              (lg/L-central-polar 'm (literal-function 'U)))
+            (up (literal-function 'r)
+              (literal-function 'phi)))
+           't)]))
+ 	 
+ 
+ 
+ 	 	  
+1.6.1 Coordinate transformations
+Calculate the 
+ velocity vector in polar coordinates.
+
+(tex$$ (velocity ((F->C p->r) (->local 't (up 'r 'φ) (up 'rdot 'φdot)))))
+ 
+Calculate the lagrangian in polar coordinates twice. Once directly and once via the lagrangian in rectangular coordinates.
+
+(defn L-alternate-central-polar
+  [m U]
+  (compose (lg/L-central-rectangular m U) (F->C p->r)))
+
+(tex$$
+    (let [lcp ((lg/L-central-polar 'm (literal-function 'U))
+            (->local 't (up 'r 'φ) (up 'rdot 'φdot)))
+          lacp ((L-alternate-central-polar 'm (literal-function 'U))
+             (->local 't (up 'r 'φ) (up 'rdot 'φdot)))]
+        (make-tex-matrix [lcp lacp])))
+ 
+ 
+ 
+ 
+ 
+Coriolis and centrifugal forces
+State, in cartesian coordinates, the Lagrangian for the two dimensional free particle in a rotating coordinate system.
+
+;;we provide a function simplify-spec (defined at the bottom)
+;;which should be called if the specs are activated 
+(defmacro simplify-alt [x]
+    (if (resolve 'simplify-spec)
+        `(simplify-spec ~x)
+        `(simplify ~x)))
+#'book-examples/simplify-alt
+(def L-free-rectangular lg/L-free-particle)
+
+(defn L-free-polar [m]
+ (compose (L-free-rectangular m) (F->C p->r)))
+
+(defn F [Omega]
+ (fn [[t [r theta]]]
+  (up r (+ theta (* Omega t)))))
+
+(defn L-rotating-polar [m Omega]
+ (compose (L-free-polar m) (F->C (F Omega))))
+
+(defn r->p
+  "rectangular to polar coordinates of state."
+  [[_ [x y :as q]]]
+  (up (sqrt (square q)) (atan (/ y x))))
+
+(defn L-rotating-rectangular [m Omega]
+  (compose (L-rotating-polar m Omega) (F->C r->p)))
+
+(def L-simplify
+  (simplify-alt ((L-rotating-rectangular 'm 'Omega)
+    (up 't (up 'x 'y) (up 'xdot 'ydot)))))
+
+(tex$$ L-simplify)
+ 
+ 
+ 
+ 
+Derive the equations of motion, in which the centrifugal and the coriolis force appear. (Hint: take the expression just obtained and use this data as code via Clojure's macro feature).
+
+(defmacro L-fn [args1 args2]
+  `(fn ~args1 (fn ~args2 ~L-simplify)))
+
+(def L-rotating-rectangular-simp (L-fn [m Omega] [[t [x y] [xdot ydot]]]))
+
+(tex$$ 
+    (((Lagrange-equations (L-rotating-rectangular-simp 'm 'Omega))
+          (up (literal-function 'x) (literal-function 'y)))
+         't))
+ 
+Plot a clockwise rotating path. (Hints: (1) Use the SICM function "Gamma" to create the triple
+ which can be transformed, (2) the angular frequency must be negative)
+
+(defn test-path-2d
+  [t]
+  (up
+   (+ (* 3 t) 7)
+   (+ (* 5 t) 11)))
+
+(defn rotate-path [path-fn]
+(simplify-alt
+ ((F->C p->r)
+  ((F->C (F 'Omega))
+   ((F->C r->p)
+    ((Gamma path-fn) 't))))))
+
+(def xy (nth (rotate-path test-path-2d) 2))
+(def x (nth xy 1))
+(def y (nth xy 2))
+
+(defmacro P-fn [args1 args2]
+  `(fn ~args1 (up (fn ~args2 ~x) (fn ~args2 ~y))))
+
+(def rotating-path-2d (P-fn [Omega] [t]))
+
+(let [NegativeOm -3]
+    (-> (points-xy->plot {"rotating-path-2d" (make-path-txyz (rotating-path-2d NegativeOm) 0 3 25)})
+        vega-lite))
+
+Show that this path indeed satiesfies the equations of motion in a rotating coordinate system.
+
+(tex$$
+   (let [Om 'Omega
+         NegativeOm (* -1 Om)]
+     (((Lagrange-equations (L-rotating-rectangular-simp 'm Om))
+       (rotating-path-2d NegativeOm))
+      't)))
+ 
+1.6.2 Systems with rigid constraints
+A pendulum driven at the pivot
+State Lagrange’s equation for this system.
+
+(defn T-pend
+  [m l _ ys]
+  (fn [local]
+    (let [[t theta thetadot] local
+          vys (D ys)]
+      (* 1/2 m
+         (+ (square (* l thetadot))
+            (square (vys t))
+            (* 2 l (vys t) thetadot (sin theta)))))))
+
+(defn V-pend
+  [m l g ys]
+  (fn [local]
+    (let [[t theta _] local]
+      (* m g (- (ys t) (* l (cos theta)))))))
+
+(def L-pend (- T-pend V-pend))
+
+(def theta (literal-function 'theta))
+(def y (literal-function 'y))
+
+(tex$$ (((Lagrange-equations (L-pend 'm 'l 'g y)) theta) 't))
+State the Lagrangian
+
+(tex$$ ((L-pend 'm 'l 'g y) (->local 't 'θ 'θdot)))
+ 
+ 
+1.6.3 Constraints as Coordinate Transformations
+Derive the previous result by using coordinate transformations.
+
+(defn L-uniform-acceleration [m g]
+  (fn [[_ [_ y] v]]
+    (- (* 1/2 m (square v)) (* m g y))))
+
+(defn dp-coordinates [l y_s]
+  (fn [[t θ]]
+    (let [x (* l (sin θ))
+          y (- (y_s t) (* l (cos θ)))]
+      (up x y))))
+
+(defn L-pend2 [m l g y_s]
+  (comp (L-uniform-acceleration m g)
+        (F->C (dp-coordinates l y_s))))
+
+(tex$$ ((L-pend2 'm 'l 'g y) (->local 't 'θ 'θdot)))
+ 
+ 
+1.8.3 Central Forces in Three Dimensions
+Calculate the z-component of the angular momentum of an arbitrary path in rectangular and spherical coordinates.
+
+(def rectangular-state (up 't
+                           (up 'x 'y 'z)
+                           (up 'xdot 'ydot 'zdot)))
+
+(def spherical-state (up 't
+                         (up 'r 'θ 'φ)
+                         (up 'rdot 'θdot 'φdot)))
+
+(defn ang-mom-z [m]
+  (fn [[_ xyz v]]
+    (get (cross-product xyz (* m v)) 2)))
+
+(tex$$
+  (make-tex-matrix
+    [((ang-mom-z 'm) rectangular-state)
+     ((compose (ang-mom-z 'm) (F->C s->r)) spherical-state)]))
+ 
+Using sherical coordinates, calculate the generalized forces and the generalized momenta of a planet moving in a central potential. Thus show that the momentum conjugate to the third coordinate  is (1) conserved (because the respective force is zero) and (2) identical the z-component of the angular momentum.
+
+(def U (literal-function 'U))
+
+(defn T3-spherical [m]
+ (compose (L-free-rectangular m) (F->C s->r)))
+
+(defn L3-central [m Vr]
+  (let [Vs (fn [[_ [r]]] (Vr r))]
+    (- (T3-spherical m) Vs)))
+
+(tex$$
+  (make-tex-matrix
+    [(((∂ 1) (L3-central 'm U)) spherical-state)
+     (((∂ 2) (L3-central 'm U)) spherical-state)]))
+ 	 
+  
+Show that the energy state function computed from the Lagrangian for a central field is in fact T + V.
+
+(tex$$
+  (make-tex-matrix
+   [((T3-spherical 'm) (->local 't (up 'r 'θ 'φ) (up 'rdot 'θdot 'φdot)))
+    ((Lagrangian->energy (L3-central 'm U)) spherical-state)]))
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Clojure Spec Definitions for this Notebook
+The definitions are minimal and closely knit to the code above. To activate them, uncomment the last (ts/instrument) expression
+
+(require '[sicmutils.value :as vl]
+         '[sicmutils.numsymb :as ny]
+         '[sicmutils.generic :as gn]
+         '[sicmutils.structure :as st]
+         '[sicmutils.simplify :as sp] ;;necessary to load simplify multifunction
+         '[sicmutils.value :as vl]
+         '[sicmutils.function :as fu] ;;necessary for ((gn/* 5 (fn[x] x)) 4)
+         '[sicmutils.expression :as ex]
+         '[sicmutils.calculus.derivative :as dr]
+         '[sicmutils.numerical.minimize :as mn])
+(s/def ::nu number?)
+(s/def ::sy symbol?)
+(s/def ::nu-sy (s/or :nu ::nu :sy ::sy))
+(s/def ::expression
+      (s/or :exp2 ::expression-2 :exp-q ::expression-q :exp-U ::expression-U
+            :exp3 ::expression-3 :exp2-7 ::expression-gt2 :ns ::nu-sy))
+
+(s/def ::expression-gt2
+      (s/and seq?
+             #(> (count %) 2)
+             (s/cat :a-gt2 #{'* '+} :rest (s/+ ::expression))))
+(s/def ::expression-3
+      (s/and seq?
+             #(= (count %) 3)
+             (s/cat :a-3 #{'- '/ 'expt} :rest (s/+ ::expression))))
+(s/def ::expression-U
+      (s/and seq?
+             #(= (count %) 2)
+             (s/cat :a-U #{'U '(D U) '((expt D 2) U)}
+                    :rest ::expression)))
+
+(s/def ::expression-2
+      (s/and seq?
+             #(= (count %) 2)
+             (s/cat :a-2 #{'sin 'cos '- 'sqrt 'atan} :rest ::expression)))
+
+(s/def ::expression-q
+      (s/and seq?
+             #(= (count %) 2)
+             (s/cat :a-q #{'q '(D q) '((expt D 2) q)
+                           'x '(D x) '((expt D 2) x)
+                           'y '(D y) '((expt D 2) y)
+                           'z '(D z) '((expt D 2) z)
+                           'r '(D r) '((expt D 2) r)
+                           'phi '(D phi) '((expt D 2) phi)
+                           'theta '(D theta) '((expt D 2) theta)}
+                    :rest ::nu-sy)))
+
+(s/def ::type #{:sicmutils.expression/numerical-expression})
+(s/def ::eexpression (s/keys :req-un [::type ::expression]))
+(s/def ::nu-sy-eex (s/or :ns ::nu-sy :eex ::eexpression))
+
+(s/def ::differential (s/and #(instance?
+                              sicmutils.calculus.derivative.Differential %)
+                            #(s/valid? ::nu-sy-eex (second (first (.terms %))))))
+
+(s/def ::nu-sy-eex-dr (s/or :ns ::nu-sy :dr ::differential :eex ::eexpression))
+
+(s/def ::up-args (s/cat :a-up ::nu-sy-eex-dr-fn-up
+                        :b-up ::nu-sy-eex-dr-fn-up
+                        :c-up (s/? ::nu-sy-eex-dr-fn-up)))
+
+(s/def ::up (s/and #(instance? sicmutils.structure.Structure %)
+                   #(> (count %) 1)
+                   #(< (count %) 4)
+                   #(#{:sicmutils.structure/up} (vl/kind %))
+                   #(s/valid? ::up-args (seq %))))
+
+(s/def ::nu-sy-eex-dr-fn-up (s/or :nse ::nu-sy-eex :fn fn? :up ::up :dr ::differential))
+(s/def ::dow-args (s/cat :a-dow ::nu-sy-eex-dr-fn-up
+                         :b-dow ::nu-sy-eex-dr-fn-up
+                         :c-dow (s/? ::nu-sy-eex-dr-fn-up)))
+
+(s/def ::dow (s/and #(instance? sicmutils.structure.Structure %)
+                    #(> (count %) 1)
+                    #(< (count %) 4)
+                    #(#{:sicmutils.structure/down} (vl/kind %))
+                    #(s/valid? ::dow-args (seq %))))
+
+(s/def ::nu-sy-eex-dr-fn-up-dow (s/or :nsedfu ::nu-sy-eex-dr-fn-up :dow ::dow))
+
+(s/def ::sfunction #(instance? sicmutils.function.Function %))
+(s/def ::nu-sy-eex-dr-fn-up-sfn (s/or :nsedfu ::nu-sy-eex-dr-fn-up :sf ::sfunction))
+(s/def ::up-fnargs (s/cat :a-uf ::nu-sy-eex-dr-fn-up-sfn
+                          :opt (s/? (s/cat
+                                     :b-uf ::nu-sy-eex-dr-fn-up-sfn
+                                     :c-uf (s/? ::nu-sy-eex-dr-fn-up-sfn)))))
+:book-examples/up-fnargs
+(s/fdef ny/mul :args (s/cat :a-mul ::expression :b-mul ::expression))
+(s/fdef gn/bin* :args (s/cat :a-bmul ::nu-sy-eex-dr-fn-up-dow :b-bmul ::nu-sy-eex-dr-fn-up-dow))
+(s/fdef ny/add :args (s/cat :a-add ::expression :b-add ::expression))
+(s/fdef gn/bin+ :args (s/cat :a-badd ::nu-sy-eex-dr-fn-up :b-badd ::nu-sy-eex-dr-fn-up))
+(s/fdef ny/sub :args (s/cat :a-sub ::expression :b-sub ::expression))
+(s/fdef gn/bin- :args (s/cat :a-sub ::nu-sy-eex-dr-fn-up-dow :b-sub ::nu-sy-eex-dr-fn-up-dow))
+(s/fdef ny/div :args (s/cat :a-div ::expression :b-div ::expression))
+(s/fdef gn/bin-div :args (s/cat :a-bdiv ::nu-sy-eex-dr-fn-up :b-bdiv ::nu-sy-eex-dr-fn-up))
+(s/fdef gn/square :args (s/cat :a-squre (s/or :nse ::nu-sy-eex :up ::up :dr ::differential)))
+(s/fdef ny/expt :args (s/cat :a-expt (s/or :dr ::differential :up ::up :exp ::expression) :expt2 int?))
+(s/fdef ny/sine :args (s/cat :a (s/or :dr ::differential :ex ::expression)))
+(s/fdef gn/sin :args (s/cat :a ::nu-sy-eex-dr))
+(s/fdef ny/cosine :args (s/cat :a (s/or :dr ::differential :ex ::expression)))
+(s/fdef gn/cos :args (s/cat :a ::nu-sy-eex-dr))
+(s/fdef st/up :args ::up-fnargs)
+
+(s/fdef lg/Lagrangian-action
+  :args (s/cat :lagrangian fn? :test-path fn? :start-time number? :end-time number?))
+
+(s/fdef mn/minimize
+  :args (s/alt
+         :three (s/cat :a3-min fn? :b3-min number? :c3-min number?)
+         :four (s/cat :a4-min fn? :b4-min number? :c4-min number? :d4-min any?)))
+
+(s/fdef lg/make-path :args
+        (s/cat :t0 number? :q0 number?
+               :t1 number? :q1 number?
+               :qs (s/spec #(s/valid? (s/+ number?) (into [] %)))))
+
+(s/fdef lg/parametric-path-action :args
+        (s/cat :a1 fn? :a2 number? :a3 number? :a4 number? :a5 number?))
+
+(s/fdef mn/multidimensional-minimize :args
+        (s/alt :two (s/cat :a1 fn? :a2 (s/spec (s/+ number?)))
+               :three (s/cat :a1 fn? :a2 (s/spec (s/+ number?)) :a3 any?)))
+
+(s/fdef lg/find-path :args (s/cat :a1 fn? :a2 number?
+                                  :a3 number? :a4 number? :a5 number? :a6 int?))
+
+(s/fdef lg/linear-interpolants :args (s/cat :a1 number? :a2 number? :a3 int?))
+(s/fdef lg/L-harmonic :args (s/cat :a1 ::nu-sy :a2 ::nu-sy))
+(s/fdef lg/Lagrange-equations :args (s/cat :a1 fn?))
+(s/fdef lg/L-uniform-acceleration :args (s/cat :a1 ::nu-sy :a2 ::nu-sy))
+(s/fdef lg/L-central-rectangular :args
+        (s/cat :a1 ::nu-sy-eex :a2 (s/or :o1 ::sfunction :o2 fn?)))
+
+(s/fdef lg/L-central-polar :args
+        (s/cat :a1 ::nu-sy-eex :a2 (s/or :o1 ::sfunction :o2 fn?)))
+
+(s/fdef lg/F->C :args (s/cat :a fn?))
+(s/fdef lg/L-free-particle :args (s/cat :a ::nu-sy))
+(s/fdef lg/Gamma :args (s/cat :a fn?))
+(s/fdef lg/->local :args (s/cat :a symbol?
+                                :b (s/or :s symbol? :u ::up)
+                                :c (s/or :s symbol? :u ::up)))
+sicmutils.mechanics.lagrange/->local
+(s/def ::up-down-expression
+  (s/and seq?
+         #(> (count %) 2)
+         #(< (count %) 5)
+         (s/cat :a-udex #{'up 'down}
+                :rest (s/+ (s/or :e ::expression :udex ::up-down-expression)))))
+
+;;simplify-spec-full is not used, it checks the result of a simplify call
+;;but this check would not be deactiveted with (ts/unstrument)
+(defn simplify-spec-full [x]
+      (let [s (ts/with-instrument-disabled (gn/simplify x))]
+          (do
+              (if-not  (s/valid? (s/or :e ::expression :udex ::up-down-expression) s)
+                (throw (Exception. "simplify result does not conform to spec")))
+              s)))
+
+(defn simplify-spec [x]
+ (ts/with-instrument-disabled (gn/simplify x)))
+
+(s/fdef simplify-spec :args (s/cat :a (s/or :e ::eexpression :u ::up :d ::dow)))
+book-examples/simplify-spec
+If you like to activate spec: (ts/instrument) If you like to deactivate spec: (ts/unstrument)
+
+;;(ts/instrument)
+
