@@ -7,9 +7,31 @@
 (define-coordinates t e/R1-rect)
 #+end_src
 
-* Short tutorial
+* Tutorial Page 1/2
 
-This is a tutorial
+(1) The most important thing is the left arrow "<" button. It brings you back to this tutorial.
+
+(2) Go to the next page with ">". (back with "<")
+
+(3) Scroll down. Do not miss some tutorial step at the bottom left or top right!
+
+(4) Execute this workspace with "Run". (back with "<")
+
+(5) You just saw some formula for polar coordinates. Have you memorized it? Let's find out!
+
+(6) Press "Get the Puzzle". (back with "<")
+
+(7) "Get the Puzzle" but come back via "Run" + "Clear output".
+
+(8) In the workspace above, you should see several blocks containing white slots.
+
+(9) Press "Run" and hold the "Color" button. (back via "Clear output")
+
+(10) On the top of the workspace, put "phi" into the slot of "sin".
+
+(11) Repeat step (9), the "(sin 'phi)" line should turn green.
+
+(12) Make the lines more and more green by solving the workspace puzzle (keep pressing "Color"!). The code below might help.  When upon completion the ">" button turns green, press it immediately.
 
 #+begin_src clojure
 (->tex-equation
@@ -52,6 +74,20 @@ This is a tutorial
   (def coordinates coordinate)
   (def vector-length count)
   (defn time [state] (first state))
+#+end_src
+
+* Tutorial Page 2/2
+
+(1) Notice that the drop down list above shows a second chapter named "Lyrics".
+
+(2) Press ">" a few times and note the generic text. Read it. (back to this page with "<")
+
+(3) From this page, after having pressed "Get the Puzzle" + "Color", again press ">".
+
+(4) Via the drop down, go to the chaper "Lyrics", press "<"+ "Color" + ">".
+
+#+begin_src clojure
+"Tutorial Page 2/2"
 #+end_src
 
 * Chapter 1: Introduction
