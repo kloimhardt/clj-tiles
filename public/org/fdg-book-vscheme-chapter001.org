@@ -9,6 +9,8 @@
 
 * Tutorial Page 1/2
 
+(0) https://kloimhardt.github.io/markus.html#b for general information
+
 (1) The most important thing is the left arrow "<" button. It brings you back to this tutorial.
 
 (2) Go to the next page with ">". (back with "<")
